@@ -6,8 +6,8 @@ import time
 import pygame, sys
 from pygame.locals import *
 
-TIMESTEPS = 20
-SLEEP_DELAY = 1
+TIMESTEPS = 100
+SLEEP_DELAY = .1
 STEER_ACTION = 15.0
 ACC_ACTION = 2.0
 FPS = 30
@@ -29,9 +29,9 @@ def process_keys():
     elif keys[pygame.K_DOWN]:
         action_dict['acc'] = -ACC_ACTION
     if keys[pygame.K_LEFT]:
-        action_dict['steer'] = STEER_ACTION
-    elif keys[pygame.K_RIGHT]:
         action_dict['steer'] = -STEER_ACTION
+    elif keys[pygame.K_RIGHT]:
+        action_dict['steer'] = +STEER_ACTION
     return action_dict
 
 if __name__ == '__main__':
@@ -80,7 +80,7 @@ if __name__ == '__main__':
         CAR_X = next_state['main_car']['x']
         CAR_Y = next_state['main_car']['y']
         CAR_ANGLE = next_state['main_car']['angle']
-        car_image_update = pygame.transform.rotate(car_image, CAR_ANGLE)
+        car_image_update = pygame.transform.rotate(car_image, -CAR_ANGLE)
         screen.blit(car_image_update, (CAR_X, CAR_Y))
 
         pygame.display.update()
