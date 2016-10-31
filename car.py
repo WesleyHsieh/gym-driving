@@ -36,7 +36,7 @@ class Car:
             'acc': Acceleration.
         :return: None
         """
-        self.angle = self.angle - action_dict['steer']
+        self.angle = self.angle + action_dict['steer']
         self.angle %= 360.0
         self.acc = action_dict['acc']
 
