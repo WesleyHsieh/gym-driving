@@ -56,4 +56,8 @@ class Car:
         state_dict['angle'] = self.angle
         return state_dict
 
+    def get_xpos(self):
+        return self.x
 
+    def get_ypos(self):
+        return self.y
