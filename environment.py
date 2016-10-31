@@ -12,7 +12,7 @@ class Environment:
 
     def __init__(self, num_cpu_cars=2):
         #TODO: Randomize car locations
-        self.main_car = Car(0, 187.5, 0.0)
+        self.main_car = Car(0, 187, 0.0)
         self.vehicles = [Car(0.0, 0.0, 0.0) for _ in range(num_cpu_cars)]
         self.terrain = []
 
