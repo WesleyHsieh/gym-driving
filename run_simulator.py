@@ -96,12 +96,10 @@ if __name__ == '__main__':
 
         # Update SCREEN_COORD
         SCREEN_COORD = (next_state['main_car']['x'] - 256, next_state['main_car']['y'] - 256)
-        print(SCREEN_COORD)
 
         # Draw tiles that screen is in
         for coord in GRASS_COORD:
             if coord[0] - SCREEN_COORD[0] < 512 and coord[1] - SCREEN_COORD[1] < 512:
-                print('true')
                 screen.blit(grass_tile, (coord[0] - SCREEN_COORD[0], coord[1] - SCREEN_COORD[1]))
         for coord in ROAD_COORD:
             if coord[0] - SCREEN_COORD[0] < 512 and coord[1] - SCREEN_COORD[1] < 512:
