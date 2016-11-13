@@ -6,14 +6,12 @@ class Environment:
     Coordinates updates to participants
     in environment. Interactions should
     be done through simulator wrapper class.
-
-    TODO: PyGame graphics
     """
 
     def __init__(self, num_cpu_cars=2):
         #TODO: Randomize car locations
-        self.main_car = Car(256, 256, 0.0)
-        self.vehicles = [Car(0.0, 0.0, 0.0) for _ in range(num_cpu_cars)]
+        self.main_car = Car(256, 256)
+        self.vehicles = [Car(0.0, 0.0) for _ in range(num_cpu_cars)]
         self.terrain = []
 
     def step(self):

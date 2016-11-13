@@ -1,18 +1,14 @@
 import numpy as np
+from rectangle import Rectangle
 
-class Car:
+class Car(Rectangle):
     """
     Car object.
     """
-    def __init__(self, x, y, angle, car_width=50, car_length=25):
-        self.x = x
-        self.y = y
+    def __init__(self, x, y, width=50, length=25, angle=0.0):
+        super(Rectangle, self).__init__(x, y, w, h, angle)
         self.vel = 0.0
         self.acc = 0.0
-        self.angle = angle
-        self.car_width = car_width
-        length = car_length
-        self.car_length = length
 
     def step(self, t=1):
         """

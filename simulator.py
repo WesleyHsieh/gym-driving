@@ -5,6 +5,7 @@ class Simulator:
     """
     Generic wrapper class for simulating
     environments.
+    TODO: Make compatible with OpenAI Gym interface.
     """
     def __init__(self):
         self.environment = Environment()
