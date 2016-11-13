@@ -4,8 +4,8 @@ class Terrain(Rectangle):
     """
     Terrain for environment.
     """
-    def __init__(self, x, y, w, h, angle=0.0):
-    	super(Rectangle, self).__init__(x, y, w, h, angle)
+    def __init__(self, x, y, width, length, angle=0.0):
+    	super(Terrain, self).__init__(x, y, width, length, angle)
     
 
 

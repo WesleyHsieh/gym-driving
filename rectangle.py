@@ -1,6 +1,6 @@
 import numpy as np
 
-class Rectangle:
+class Rectangle(object):
     def __init__(self, x, y, width=50, length=25, angle=0.0):
         self.x = x
         self.y = y

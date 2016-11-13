@@ -5,10 +5,11 @@ class Car(Rectangle):
     """
     Car object.
     """
-    def __init__(self, x, y, width=50, length=25, angle=0.0):
-        super(Rectangle, self).__init__(x, y, w, h, angle)
+    def __init__(self, x, y, width=50, length=25, angle=0.0, max_vel=10.0):
+        super(Car, self).__init__(x, y, width, length, angle)
         self.vel = 0.0
         self.acc = 0.0
+        self.max_vel = max_vel
 
     def step(self, t=1):
         """
@@ -23,6 +24,7 @@ class Car(Rectangle):
         self.x += dx
         self.y += dy
         self.vel += self.acc
+        self.vel = max(min(self.vel, self.max_vel), 0.0)
 
     def take_action(self, action_dict):
         """
@@ -35,6 +37,7 @@ class Car(Rectangle):
         self.angle = self.angle + action_dict['steer']
         self.angle %= 360.0
         self.acc = action_dict['acc']
+        self.acc = max(min(self.acc, self.max_vel - self.vel), -self.vel)
 
     def get_pos(self):
         """
