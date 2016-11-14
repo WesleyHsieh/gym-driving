@@ -8,9 +8,9 @@ class Environment:
     be done through simulator wrapper class.
     """
 
-    def __init__(self, num_cpu_cars=2):
+    def __init__(self, screen_size, num_cpu_cars=2):
         #TODO: Randomize car locations
-        self.main_car = Car(256, 256)
+        self.main_car = Car(screen_size[0]/2, screen_size[1]/2)
         self.vehicles = [Car(0.0, 0.0) for _ in range(num_cpu_cars)]
         self.terrain = []
 
