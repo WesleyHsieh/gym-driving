@@ -6,8 +6,9 @@ from terrain import *
 import time
 import pygame, sys
 from pygame.locals import *
+import random
 
-TIMESTEPS = 200
+TIMESTEPS = 150
 SLEEP_DELAY = .05
 STEER_ACTION = 15.0
 ACC_ACTION = 2.0
@@ -45,9 +46,20 @@ if __name__ == '__main__':
     pygame.display.set_caption('Driving Simulator')
 
     # Add the terrain
-    TERRAINS.append(Terrain(-4096, -4096, 8192, 4224, 'grass', screen, SCREEN_SIZE))
-    TERRAINS.append(Terrain(-4096, 128, 8192, 256, 'road', screen, SCREEN_SIZE))
-    TERRAINS.append(Terrain(-4096, 384, 8192, 4224, 'grass', screen, SCREEN_SIZE))
+    TERRAINS.append(Terrain(-2048, -2048, 4096, 1792, 'dirt', screen, SCREEN_SIZE))
+    TERRAINS.append(Terrain(-2048, -256, 4096, 128, 'patchy', screen, SCREEN_SIZE))
+    TERRAINS.append(Terrain(-2048, -128, 4096, 256, 'grass', screen, SCREEN_SIZE))
+    for i in random.sample(xrange(0, 32), 12):
+        TERRAINS.append(Terrain(-2048 + i*128, -128 + (i%2) * 128, 128, 128, 'icegrass', screen, SCREEN_SIZE))
+    TERRAINS.append(Terrain(-2048, 128, 4096, 256, 'road', screen, SCREEN_SIZE))
+    for i in random.sample(xrange(0, 32), 8):
+        TERRAINS.append(Terrain(-2048 + i*128, 128 + (i%2) * 128, 128, 128, 'ice', screen, SCREEN_SIZE))
+    TERRAINS.append(Terrain(-2048, 384, 4096, 256, 'grass', screen, SCREEN_SIZE))
+    for i in random.sample(xrange(0, 32), 12):
+        TERRAINS.append(Terrain(-2048 + i*128, 384 + (i%2) * 128, 128, 128, 'icegrass', screen, SCREEN_SIZE))
+    TERRAINS.append(Terrain(-2048, 640, 4096, 128, 'patchy', screen, SCREEN_SIZE))
+    TERRAINS.append(Terrain(-2048, 768, 4096, 1792, 'dirt', screen, SCREEN_SIZE))
+
     for t in TERRAINS:
         t.update_graphics(SCREEN_COORD)
 

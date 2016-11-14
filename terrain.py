@@ -18,6 +18,14 @@ class Terrain(Rectangle):
             self.texture = pygame.image.load('images/road_tile_lite.jpg')
         elif texture == 'grass':
             self.texture = pygame.image.load('images/grass_tile_lite.jpg')
+        elif texture == 'patchy':
+            self.texture = pygame.image.load('images/patchy_tile_lite.jpg')
+        elif texture == 'dirt':
+            self.texture = pygame.image.load('images/dirt_tile_lite.jpg')
+        elif texture == 'ice':
+            self.texture = pygame.image.load('images/ice_tile_lite.jpg')
+        elif texture == 'icegrass':
+            self.texture = pygame.image.load('images/icegrass_tile_lite.jpg')
         else:
             print('Error: invalid texture')
         self.screen = screen
