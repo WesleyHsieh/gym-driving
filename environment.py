@@ -11,7 +11,7 @@ class Environment:
     def __init__(self, screen_size, num_cpu_cars=2):
         #TODO: Randomize car locations
         self.main_car = Car(screen_size[0]/2, screen_size[1]/2)
-        self.vehicles = [Car(0.0, 0.0) for _ in range(num_cpu_cars)]
+        self.vehicles = [Car(screen_size[0]/2, screen_size[1]/2) for _ in range(num_cpu_cars)]
         self.terrain = []
 
     def step(self):
@@ -31,11 +31,13 @@ class Environment:
             'main_car': Position of main car.
             'other_cars': Position of other cars.
         """
-        #TODO: Collision detection
         state_dict = {}
         state_dict['main_car'] = self.main_car.get_state()
         state_dict['other_cars'] = [vehicle.get_state() for vehicle in self.vehicles]
-        return state_dict
+        state_dict['collisions'] = [self.main_car.collide_rect(car) for car in self.vehicles]
+        state_dict['num_collisions'] = sum(state_dict['collisions'])
+        done = False
+        return state_dict, done
 
     def take_action(self, action):
         """
@@ -45,8 +47,8 @@ class Environment:
         :return: array
             Reward.
         """
-        #TODO: Reward
         self.main_car.take_action(action)
         self.step()
-        reward = None
-        return reward
+        state_dict, done = self.get_state()
+        reward = -state_dict['num_collisions']
+        return state_dict, reward, done

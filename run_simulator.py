@@ -55,7 +55,7 @@ if __name__ == '__main__':
     car_image = pygame.image.load('images/car.png')
     screen.blit(car_image, (CAR_X, CAR_Y))
 
-    simulator = Simulator(SCREEN_SIZE)
+    simulator = DrivingEnv(SCREEN_SIZE)
     states, actions, rewards = [], [], []
 
     for t in range(TIMESTEPS):
@@ -67,27 +67,23 @@ if __name__ == '__main__':
 
         # Clear the screen
         screen.fill(WHITE)
-
-        state = simulator.get_state()
-
         key = pygame.key.get_pressed()
         action = process_keys()
 
-        reward = simulator.take_action(action)
-        next_state = simulator.get_state()
+        state, reward, done, info_dict = simulator._step(action)
 
         states.append(state)
         actions.append(action)
         rewards.append(reward)
         print "State, Action, Next State"
-        print state
+        print states[t-1]
         print action
-        print next_state
+        print states[t]
 
         # Update Car Location
-        CAR_X = next_state['main_car']['x']
-        CAR_Y = next_state['main_car']['y']
-        CAR_ANGLE = next_state['main_car']['angle']
+        CAR_X = state['main_car']['x']
+        CAR_Y = state['main_car']['y']
+        CAR_ANGLE = state['main_car']['angle']
         car_image_update = pygame.transform.rotate(car_image, -CAR_ANGLE)
 
         # Update SCREEN_COORD
@@ -104,7 +100,7 @@ if __name__ == '__main__':
         fpsClock.tick(FPS)
 
         if t == TIMESTEPS - 1:
-            states.append(next_state)
+            states.append(state)
         time.sleep(SLEEP_DELAY)
 
     #print "States"
