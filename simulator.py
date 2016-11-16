@@ -95,8 +95,7 @@ class DrivingEnv(gym.Env):
         #     self.steps_beyond_done += 1
         #     reward = 0.0
         
-        reward = self.environment.take_action(action)
-        state, done = self.environment.get_state()
+        state, reward, done = self.environment.take_action(action)
         info_dict = {}
         print state, reward, done, info_dict
         return state, reward, done, info_dict
@@ -155,8 +154,3 @@ class DrivingEnv(gym.Env):
         # cartx = x[0]*scale+screen_width/2.0 # MIDDLE OF CART
         # self.carttrans.set_translation(cartx, carty)
         # self.poletrans.set_rotation(-x[2])
-
-    def take_action(self, action):
-        reward = self.environment.take_action(action)
-        return reward
-        # return self.viewer.render(return_rgb_array = mode=='rgb_array')
