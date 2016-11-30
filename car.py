@@ -5,11 +5,12 @@ class Car(Rectangle):
     """
     Car object.
     """
-    def __init__(self, x, y, width=50, length=25, angle=0.0, max_vel=10.0):
+    def __init__(self, x, y, width=50, length=25, angle=0.0, max_vel=10.0, mass=100.0):
         super(Car, self).__init__(x, y, width, length, angle)
         self.vel = 0.0
         self.acc = 0.0
         self.max_vel = max_vel
+        self.mass = mass
 
     def step(self, t=1):
         """
