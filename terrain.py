@@ -14,20 +14,20 @@ class Terrain(Rectangle):
     """
     def __init__(self, x, y, width, length, texture, screen, screen_size, angle=0.0):
     	super(Terrain, self).__init__(x, y, width, length, angle)
-        if texture == 'road':
-            self.texture = pygame.image.load('images/road_tile_lite.jpg')
-        elif texture == 'grass':
-            self.texture = pygame.image.load('images/grass_tile_lite.jpg')
-        elif texture == 'patchy':
-            self.texture = pygame.image.load('images/patchy_tile_lite.jpg')
-        elif texture == 'dirt':
-            self.texture = pygame.image.load('images/dirt_tile_lite.jpg')
-        elif texture == 'ice':
-            self.texture = pygame.image.load('images/ice_tile_lite.jpg')
-        elif texture == 'icegrass':
-            self.texture = pygame.image.load('images/icegrass_tile_lite.jpg')
+        self.terrain_properties = {
+            'road': {'decel': 0, 'slip': 0},
+            'grass': {'decel': 1, 'slip': 0},
+            'patchy': {'decel': 1, 'slip': 0},
+            'dirt': {'decel': 2, 'slip': 0},
+            'ice': {'decel': 0, 'slip': 1},
+            'icegrass': {'decel': 1, 'slip': 1},
+        }
+        if texture in self.terrain_properties:
+            self.texture = pygame.image.load('images/{}_tile_lite.jpg'.format(texture))
         else:
             print('Error: invalid texture')
+        self.decel = self.terrain_properties[texture]['decel']
+        self.slip = self.terrain_properties[texture]['slip']
         self.screen = screen
         self.screen_size = screen_size
         self.tile_coords = []

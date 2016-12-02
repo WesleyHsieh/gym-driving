@@ -8,7 +8,7 @@ import pygame, sys
 from pygame.locals import *
 import random
 
-TIMESTEPS = 150
+TIMESTEPS = 1500
 SLEEP_DELAY = .05
 STEER_ACTION = 15.0
 ACC_ACTION = 2.0
@@ -69,7 +69,7 @@ if __name__ == '__main__':
     car_image = pygame.image.load('images/car.png')
     screen.blit(car_image, (CAR_X, CAR_Y))
 
-    simulator = DrivingEnv(SCREEN_SIZE)
+    simulator = DrivingEnv(SCREEN_SIZE, TERRAINS)
     states, actions, rewards = [], [], []
 
     for t in range(TIMESTEPS):
@@ -116,10 +116,3 @@ if __name__ == '__main__':
         if t == TIMESTEPS - 1:
             states.append(state)
         time.sleep(SLEEP_DELAY)
-
-    #print "States"
-    #print states
-    #print "Actions"
-    #print actions
-    #print "Rewards"
-    #print rewards

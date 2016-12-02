@@ -8,12 +8,12 @@ class Environment:
     be done through simulator wrapper class.
     """
 
-    def __init__(self, screen_size, num_cpu_cars=2):
+    def __init__(self, screen_size, terrain=[], num_cpu_cars=2):
         #TODO: Randomize car locations
         self.main_car = Car(screen_size[0]/2, screen_size[1]/2)
         self.vehicles = [Car(screen_size[0]/2, screen_size[1]/2) for _ in range(num_cpu_cars)]
-        self.terrain = []
-
+        self.terrain = terrain
+        
     def step(self):
         """
         Updates environment by one timestep.
@@ -48,7 +48,8 @@ class Environment:
         :return: array
             Reward.
         """
-        self.main_car.take_action(action)
+        terrain_collisions = [terrain for terrain in self.terrain if self.main_car.collide_rect(terrain)]
+        self.main_car.take_action(action, terrain_collisions)
         self.step()
         state_dict, done = self.get_state()
         reward = -state_dict['num_car_collisions']

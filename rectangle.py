@@ -32,7 +32,7 @@ class Rectangle(object):
         """
         corners = self.get_corners()
         other_corners = other_rect.get_corners()
-        return any([self.contains_point(point) for point in other_corners]) and \
+        return any([self.contains_point(point) for point in other_corners]) or \
             any([other_rect.contains_point(point) for point in corners])
 
     def contains_point(self, point):

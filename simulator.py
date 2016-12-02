@@ -21,8 +21,8 @@ class DrivingEnv(gym.Env):
     #     'video.frames_per_second' : 50
     # }
 
-    def __init__(self, screen_size):
-        self.environment = Environment(screen_size)
+    def __init__(self, screen_size, terrain):
+        self.environment = Environment(screen_size, terrain)
         # self.gravity = 9.8
         # self.masscart = 1.0
         # self.masspole = 0.1
