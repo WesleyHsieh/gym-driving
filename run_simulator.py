@@ -8,10 +8,10 @@ import pygame, sys
 from pygame.locals import *
 import random
 
-TIMESTEPS = 1000
+TIMESTEPS = 10000
 SLEEP_DELAY = .05
 STEER_ACTION = 15.0
-ACC_ACTION = 2.0
+ACC_ACTION = 5.0
 FPS = 30
 SCREEN_SIZE = (512, 512)
 SCREEN_COORD = (0, 0)
@@ -38,6 +38,15 @@ def process_keys():
         action_dict['steer'] = +STEER_ACTION
     return action_dict
 
+def draw_box_coords(rectangle, screen, SCREEN_COORD):
+    corners = rectangle.get_corners()
+    for c in corners:
+        pos = (int(c[0] - SCREEN_COORD[0]), int(c[1] - SCREEN_COORD[1]))
+        pygame.draw.circle(screen, 0, pos, 5, 0)
+    c = rectangle.get_pos()
+    pos = (int(c[0] - SCREEN_COORD[0]), int(c[1] - SCREEN_COORD[1]))
+    pygame.draw.circle(screen, 0, pos, 5, 0)
+
 if __name__ == '__main__':
     # PyGame initilizations
     pygame.init()
@@ -46,11 +55,13 @@ if __name__ == '__main__':
     pygame.display.set_caption('Driving Simulator')
 
     # Add the terrain
+    #TERRAINS.append(Terrain(-2048, -256, 1024, 128, 'road', screen, SCREEN_SIZE))
+    
     TERRAINS.append(Terrain(-2048, -256, 8192, 128, 'road', screen, SCREEN_SIZE))
     TERRAINS.append(Terrain(-2048, -128, 8192, 128, 'grass', screen, SCREEN_SIZE))
     TERRAINS.append(Terrain(-2048, 0, 8192, 128, 'road', screen, SCREEN_SIZE))
-    for i in random.sample(xrange(0, 64), 16):
-        TERRAINS.append(Terrain(-2048 + i*128, 0, 128, 128, 'ice', screen, SCREEN_SIZE))
+    # for i in random.sample(xrange(0, 64), 16):
+    #     TERRAINS.append(Terrain(-2048 + i*128, 0, 128, 128, 'ice', screen, SCREEN_SIZE))
     TERRAINS.append(Terrain(-2048, 128, 8192, 128, 'grass', screen, SCREEN_SIZE))
     TERRAINS.append(Terrain(-2048, 256, 8192, 128, 'dirt', screen, SCREEN_SIZE))
     TERRAINS.append(Terrain(-2048, 384, 8192, 128, 'grass', screen, SCREEN_SIZE))
@@ -91,10 +102,10 @@ if __name__ == '__main__':
         states.append(state)
         actions.append(action)
         rewards.append(reward)
-        print "State, Action, Next State"
-        print states[t-1]
-        print action
-        print states[t]
+        # print "State, Action, Next State"
+        # print states[t-1]
+        # print action
+        # print states[t]
 
         # Update Car Location
         CAR_X = state['main_car']['x']
@@ -108,12 +119,26 @@ if __name__ == '__main__':
         # Update terrain graphics
         for t in TERRAINS:
             t.update_graphics(SCREEN_COORD)
+            draw_box_coords(t, screen, SCREEN_COORD)
+
 
         # Update car graphics
-        screen.blit(car_image_update, tuple(x/2 for x in SCREEN_SIZE))
+        # TODO: Blit currently maps to top left corner
+        car = simulator.environment.main_car
+        corners = car.get_corners()
+        center = car.get_pos()
+        top_left = corners[0]
+        x_offset, y_offset = top_left[0] - center[0], top_left[1] - center[1]
+        new_pos = (int(SCREEN_SIZE[0] / 2 - x_offset), int(SCREEN_SIZE[1] / 2 - y_offset))
+        screen.blit(car_image_update, new_pos)
+
+        # Debug
+        # circle(Surface, color, pos, radius, width=0)
+        draw_box_coords(simulator.environment.main_car, screen, SCREEN_COORD)
 
         pygame.display.update()
         fpsClock.tick(FPS)
+
 
         if t == TIMESTEPS - 1:
             states.append(state)

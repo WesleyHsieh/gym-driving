@@ -97,7 +97,7 @@ class DrivingEnv(gym.Env):
         
         state, reward, done = self.environment.take_action(action)
         info_dict = {}
-        print state, reward, done, info_dict
+        # print state, reward, done, info_dict
         return state, reward, done, info_dict
         
     def _reset(self):

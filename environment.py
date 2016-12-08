@@ -22,6 +22,7 @@ class Environment:
         self.main_car.step()
         for vehicle in self.vehicles:
             vehicle.step()
+        print 'terrain pos', self.terrain[0].get_corners()
 
     def get_state(self):
         """

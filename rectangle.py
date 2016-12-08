@@ -8,18 +8,26 @@ class Rectangle(object):
         self.width = width
         self.length = length
 
+    def get_pos(self):
+        """
+        Returns x, y coordinates.
+        :return: tuple
+            x, y coordinates.
+        """
+        return self.x, self.y
+        
     def get_corners(self):
         """"
         Returns corners of rectangle. 
         :return: None
         """
-        angle = self.angle
+        angle = np.radians(self.angle)
         corner_offsets = np.array([self.width / 2.0, self.length / 2.0])
         centers = np.array([self.x, self.y])
         signs = np.array([[1,1], [1,-1], [-1,1], [-1,-1]])
-        corners = centers + signs * corner_offsets
+        corner_offsets = signs * corner_offsets
         rotation_mat = np.array([[np.cos(angle), -np.sin(angle)], [np.sin(angle), np.cos(angle)]])
-        rotated_corners = np.dot(corners, rotation_mat.T)
+        rotated_corners = np.dot(corner_offsets, rotation_mat.T) + centers
         return rotated_corners
 
     def collide_rect(self, other_rect):

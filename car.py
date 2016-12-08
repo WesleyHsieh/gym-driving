@@ -39,23 +39,21 @@ class Car(Rectangle):
         # Get properties of terrain that the car is currently on
         decel = np.sum([t.decel for t in terrain_collisions])
         slip = np.sum([t.slip for t in terrain_collisions])
+        print "collision textures", [t.texture for t in terrain_collisions]
         print "decel", decel
         print "slip", slip
+        print 'vel', self.vel
+        print 'angle', self.angle
+        print 'width, length', self.width, self.length
+        print 'x,y', self.x, self.y
+        print 'corners', self.get_corners()
 
-        if slip == 0:
-            self.vel_angle = self.angle
         self.angle += action_dict['steer']
         self.angle %= 360.0
+        if slip == 0:
+            self.vel_angle = self.angle
         self.acc = action_dict['acc'] - decel
         self.acc = max(min(self.acc, self.max_vel - self.vel), -self.vel)
-
-    def get_pos(self):
-        """
-        Returns x, y coordinates.
-        :return: tuple
-            x, y coordinates.
-        """
-        return self.x, self.y
 
     def get_state(self):
         state_dict = {}
