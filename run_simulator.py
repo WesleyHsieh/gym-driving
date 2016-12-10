@@ -25,7 +25,12 @@ TERRAINS = []
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GRAPHICS_MODE = True
-CONTROLLER_MODE = 'xbox'
+CONTROLLER_MODE = 'keyboard'
+"""
+Controller Mode:
+keyboard: Up/Down to accelerate, Left/Right to steer
+xbox: Left stick up/down to accelerate, right stick left/right to steer
+"""
 
 def draw_box_coords(rectangle, screen, SCREEN_COORD):
     corners = rectangle.get_corners()

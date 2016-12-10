@@ -5,7 +5,7 @@ import sys
 
 
 class XboxController:
-    def __init__(self,scales = [1,1,1,1]):
+    def __init__(self,scales = [1.0,1.0,1.0,1.0]):
         pygame.init()
         pygame.joystick.init()
         self.controller = pygame.joystick.Joystick(0)
