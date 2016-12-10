@@ -2,6 +2,7 @@ from car import *
 from environment import *
 from simulator import *
 from terrain import *
+from controller import *
 
 import time
 import pygame, sys
@@ -10,8 +11,8 @@ import random
 
 TIMESTEPS = 10000
 SLEEP_DELAY = .05
-STEER_ACTION = 15.0
 ACC_ACTION = 5.0
+STEER_ACTION = 15.0
 FPS = 30
 SCREEN_SIZE = (512, 512)
 SCREEN_COORD = (0, 0)
@@ -23,20 +24,8 @@ TERRAINS = []
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-
-def process_keys():
-    action_dict = {'steer': 0.0, 'acc': 0.0}
-    pygame.event.pump()
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_UP]:
-        action_dict['acc'] = ACC_ACTION
-    elif keys[pygame.K_DOWN]:
-        action_dict['acc'] = -ACC_ACTION
-    if keys[pygame.K_LEFT]:
-        action_dict['steer'] = -STEER_ACTION
-    elif keys[pygame.K_RIGHT]:
-        action_dict['steer'] = +STEER_ACTION
-    return action_dict
+GRAPHICS_MODE = True
+CONTROLLER_MODE = 'xbox'
 
 def draw_box_coords(rectangle, screen, SCREEN_COORD):
     corners = rectangle.get_corners()
@@ -48,11 +37,14 @@ def draw_box_coords(rectangle, screen, SCREEN_COORD):
     pygame.draw.circle(screen, 0, pos, 5, 0)
 
 if __name__ == '__main__':
-    # PyGame initilizations
+    # PyGame initializations
     pygame.init()
     fpsClock = pygame.time.Clock()
-    screen = pygame.display.set_mode(SCREEN_SIZE)
-    pygame.display.set_caption('Driving Simulator')
+    if GRAPHICS_MODE:
+        screen = pygame.display.set_mode(SCREEN_SIZE)
+        pygame.display.set_caption('Driving Simulator')
+    else:
+        screen = None
 
     # Add the terrain
     #TERRAINS.append(Terrain(-2048, -256, 1024, 128, 'road', screen, SCREEN_SIZE))
@@ -66,22 +58,24 @@ if __name__ == '__main__':
     TERRAINS.append(Terrain(-2048, 256, 8192, 128, 'dirt', screen, SCREEN_SIZE))
     TERRAINS.append(Terrain(-2048, 384, 8192, 128, 'grass', screen, SCREEN_SIZE))
 
-    '''
+
     for i in random.sample(xrange(0, 32), 12):
         TERRAINS.append(Terrain(-2048 + i*128, -128 + (i%2) * 128, 128, 128, 'icegrass', screen, SCREEN_SIZE))
     for i in random.sample(xrange(0, 32), 8):
         TERRAINS.append(Terrain(-2048 + i*128, 128 + (i%2) * 128, 128, 128, 'ice', screen, SCREEN_SIZE))
     for i in random.sample(xrange(0, 32), 12):
         TERRAINS.append(Terrain(-2048 + i*128, 384 + (i%2) * 128, 128, 128, 'icegrass', screen, SCREEN_SIZE))
-    '''
 
-    for t in TERRAINS:
-        t.update_graphics(SCREEN_COORD)
 
-    # Add the car
-    car_image = pygame.image.load('images/car.png')
-    screen.blit(car_image, (CAR_X, CAR_Y))
+    if GRAPHICS_MODE:
+        for t in TERRAINS:
+            t.update_graphics(SCREEN_COORD)
 
+        # Add the car
+        car_image = pygame.image.load('images/car.png')
+        screen.blit(car_image, (CAR_X, CAR_Y))
+
+    controller = Controller(ACC_ACTION, STEER_ACTION, CONTROLLER_MODE)
     simulator = DrivingEnv(SCREEN_SIZE, TERRAINS)
     states, actions, rewards = [], [], []
 
@@ -92,10 +86,7 @@ if __name__ == '__main__':
                 pygame.quit()
                 sys.exit()
 
-        # Clear the screen
-        screen.fill(WHITE)
-        key = pygame.key.get_pressed()
-        action = process_keys()
+        action = controller.process_input()
 
         state, reward, done, info_dict = simulator._step(action)
 
@@ -111,33 +102,35 @@ if __name__ == '__main__':
         CAR_X = state['main_car']['x']
         CAR_Y = state['main_car']['y']
         CAR_ANGLE = state['main_car']['angle']
-        car_image_update = pygame.transform.rotate(car_image, -CAR_ANGLE)
 
-        # Update SCREEN_COORD
-        SCREEN_COORD = (CAR_X - SCREEN_SIZE[0]/2, CAR_Y - SCREEN_SIZE[1]/2)
+        if GRAPHICS_MODE:
+            # Clear the screen
+            screen.fill(WHITE)
+            car_image_update = pygame.transform.rotate(car_image, -CAR_ANGLE)
 
-        # Update terrain graphics
-        for t in TERRAINS:
-            t.update_graphics(SCREEN_COORD)
-            draw_box_coords(t, screen, SCREEN_COORD)
+            # Update SCREEN_COORD
+            SCREEN_COORD = (CAR_X - SCREEN_SIZE[0]/2, CAR_Y - SCREEN_SIZE[1]/2)
+
+            # Update terrain graphics
+            for t in TERRAINS:
+                t.update_graphics(SCREEN_COORD)
+                draw_box_coords(t, screen, SCREEN_COORD)
 
 
-        # Update car graphics
-        # TODO: Blit currently maps to top left corner
-        car = simulator.environment.main_car
-        corners = car.get_corners()
-        center = car.get_pos()
-        top_left = corners[0]
-        x_offset, y_offset = top_left[0] - center[0], top_left[1] - center[1]
-        new_pos = (int(SCREEN_SIZE[0] / 2 - x_offset), int(SCREEN_SIZE[1] / 2 - y_offset))
-        screen.blit(car_image_update, new_pos)
+            # Update car graphics
+            car = simulator.environment.main_car
+            corners, center, angle = car.get_corners(), car.get_pos(), car.angle
+            x_offset = (np.abs((car.width - car.length) * np.cos(np.radians(angle))) + car.length) / 2
+            y_offset = (np.abs((car.width - car.length) * np.sin(np.radians(angle))) + car.length) / 2
+            new_pos = (int(SCREEN_SIZE[0] / 2 - x_offset), int(SCREEN_SIZE[1] / 2 - y_offset))
+            screen.blit(car_image_update, new_pos)
+            pygame.draw.circle(screen, 0, new_pos, 5, 0)
 
-        # Debug
-        # circle(Surface, color, pos, radius, width=0)
-        draw_box_coords(simulator.environment.main_car, screen, SCREEN_COORD)
+            # Debug
+            draw_box_coords(simulator.environment.main_car, screen, SCREEN_COORD)
 
-        pygame.display.update()
-        fpsClock.tick(FPS)
+            pygame.display.update()
+            fpsClock.tick(FPS)
 
 
         if t == TIMESTEPS - 1:

@@ -5,7 +5,7 @@ import sys
 
 
 class XboxController:
-    def __init__(self,scales = [.3,.01,.01,.01,.01,.01,.01]):
+    def __init__(self,scales = [1,1,1,1]):
         pygame.init()
         pygame.joystick.init()
         self.controller = pygame.joystick.Joystick(0)
@@ -15,19 +15,13 @@ class XboxController:
                                    self.controller.get_axis(1))
         self.rStick = RightStick(self.controller.get_axis(4),
                                      self.controller.get_axis(3))
-        # self.lDpad = RightStick(self.controller.get_axis(5),
-        #                              self.controller.get_axis(5))
-        # dpad directions ordered as up down left_stick right
         dPadDirs = getDirs(self.controller)
         
         self.dPad = DPad(dPadDirs)
-        #self.dPad = DPad(self.controller.get_hat(0))
         self.trigger = Trigger(self.controller.get_axis(2))
         self.inUse = [False,False,False,False]
 
-        print self.controller.get_numbuttons(), self.controller.get_numaxes()
-        
-        length = 7
+        length = len(scales)
         self.offsets = np.zeros(length)
         self.uScale = np.ones(length)
         self.lScale = np.ones(length)
@@ -41,21 +35,15 @@ class XboxController:
         for event in pygame.event.get(): # User did something
             if event.type == pygame.JOYBUTTONDOWN and self.controller.get_button(7) == 1.0: # If user clicked close
                 return None
-            #elif self.controller.get_button(3) == 1.0:
-            #    return 'switch'
-                # Flag that we are done so we exit this loop
-                
         state = self.getControllerState()
-        updates = self.convert(state)     
-        result = updates*self.scales
-        # print "DFHKSDJFHD\nSJFFHDSK\nFJ\nDHFKSDJFH\nSDKJF\nHSDK\nFJH"
+        updates = self.convert(state)
+        result = updates * self.scales
         return result
         
     def calibrate(self):
         save_stdout = sys.stdout
         sys.stdout = open('trash', 'w') 
-        # calibrate sticks 
-        # reset offsets and scaling factors 
+        # Calibrate sticks, reset offsets and scaling factors 
         length = len(self.offsets)
         self.offsets = np.zeros(length)
         self.uScale = np.ones(length)
@@ -66,29 +54,18 @@ class XboxController:
         self.uScale = abs(1/(np.ones(length)-self.offsets))
         self.lScale = abs(1/(-np.ones(length)-self.offsets))
         sys.stdout = save_stdout
-
-
         
     def convert(self,state):
-        wrist = -state['right_stick'][0]
-        ext = -state['right_stick'][1]  
-        turntable = -state['left_stick'][0]
-        elev = -state['left_stick'][1]
-        grip = state['d_pad'][0]
-        claw = state['d_pad'][1]
-        rot = -state['trigger']
+        left_stick_horizontal = state['left_stick'][0]
+        left_stick_vertical = state['left_stick'][1]
+        right_stick_horizontal = state['right_stick'][0] 
+        right_stick_vertical = state['right_stick'][1]
+
+        # Offset
+        updates = np.array([left_stick_horizontal, left_stick_vertical,
+                    right_stick_horizontal, right_stick_vertical]) - self.offsets
         
-        """rot = -state['right_stick'][0]
-        ext = -state['right_stick'][1]  
-        wrist = state['left_stick'][0]
-        elev = -state['left_stick'][1]
-        grip = state['d_pad'][0]
-        turntable = state['trigger']
-        """
-        # offset
-        updates = np.array([rot,elev,ext,wrist,grip,turntable,claw])-self.offsets
-        
-        #scale upper and lower bounds 
+        # Scale upper and lower bounds 
         for i in range(0,len(updates)):
             if updates[i] > 0:
                 updates[i] = updates[i]*self.uScale[i]
@@ -96,30 +73,25 @@ class XboxController:
                 updates[i] = updates[i]*self.lScale[i]
             if abs(updates[i]) < self.driftLimit:
                 updates[i] = 0
-
-                
         return updates
         
 
     def getControllerState(self):
         pygame.event.clear()
         self.update()
-        #if self.isInUse():
         state = {'left_stick':self.lStick.getPos(),
                      'right_stick':self.rStick.getPos(),
                      'd_pad':self.dPad.getPos(),
                      'trigger':self.trigger.getPos()
-                     # 'ldpad':self.lDpad.getPos()
                      }
         return state
             
     def update(self):
         self.lStick.setCurrent(self.controller.get_axis(0),
                                    self.controller.get_axis(1))
-        self.rStick.setCurrent(self.controller.get_axis(4),
-                                     self.controller.get_axis(3))
+        self.rStick.setCurrent(self.controller.get_axis(3),
+                                     self.controller.get_axis(4))
         self.dPad.setCurrent(getDirs(self.controller))
-        #self.dPad.setCurrent(self.controller.get_hat(0))
         self.trigger.setCurrent(self.controller.get_axis(2))
 
     def isInUse(self):
@@ -134,14 +106,9 @@ class XboxController:
     def override(self):
         return self.controller.get_button(9) == 1.0
 
-# returns dirs in up down left right order
+
 def getDirs(controller):
-    # dPadDirs = [
-    #             controller.get_button(0),
-    #             controller.get_button(1),
-    #             controller.get_button(2),
-    #             controller.get_button(3)
-    # ]    
+    # Returns dirs in up down left right order
     dPadDirs = [
                 controller.get_button(0),
                 controller.get_button(1),
@@ -234,3 +201,10 @@ class Trigger:
     def isInUse(self):
         return self.a0!=self.initA0
 
+if __name__ == '__main__':
+    controller = XboxController()
+    for i in range(10000):
+        time.sleep(0.1)
+        state = controller.getControllerState()
+        print "State"
+        print state
