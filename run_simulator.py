@@ -9,7 +9,7 @@ import pygame, sys
 from pygame.locals import *
 import random
 
-TIMESTEPS = 1000
+TIMESTEPS = 500
 SLEEP_DELAY = .05
 ACC_ACTION = 5.0
 STEER_ACTION = 15.0
