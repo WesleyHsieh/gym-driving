@@ -1,17 +1,27 @@
 import numpy as np
 from rectangle import Rectangle
+import pygame
 
 class Car(Rectangle):
     """
     Car object.
     """
-    def __init__(self, x, y, width=50, length=25, angle=0.0, max_vel=20.0, mass=100.0):
+    def __init__(self, x, y, width=50, length=25, angle=0.0, vel=0.0, acc=0.0, max_vel=20.0, mass=100.0, screen=None, screen_size=0, texture='main'):
         super(Car, self).__init__(x, y, width, length, angle)
         self.vel_angle = angle
-        self.vel = 0.0
-        self.acc = 0.0
+        self.vel = vel
+        self.acc = acc
         self.max_vel = max_vel
         self.mass = mass
+        self.screen = screen
+        self.screen_size = screen_size
+        self.texture = texture
+
+        car_textures = ['main', 'red', 'orange']
+        if texture in car_textures:
+            self.texture_image = pygame.image.load('images/{}_car_lite.png'.format(texture))
+        else:
+            print('Error: invalid texture')
 
     def step(self, t=1):
         """
@@ -39,15 +49,7 @@ class Car(Rectangle):
         # Get properties of terrain that the car is currently on
         decel = np.sum([t.decel for t in terrain_collisions])
         slip = np.sum([t.slip for t in terrain_collisions])
-        print "collision textures", [t.texture for t in terrain_collisions]
-        print "collision corners"
-        for t in terrain_collisions:
-            print t.get_corners()
-        # print "decel", decel
-        # print "slip", slip
-        # print 'vel', self.vel
-        # print 'angle', self.angle
-        # print 'width, length', self.width, self.length
+
         print 'x,y', self.x, self.y
         # print 'corners', self.get_corners()
 
@@ -67,8 +69,12 @@ class Car(Rectangle):
         state_dict['vel_angle'] = self.vel_angle
         return state_dict
 
-    def get_xpos(self):
-        return self.x
-
-    def get_ypos(self):
-        return self.y
+    def update_graphics(self, screen_coord):
+        corners, center, angle = self.get_corners(), self.get_pos(), self.angle
+        x_offset = (np.abs((self.width - self.length) * np.cos(np.radians(angle))) + self.length) / 2
+        y_offset = (np.abs((self.width - self.length) * np.sin(np.radians(angle))) + self.length) / 2
+        # Subtract screen_coord to get screen pos
+        image_rotated = pygame.transform.rotate(self.texture_image, -angle)
+        if -100 <= center[0] - screen_coord[0] <= self.screen_size[0] and -100 <= center[1] - screen_coord[1] <= self.screen_size[1]:
+            pos = (int(center[0] - screen_coord[0] - x_offset), int(center[1] - screen_coord[1] - y_offset))
+            self.screen.blit(image_rotated, pos)

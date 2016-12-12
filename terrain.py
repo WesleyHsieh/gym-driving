@@ -41,7 +41,7 @@ class Terrain(Rectangle):
     def update_graphics(self, screen_coord):
         # Subtract screen_coord to get screen pos
         for coord in self.tile_coords:
-            if coord[0] - screen_coord[0] < self.screen_size[0] and coord[1] - screen_coord[1] < self.screen_size[1]:
+            if -100 <= coord[0] - screen_coord[0] <= self.screen_size[0] and -100 <= coord[1] - screen_coord[1] <= self.screen_size[1]:
                 pos = (int(coord[0] - screen_coord[0]), int(coord[1] - screen_coord[1]))
                 self.screen.blit(self.texture_image, pos)
-                pygame.draw.circle(self.screen, 0, pos, 5, 0)
+                #pygame.draw.circle(self.screen, 0, pos, 5, 0)
