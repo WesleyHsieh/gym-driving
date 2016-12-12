@@ -60,9 +60,9 @@ if __name__ == '__main__':
     #     TERRAINS.append(Terrain(-2048 + i*128, 384 + (i%2) * 128, 128, 128, 'icegrass', screen, SCREEN_SIZE))
 
 
-    TERRAINS.append(Terrain(-2048, -1856, 16384, 2048, 'grass', screen, SCREEN_SIZE))
-    TERRAINS.append(Terrain(-2048, 192, 16384, 256, 'road', screen, SCREEN_SIZE))
-    TERRAINS.append(Terrain(-2048, 448, 16384, 2048, 'grass', screen, SCREEN_SIZE))
+    TERRAINS.append(Terrain(0, -1152, 16384, 2048, 'grass', screen, SCREEN_SIZE))
+    TERRAINS.append(Terrain(0, 0, 16384, 256, 'road', screen, SCREEN_SIZE))
+    TERRAINS.append(Terrain(0, 1152, 16384, 2048, 'grass', screen, SCREEN_SIZE))
     # for i in random.sample(xrange(0, 64), 16):
     #     TERRAINS.append(Terrain(-2048 + i*128, 0, 128, 128, 'ice', screen, SCREEN_SIZE))
 

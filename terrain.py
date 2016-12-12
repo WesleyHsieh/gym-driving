@@ -35,7 +35,7 @@ class Terrain(Rectangle):
 
         for i in range(-int(width / 2), int(width / 2), 128):
             for k in range(-int(length / 2), int(length / 2), 128):
-                # Centers of each 128x128 tile
+                # Top left corners of each 128x128 tile
                 self.tile_coords.append((x + i, y + k))
 
     def update_graphics(self, screen_coord):
