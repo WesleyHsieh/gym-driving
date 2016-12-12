@@ -11,9 +11,9 @@ class Environment:
     def __init__(self, screen_size, terrain=[], num_cpu_cars=2):
         #TODO: Randomize car locations
         self.main_car = Car(0, 0)
-        self.vehicles = [Car(0, 0) for _ in range(num_cpu_cars)]
+        self.vehicles = [Car(0, -100 + 200 * i) for i in range(num_cpu_cars)]
         self.terrain = terrain
-        
+
     def step(self):
         """
         Updates environment by one timestep.
@@ -37,7 +37,7 @@ class Environment:
         state_dict['other_cars'] = [vehicle.get_state() for vehicle in self.vehicles]
         state_dict['car_collisions'] = [self.main_car.collide_rect(car) for car in self.vehicles]
         state_dict['num_car_collisions'] = sum(state_dict['car_collisions'])
-        state_dict['terrain_collisions'] = [self.main_car.collide_rect(terrain) for terrain in self.terrain]        
+        state_dict['terrain_collisions'] = [self.main_car.collide_rect(terrain) for terrain in self.terrain]
         done = False
         return state_dict, done
 
