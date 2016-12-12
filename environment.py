@@ -10,8 +10,8 @@ class Environment:
 
     def __init__(self, screen_size, terrain=[], num_cpu_cars=2):
         #TODO: Randomize car locations
-        self.main_car = Car(screen_size[0]/2, screen_size[1]/2)
-        self.vehicles = [Car(screen_size[0]/2, screen_size[1]/2) for _ in range(num_cpu_cars)]
+        self.main_car = Car(0, 0)
+        self.vehicles = [Car(0, 0) for _ in range(num_cpu_cars)]
         self.terrain = terrain
         
     def step(self):
@@ -22,7 +22,7 @@ class Environment:
         self.main_car.step()
         for vehicle in self.vehicles:
             vehicle.step()
-        print 'terrain pos', self.terrain[0].get_corners()
+        #print 'terrain pos', self.terrain[0].get_corners()
 
     def get_state(self):
         """

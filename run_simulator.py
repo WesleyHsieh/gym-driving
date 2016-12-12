@@ -17,8 +17,8 @@ FPS = 30
 SCREEN_SIZE = (512, 512)
 SCREEN_COORD = (0, 0)
 
-CAR_X = 256
-CAR_Y = 256
+CAR_X = 0
+CAR_Y = 0
 CAR_ANGLE = 0
 TERRAINS = []
 
@@ -53,23 +53,24 @@ if __name__ == '__main__':
 
     # Add the terrain
     #TERRAINS.append(Terrain(-2048, -256, 1024, 128, 'road', screen, SCREEN_SIZE))
-    
-    TERRAINS.append(Terrain(-2048, -256, 8192, 128, 'road', screen, SCREEN_SIZE))
-    TERRAINS.append(Terrain(-2048, -128, 8192, 128, 'grass', screen, SCREEN_SIZE))
-    TERRAINS.append(Terrain(-2048, 0, 8192, 128, 'road', screen, SCREEN_SIZE))
+    TRACK_WIDTH = 1024
+    TRACK_LENGTH = 128
+    TERRAINS.append(Terrain(-512, -256, TRACK_WIDTH, TRACK_LENGTH , 'road', screen, SCREEN_SIZE))
+    TERRAINS.append(Terrain(-512, -128, TRACK_WIDTH, TRACK_LENGTH , 'grass', screen, SCREEN_SIZE))
+    TERRAINS.append(Terrain(-512, 0, TRACK_WIDTH, TRACK_LENGTH , 'road', screen, SCREEN_SIZE))
     # for i in random.sample(xrange(0, 64), 16):
     #     TERRAINS.append(Terrain(-2048 + i*128, 0, 128, 128, 'ice', screen, SCREEN_SIZE))
-    TERRAINS.append(Terrain(-2048, 128, 8192, 128, 'grass', screen, SCREEN_SIZE))
-    TERRAINS.append(Terrain(-2048, 256, 8192, 128, 'dirt', screen, SCREEN_SIZE))
-    TERRAINS.append(Terrain(-2048, 384, 8192, 128, 'grass', screen, SCREEN_SIZE))
+    TERRAINS.append(Terrain(-512, 128, TRACK_WIDTH, TRACK_LENGTH , 'grass', screen, SCREEN_SIZE))
+    TERRAINS.append(Terrain(-512, 256, TRACK_WIDTH, TRACK_LENGTH , 'dirt', screen, SCREEN_SIZE))
+    TERRAINS.append(Terrain(-512, 384, TRACK_WIDTH, TRACK_LENGTH , 'grass', screen, SCREEN_SIZE))
 
 
-    for i in random.sample(xrange(0, 32), 12):
-        TERRAINS.append(Terrain(-2048 + i*128, -128 + (i%2) * 128, 128, 128, 'icegrass', screen, SCREEN_SIZE))
-    for i in random.sample(xrange(0, 32), 8):
-        TERRAINS.append(Terrain(-2048 + i*128, 128 + (i%2) * 128, 128, 128, 'ice', screen, SCREEN_SIZE))
-    for i in random.sample(xrange(0, 32), 12):
-        TERRAINS.append(Terrain(-2048 + i*128, 384 + (i%2) * 128, 128, 128, 'icegrass', screen, SCREEN_SIZE))
+    # for i in random.sample(xrange(0, 32), 12):
+    #     TERRAINS.append(Terrain(-2048 + i*128, -128 + (i%2) * 128, 128, 128, 'icegrass', screen, SCREEN_SIZE))
+    # for i in random.sample(xrange(0, 32), 8):
+    #     TERRAINS.append(Terrain(-2048 + i*128, 128 + (i%2) * 128, 128, 128, 'ice', screen, SCREEN_SIZE))
+    # for i in random.sample(xrange(0, 32), 12):
+    #     TERRAINS.append(Terrain(-2048 + i*128, 384 + (i%2) * 128, 128, 128, 'icegrass', screen, SCREEN_SIZE))
 
 
     if GRAPHICS_MODE:

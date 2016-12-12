@@ -40,13 +40,16 @@ class Car(Rectangle):
         decel = np.sum([t.decel for t in terrain_collisions])
         slip = np.sum([t.slip for t in terrain_collisions])
         print "collision textures", [t.texture for t in terrain_collisions]
-        print "decel", decel
-        print "slip", slip
-        print 'vel', self.vel
-        print 'angle', self.angle
-        print 'width, length', self.width, self.length
+        print "collision corners"
+        for t in terrain_collisions:
+            print t.get_corners()
+        # print "decel", decel
+        # print "slip", slip
+        # print 'vel', self.vel
+        # print 'angle', self.angle
+        # print 'width, length', self.width, self.length
         print 'x,y', self.x, self.y
-        print 'corners', self.get_corners()
+        # print 'corners', self.get_corners()
 
         self.angle += action_dict['steer']
         self.angle %= 360.0

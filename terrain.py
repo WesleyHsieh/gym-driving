@@ -33,15 +33,15 @@ class Terrain(Rectangle):
         self.screen_size = screen_size
         self.tile_coords = []
 
-        for i in range(0, int(width/128)):
-            for k in range(0, int(length/128)):
+        for i in range(-int(width / 2), int(width / 2), 128):
+            for k in range(-int(length / 2), int(length / 2), 128):
                 # Centers of each 128x128 tile
-                self.tile_coords.append((x + i*128, y + k*128))
+                self.tile_coords.append((x + i, y + k))
 
     def update_graphics(self, screen_coord):
-        # Subtract screen_coord to get screen pos, subtract 64/64 to get top left corner
+        # Subtract screen_coord to get screen pos
         for coord in self.tile_coords:
-            if coord[0] - screen_coord[0] - 64 < self.screen_size[0] and coord[1] - screen_coord[1] - 64 < self.screen_size[1]:
-                pos = (int(coord[0] - screen_coord[0] - 64), int(coord[1] - screen_coord[1] - 64))
+            if coord[0] - screen_coord[0] < self.screen_size[0] and coord[1] - screen_coord[1] < self.screen_size[1]:
+                pos = (int(coord[0] - screen_coord[0]), int(coord[1] - screen_coord[1]))
                 self.screen.blit(self.texture_image, pos)
                 pygame.draw.circle(self.screen, 0, pos, 5, 0)
