@@ -1,5 +1,6 @@
 from car import Car
 import numpy as np
+import pygame
 
 class Environment:
     """
@@ -8,15 +9,19 @@ class Environment:
     be done through simulator wrapper class.
     """
 
-    def __init__(self, screen_size, screen=None, terrain=[], num_cpu_cars=2):
+    def __init__(self, graphics_mode, screen_size, screen=None, terrain=[], num_cpu_cars=4):
         #TODO: Randomize car locations
         cpu_car_textures = ['red', 'orange']
+        lims = [[-400.0, 400.0], [-37.5, 37.5]]
         self.main_car = Car(x=0, y=0, angle=0.0, max_vel=20.0, \
             screen=screen, screen_size=screen_size, texture='main')
-        self.vehicles = [Car(x=0, y=-100 + 200 * i, angle=0.0, vel=10.0, \
-            screen=screen, screen_size=screen_size, texture=cpu_car_textures[i]) \
-            for i in range(len(cpu_car_textures))]
+        self.vehicles = [Car(x=np.random.uniform(lims[0][0], lims[0][1]), y=np.random.uniform(lims[1][0], lims[1][1]), \
+            angle=0.0, vel=10.0, screen=screen, screen_size=screen_size, texture=np.random.choice(cpu_car_textures)) \
+            for i in range(num_cpu_cars)]
+        self.screen_size = screen_size
+        self.screen = screen
         self.terrain = terrain
+        self.graphics_mode = graphics_mode
 
     def step(self):
         """
@@ -26,6 +31,21 @@ class Environment:
         self.main_car.step()
         for vehicle in self.vehicles:
             vehicle.step()
+
+        if self.graphics_mode:
+            # Clear screen
+            self.screen.fill((255, 255, 255))
+            main_car_pos = self.main_car.get_pos()
+            screen_coord = (main_car_pos[0] - self.screen_size[0]/2, main_car_pos[1] - self.screen_size[1]/2)
+
+            for t in self.terrain:
+                t.update_graphics(screen_coord)
+            self.main_car.update_graphics(screen_coord)
+            for c in self.vehicles:
+                c.update_graphics(screen_coord)
+            
+            pygame.display.update()
+
         #print 'terrain pos', self.terrain[0].get_corners()
 
     def get_state(self):

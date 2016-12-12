@@ -1,5 +1,6 @@
 from environment import *
 from car import *
+from terrain import *
 
 import logging
 import math
@@ -21,8 +22,17 @@ class DrivingEnv(gym.Env):
     #     'video.frames_per_second' : 50
     # }
 
-    def __init__(self, screen_size, screen, terrain):
-        self.environment = Environment(screen_size, screen, terrain)
+    def __init__(self, graphics_mode=True, screen_size=(500, 500), screen=None, terrain=None):
+        # Default options for PyGame screen, terrain
+        if screen is None:
+            screen = pygame.display.set_mode(screen_size)
+            pygame.display.set_caption('Driving Simulator')
+        if terrain is None:
+            terrain = []
+            terrain.append(Terrain(0, -2000, 20000, 3900, 'grass', screen, screen_size))
+            terrain.append(Terrain(0, 0, 20000, 100, 'road', screen, screen_size))
+            terrain.append(Terrain(0, 2000, 20000, 3900, 'grass', screen, screen_size))
+        self.environment = Environment(graphics_mode, screen_size, screen, terrain)
         # self.gravity = 9.8
         # self.masscart = 1.0
         # self.masspole = 0.1

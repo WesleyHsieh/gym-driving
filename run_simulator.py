@@ -62,26 +62,13 @@ if __name__ == '__main__':
     # for i in random.sample(xrange(0, 32), 12):
     #     TERRAINS.append(Terrain(-2048 + i*128, 384 + (i%2) * 128, 128, 128, 'icegrass', screen, SCREEN_SIZE))
 
-    TERRAINS.append(Terrain(0, -2000, 20000, 3700, 'grass', screen, SCREEN_SIZE))
-    TERRAINS.append(Terrain(0, 0, 20000, 300, 'road', screen, SCREEN_SIZE))
-    TERRAINS.append(Terrain(0, 2000, 20000, 3700, 'grass', screen, SCREEN_SIZE))
-
-    if GRAPHICS_MODE:
-        for t in TERRAINS:
-            t.update_graphics(SCREEN_COORD)
-
-        # Add the car
-        main_car_image = pygame.image.load('images/main_car_lite.png')
-        screen.blit(main_car_image, (CAR_X, CAR_Y))
-
-        # Add other vehicles
-        red_car_image = pygame.image.load('images/red_car_lite.png')
-        screen.blit(red_car_image, (VEHICLES_X[0], VEHICLES_Y[0]))
-        orange_car_image = pygame.image.load('images/orange_car_lite.png')
-        screen.blit(orange_car_image, (VEHICLES_X[1], VEHICLES_Y[1]))
+    TERRAINS.append(Terrain(0, -2000, 20000, 3900, 'grass', screen, SCREEN_SIZE))
+    TERRAINS.append(Terrain(0, 0, 20000, 100, 'road', screen, SCREEN_SIZE))
+    TERRAINS.append(Terrain(0, 2000, 20000, 3900, 'grass', screen, SCREEN_SIZE))
 
     controller = Controller(ACC_ACTION, STEER_ACTION, CONTROLLER_MODE)
-    simulator = DrivingEnv(SCREEN_SIZE, screen, TERRAINS)
+    simulator = DrivingEnv()
+    #simulator = DrivingEnv(GRAPHICS_MODE, SCREEN_SIZE, screen, TERRAINS)
     states, actions, rewards = [], [], []
 
     for t in range(TIMESTEPS):
@@ -103,41 +90,7 @@ if __name__ == '__main__':
         # print action
         # print states[t]
 
-        # Update Car Location
-        CAR_X = state['main_car']['x']
-        CAR_Y = state['main_car']['y']
-        CAR_ANGLE = state['main_car']['angle']
-
-        # Update Vehicle Locations
-        for i in range(len(state['other_cars'])):
-            VEHICLES_X[i] = state['other_cars'][i]['x']
-            VEHICLES_Y[i] = state['other_cars'][i]['y']
-            VEHICLES_ANGLE[i] = state['other_cars'][i]['angle']
-
-        if GRAPHICS_MODE:
-            # Clear the screen
-            screen.fill(WHITE)
-            main_car_image_update = pygame.transform.rotate(main_car_image, -CAR_ANGLE)
-            red_car_image_update = pygame.transform.rotate(red_car_image, -CAR_ANGLE)
-            orange_car_image_update = pygame.transform.rotate(orange_car_image, -CAR_ANGLE)
-
-            # Update SCREEN_COORD
-            SCREEN_COORD = (CAR_X - SCREEN_SIZE[0]/2, CAR_Y - SCREEN_SIZE[1]/2)
-
-            # Update terrain graphics
-            for t in TERRAINS:
-                t.update_graphics(SCREEN_COORD)
-                #draw_box_coords(t, screen, SCREEN_COORD)
-            simulator.environment.main_car.update_graphics(SCREEN_COORD)
-            #pygame.draw.circle(screen, 0, new_pos, 5, 0)
-            for car in simulator.environment.vehicles:
-                car.update_graphics(SCREEN_COORD)
-            # Debug
-            # draw_box_coords(simulator.environment.main_car, screen, SCREEN_COORD)
-
-            pygame.display.update()
-            fpsClock.tick(FPS)
-
+        fpsClock.tick(FPS)
 
         if t == TIMESTEPS - 1:
             states.append(state)
