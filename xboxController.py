@@ -206,5 +206,5 @@ if __name__ == '__main__':
     for i in range(10000):
         time.sleep(0.1)
         state = controller.getControllerState()
-        print "State"
-        print state
+        print("State")
+        print(state)

@@ -66,7 +66,7 @@ if __name__ == '__main__':
     TERRAINS.append(Terrain(0, 0, 20000, 100, 'road', screen, SCREEN_SIZE))
     TERRAINS.append(Terrain(0, 2000, 20000, 3900, 'grass', screen, SCREEN_SIZE))
 
-    controller = Controller(ACC_ACTION, STEER_ACTION, CONTROLLER_MODE)
+    controller = Controller(CONTROLLER_MODE)
     simulator = DrivingEnv()
     #simulator = DrivingEnv(GRAPHICS_MODE, SCREEN_SIZE, screen, TERRAINS)
     states, actions, rewards = [], [], []
@@ -85,10 +85,10 @@ if __name__ == '__main__':
         states.append(state)
         actions.append(action)
         rewards.append(reward)
-        # print "State, Action, Next State"
-        # print states[t-1]
-        # print action
-        # print states[t]
+        # print("State, Action, Next State")
+        # print(states[t-1])
+        # print(action)
+        # print(states[t])
 
         fpsClock.tick(FPS)
 

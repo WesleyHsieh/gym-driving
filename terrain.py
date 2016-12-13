@@ -13,7 +13,7 @@ class Terrain(Rectangle):
     :param screen: PyGame screen object
     """
     def __init__(self, x, y, width, length, texture, screen, screen_size, angle=0.0):
-    	super(Terrain, self).__init__(x, y, width, length, angle)
+        super(Terrain, self).__init__(x, y, width, length, angle)
         self.terrain_properties = {
             'road': {'decel': 0, 'slip': 0},
             'grass': {'decel': 1, 'slip': 0},

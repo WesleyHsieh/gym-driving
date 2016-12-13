@@ -9,19 +9,33 @@ class Environment:
     be done through simulator wrapper class.
     """
 
-    def __init__(self, graphics_mode, screen_size, screen=None, terrain=[], num_cpu_cars=4):
-        #TODO: Randomize car locations
-        cpu_car_textures = ['red', 'orange']
-        lims = [[-400.0, 400.0], [-37.5, 37.5]]
-        self.main_car = Car(x=0, y=0, angle=0.0, max_vel=20.0, \
-            screen=screen, screen_size=screen_size, texture='main')
-        self.vehicles = [Car(x=np.random.uniform(lims[0][0], lims[0][1]), y=np.random.uniform(lims[1][0], lims[1][1]), \
-            angle=0.0, vel=10.0, screen=screen, screen_size=screen_size, texture=np.random.choice(cpu_car_textures)) \
-            for i in range(num_cpu_cars)]
+    def __init__(self, graphics_mode, screen_size, screen=None, terrain=[], num_cpu_cars=5):
+        self.cpu_car_textures = ['red', 'orange']
+        self.num_cpu_cars = num_cpu_cars
         self.screen_size = screen_size
         self.screen = screen
         self.terrain = terrain
         self.graphics_mode = graphics_mode
+        self.steer_action = 15.0
+        self.acc_action = 5.0
+        self.reset()
+
+    def reset(self):
+        lims = [[-400.0, 400.0], [-37.5, 37.5]]
+        main_car_angle = np.random.choice(np.arange(-30, 31, 15))
+        self.main_car = Car(x=0, y=0, angle=main_car_angle, max_vel=20.0, \
+            screen=self.screen, screen_size=self.screen_size, texture='main')
+        # Create CPU-controlled cars, ensuring they are collision-free
+        self.vehicles = []
+        for _ in range(self.num_cpu_cars):
+            collision = True
+            while collision:
+                new_car = Car(x=np.random.uniform(lims[0][0], lims[0][1]), y=np.random.uniform(lims[1][0], lims[1][1]), \
+                angle=0.0, vel=10.0, screen=self.screen, screen_size=self.screen_size, texture=np.random.choice(self.cpu_car_textures))
+                collision = any([new_car.collide_rect(car) for car in self.vehicles])
+            self.vehicles.append(new_car)
+        state = self.get_state()
+        return state
 
     def step(self):
         """
@@ -46,8 +60,6 @@ class Environment:
             
             pygame.display.update()
 
-        #print 'terrain pos', self.terrain[0].get_corners()
-
     def get_state(self):
         """
         Returns current state, corresponding
@@ -56,14 +68,13 @@ class Environment:
             'main_car': Position of main car.
             'other_cars': Position of other cars.
         """
-        state_dict = {}
-        state_dict['main_car'] = self.main_car.get_state()
-        state_dict['other_cars'] = [vehicle.get_state() for vehicle in self.vehicles]
-        state_dict['car_collisions'] = [self.main_car.collide_rect(car) for car in self.vehicles]
-        state_dict['num_car_collisions'] = sum(state_dict['car_collisions'])
-        state_dict['terrain_collisions'] = [self.main_car.collide_rect(terrain) for terrain in self.terrain]
-        done = False
-        return state_dict, done
+        info_dict = {}
+        state, info_dict['main_car'] = self.main_car.get_state()
+        info_dict['other_cars'] = [vehicle.get_state()[1] for vehicle in self.vehicles]
+        info_dict['car_collisions'] = [self.main_car.collide_rect(car) for car in self.vehicles]
+        info_dict['num_car_collisions'] = sum(info_dict['car_collisions'])
+        info_dict['terrain_collisions'] = [self.main_car.collide_rect(terrain) for terrain in self.terrain]
+        return state, info_dict
 
     def take_action(self, action):
         """
@@ -73,13 +84,19 @@ class Environment:
         :return: array
             Reward.
         """
-        # TODO: Take in action vector
         terrain_collisions = [terrain for terrain in self.terrain if self.main_car.collide_rect(terrain)]
         car_collisions = [car for car in self.vehicles if self.main_car.collide_rect(car)]
-        print "collision textures", [t.texture for t in terrain_collisions]
-        print "car collision textures", [c.texture for c in car_collisions]
-        self.main_car.take_action(action, terrain_collisions)
+
+        print("collision textures", [t.texture for t in terrain_collisions])
+        print("car collision textures", [c.texture for c in car_collisions])
+        # Convert numerical action vector to steering angle / acceleration
+        steer = action[0] - 1
+        acc = self.steer_action
+        action_unpacked = np.array([steer * self.steer_action, acc * self.acc_action])
+        self.main_car.take_action(action_unpacked, terrain_collisions)
         self.step()
-        state_dict, done = self.get_state()
-        reward = -state_dict['num_car_collisions']
-        return state_dict, reward, done
+        state, info_dict = self.get_state()
+        done = any([t.texture == 'grass' for t in terrain_collisions])
+        reward = 0 if done else 1
+
+        return state, reward, done, info_dict

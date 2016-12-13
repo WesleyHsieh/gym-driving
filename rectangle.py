@@ -57,9 +57,3 @@ class Rectangle(object):
         c1 = 0 <= np.dot(AM, AB) <= np.dot(AB, AB) 
         c2 = 0 <= np.dot(AM, AC) <= np.dot(AC, AC)
         return c1 and c2
-
-    def update_graphics(self):
-        """
-        TODO: Updates graphics.
-        """
-        pass

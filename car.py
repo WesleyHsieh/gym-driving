@@ -8,6 +8,7 @@ class Car(Rectangle):
     """
     def __init__(self, x, y, width=50, length=25, angle=0.0, vel=0.0, acc=0.0, max_vel=20.0, mass=100.0, screen=None, screen_size=0, texture='main'):
         super(Car, self).__init__(x, y, width, length, angle)
+        self.angle = angle
         self.vel_angle = angle
         self.vel = vel
         self.acc = acc
@@ -38,7 +39,7 @@ class Car(Rectangle):
         self.vel += self.acc
         self.vel = max(min(self.vel, self.max_vel), 0.0)
 
-    def take_action(self, action_dict, terrain_collisions):
+    def take_action(self, action, terrain_collisions):
         """
         Updates car state according to action.
         :param action_dict: dict
@@ -50,24 +51,25 @@ class Car(Rectangle):
         decel = np.sum([t.decel for t in terrain_collisions])
         slip = np.sum([t.slip for t in terrain_collisions])
 
-        print 'x,y', self.x, self.y
+        print('x,y', self.x, self.y)
         # print 'corners', self.get_corners()
-
-        self.angle += action_dict['steer']
+        action_steer, action_acc = action 
+        self.angle += action_steer
         self.angle %= 360.0
         if slip == 0:
             self.vel_angle = self.angle
-        self.acc = action_dict['acc'] - decel
+        self.acc = action_acc - decel
         self.acc = max(min(self.acc, self.max_vel - self.vel), -self.vel)
 
     def get_state(self):
-        state_dict = {}
-        state_dict['x'] = self.x
-        state_dict['y'] = self.y
-        state_dict['vel'] = self.vel
-        state_dict['angle'] = self.angle
-        state_dict['vel_angle'] = self.vel_angle
-        return state_dict
+        state = np.array([self.x, self.y, self.angle])
+        info_dict = {}
+        info_dict['x'] = self.x
+        info_dict['y'] = self.y
+        info_dict['vel'] = self.vel
+        info_dict['angle'] = self.angle
+        info_dict['vel_angle'] = self.vel_angle
+        return state, info_dict
 
     def update_graphics(self, screen_coord):
         corners, center, angle = self.get_corners(), self.get_pos(), self.angle
