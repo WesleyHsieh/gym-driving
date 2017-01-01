@@ -34,7 +34,7 @@ class Environment:
                 angle=0.0, vel=10.0, screen=self.screen, screen_size=self.screen_size, texture=np.random.choice(self.cpu_car_textures))
                 collision = any([new_car.collide_rect(car) for car in self.vehicles])
             self.vehicles.append(new_car)
-        state = self.get_state()
+        state, info_dict = self.get_state()
         return state
 
     def step(self):
@@ -87,11 +87,11 @@ class Environment:
         terrain_collisions = [terrain for terrain in self.terrain if self.main_car.collide_rect(terrain)]
         car_collisions = [car for car in self.vehicles if self.main_car.collide_rect(car)]
 
-        print("collision textures", [t.texture for t in terrain_collisions])
-        print("car collision textures", [c.texture for c in car_collisions])
+        # print("collision textures", [t.texture for t in terrain_collisions])
+        # print("car collision textures", [c.texture for c in car_collisions])
         # Convert numerical action vector to steering angle / acceleration
         steer = action[0] - 1
-        acc = self.steer_action
+        acc = action[1]
         action_unpacked = np.array([steer * self.steer_action, acc * self.acc_action])
         self.main_car.take_action(action_unpacked, terrain_collisions)
         self.step()

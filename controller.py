@@ -2,7 +2,6 @@ from xboxController import *
 import numpy as np
 
 class Controller:
-    # TODO: Vectorize process_input()
     def __init__(self, mode='keyboard'):
         self.mode = mode
         if mode == 'keyboard':

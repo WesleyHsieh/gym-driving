@@ -1,6 +1,8 @@
 import numpy as np
 from rectangle import Rectangle
 import pygame
+import os
+
 
 class Car(Rectangle):
     """
@@ -20,7 +22,9 @@ class Car(Rectangle):
 
         car_textures = ['main', 'red', 'orange']
         if texture in car_textures:
-            self.texture_image = pygame.image.load('images/{}_car_lite.png'.format(texture))
+            base_dir = os.path.dirname(__file__)
+            filename = os.path.join(base_dir, 'images', '{}_car_lite.png'.format(texture))
+            self.texture_image = pygame.image.load(filename)
         else:
             print('Error: invalid texture')
 
@@ -51,7 +55,7 @@ class Car(Rectangle):
         decel = np.sum([t.decel for t in terrain_collisions])
         slip = np.sum([t.slip for t in terrain_collisions])
 
-        print('x,y', self.x, self.y)
+        # print('x,y', self.x, self.y)
         # print 'corners', self.get_corners()
         action_steer, action_acc = action 
         self.angle += action_steer

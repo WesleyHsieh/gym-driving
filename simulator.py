@@ -21,7 +21,7 @@ class DrivingEnv(gym.Env):
     #     'video.frames_per_second' : 50
     # }
 
-    def __init__(self, graphics_mode=True, screen_size=(500, 500), screen=None, terrain=None):
+    def __init__(self, graphics_mode=False, screen_size=(500, 500), screen=None, terrain=None):
         # Default options for PyGame screen, terrain
         if screen is None:
             screen = pygame.display.set_mode(screen_size)
@@ -57,6 +57,7 @@ class DrivingEnv(gym.Env):
     #     return [seed]
 
     def _step(self, action):
+        action = np.array([action, 1.0])
         state, reward, done, info_dict = self.environment.take_action(action)
         # print(state, reward, done, info_dict)
         return state, reward, done, info_dict

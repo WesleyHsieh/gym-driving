@@ -2,6 +2,7 @@ from rectangle import *
 
 import pygame
 from pygame.locals import *
+import os
 
 class Terrain(Rectangle):
     """
@@ -23,7 +24,9 @@ class Terrain(Rectangle):
             'icegrass': {'decel': 1, 'slip': 1},
         }
         if texture in self.terrain_properties:
-            self.texture_image = pygame.image.load('images/{}_tile_lite.jpg'.format(texture))
+            base_dir = os.path.dirname(__file__)
+            filename = os.path.join(base_dir, 'images', '{}_tile_lite.jpg'.format(texture))
+            self.texture_image = pygame.image.load(filename)
         else:
             print('Error: invalid texture')
         self.texture = texture

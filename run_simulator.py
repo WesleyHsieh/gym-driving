@@ -67,7 +67,7 @@ if __name__ == '__main__':
     TERRAINS.append(Terrain(0, 2000, 20000, 3900, 'grass', screen, SCREEN_SIZE))
 
     controller = Controller(CONTROLLER_MODE)
-    simulator = DrivingEnv()
+    simulator = DrivingEnv(graphics_mode=GRAPHICS_MODE)
     #simulator = DrivingEnv(GRAPHICS_MODE, SCREEN_SIZE, screen, TERRAINS)
     states, actions, rewards = [], [], []
 
@@ -79,6 +79,8 @@ if __name__ == '__main__':
                 sys.exit()
 
         action = controller.process_input()
+        # Steering only
+        action = action[0]
 
         state, reward, done, info_dict = simulator._step(action)
 
