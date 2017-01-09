@@ -1,4 +1,5 @@
-from car import Car
+from gym_driving.envs.car import Car
+
 import numpy as np
 import pygame
 

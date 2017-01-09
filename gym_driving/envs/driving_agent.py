@@ -1,7 +1,7 @@
-from car import *
-from environment import *
-from simulator import *
-from terrain import *
+from gym_driving.envs.car import *
+from gym_driving.envs.environment import *
+from gym_driving.envs.driving_env import *
+from gym_driving.envs.terrain import *
 
 from copy import deepcopy
 import heapq

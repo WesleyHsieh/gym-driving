@@ -1,5 +1,6 @@
-from xboxController import *
-from driving_agent import *
+from gym_driving.envs.xboxController import *
+from gym_driving.envs.driving_agent import *
+
 import numpy as np
 
 class Controller:

@@ -1,4 +1,4 @@
-from rectangle import *
+from gym_driving.envs.rectangle import *
 
 import pygame
 from pygame.locals import *

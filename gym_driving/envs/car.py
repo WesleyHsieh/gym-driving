@@ -1,7 +1,8 @@
 import numpy as np
-from rectangle import Rectangle
 import pygame
 import os
+
+from gym_driving.envs.rectangle import Rectangle
 
 
 class Car(Rectangle):

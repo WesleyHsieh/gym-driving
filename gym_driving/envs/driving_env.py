@@ -1,6 +1,6 @@
-from environment import *
-from car import *
-from terrain import *
+from gym_driving.envs.environment import *
+from gym_driving.envs.car import *
+from gym_driving.envs.terrain import *
 
 import logging
 import math
@@ -21,7 +21,7 @@ class DrivingEnv(gym.Env):
     #     'video.frames_per_second' : 50
     # }
 
-    def __init__(self, graphics_mode=False, screen_size=(500, 500), screen=None, terrain=None, screenshot_dir='screenshots', screenshot_rate=10):
+    def __init__(self, graphics_mode=False, screen_size=(500, 500), screen=None, terrain=None, screenshot_dir=None, screenshot_rate=10):
         # Default options for PyGame screen, terrain
         if screen is None:
             screen = pygame.display.set_mode(screen_size)
