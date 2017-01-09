@@ -1,4 +1,5 @@
 from xboxController import *
+from driving_agent import *
 import numpy as np
 
 class Controller:
@@ -8,14 +9,18 @@ class Controller:
             pass
         elif mode == 'xbox':
             self.xbox_controller = XboxController()
+        elif mode == 'agent':
+            self.agent = DrivingAgent()
         else:
-            pass
+            raise NotImplementedError
 
-    def process_input(self):
+    def process_input(self, env):
         if self.mode == 'keyboard':
             action = self.process_keys()
         elif self.mode == 'xbox':
             action = self.process_xbox_controller()
+        elif self.mode == 'agent':
+            action = self.process_agent(env)
         return action
 
     def process_keys(self):
@@ -41,5 +46,11 @@ class Controller:
                         self.xbox_controller.getUpdates()
         steer = np.rint(right_stick_horizontal) + 1
         acc = -np.rint(left_stick_vertical) + 1
+        action = np.array([steer, acc])
+        return action
+
+    def process_agent(self, env):
+        steer = self.agent.driving_agent(env)
+        acc = 0
         action = np.array([steer, acc])
         return action

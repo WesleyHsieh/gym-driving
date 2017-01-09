@@ -13,7 +13,7 @@ class Terrain(Rectangle):
         'road' or 'grass'.
     :param screen: PyGame screen object
     """
-    def __init__(self, x, y, width, length, texture, screen, screen_size, angle=0.0):
+    def __init__(self, x, y, width, length, texture, screen, screen_size, angle=0.0, graphics_mode=False):
         super(Terrain, self).__init__(x, y, width, length, angle)
         self.terrain_properties = {
             'road': {'decel': 0, 'slip': 0},
@@ -23,12 +23,14 @@ class Terrain(Rectangle):
             'ice': {'decel': 0, 'slip': 1},
             'icegrass': {'decel': 1, 'slip': 1},
         }
-        if texture in self.terrain_properties:
-            base_dir = os.path.dirname(__file__)
-            filename = os.path.join(base_dir, 'images', '{}_tile_lite.jpg'.format(texture))
-            self.texture_image = pygame.image.load(filename)
-        else:
-            print('Error: invalid texture')
+        self.graphics_mode = graphics_mode
+        if self.graphics_mode:
+            if texture in self.terrain_properties:
+                base_dir = os.path.dirname(__file__)
+                filename = os.path.join(base_dir, 'images', '{}_tile_lite.jpg'.format(texture))
+                self.texture_image = pygame.image.load(filename)
+            else:
+                print('Error: invalid terrain texture')
         self.texture = texture
         self.decel = self.terrain_properties[texture]['decel']
         self.slip = self.terrain_properties[texture]['slip']
@@ -42,6 +44,7 @@ class Terrain(Rectangle):
                 self.tile_coords.append((x + i, y + k))
 
     def update_graphics(self, screen_coord):
+        assert self.graphics_mode is True
         # Subtract screen_coord to get screen pos
         for coord in self.tile_coords:
             if -100 <= coord[0] - screen_coord[0] <= self.screen_size[0] and -100 <= coord[1] - screen_coord[1] <= self.screen_size[1]:

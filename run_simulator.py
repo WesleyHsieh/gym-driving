@@ -29,6 +29,8 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GRAPHICS_MODE = True
 CONTROLLER_MODE = 'keyboard'
+SCREENSHOT_DIR = None
+# SCREENSHOT_DIR = 'screenshots'
 """
 Controller Mode:
 keyboard: Up/Down to accelerate, Left/Right to steer
@@ -62,12 +64,12 @@ if __name__ == '__main__':
     # for i in random.sample(xrange(0, 32), 12):
     #     TERRAINS.append(Terrain(-2048 + i*128, 384 + (i%2) * 128, 128, 128, 'icegrass', screen, SCREEN_SIZE))
 
-    TERRAINS.append(Terrain(0, -2000, 20000, 3900, 'grass', screen, SCREEN_SIZE))
-    TERRAINS.append(Terrain(0, 0, 20000, 100, 'road', screen, SCREEN_SIZE))
-    TERRAINS.append(Terrain(0, 2000, 20000, 3900, 'grass', screen, SCREEN_SIZE))
+    # TERRAINS.append(Terrain(0, -2000, 20000, 3900, 'grass', screen, SCREEN_SIZE))
+    # TERRAINS.append(Terrain(0, 0, 20000, 100, 'road', screen, SCREEN_SIZE))
+    # TERRAINS.append(Terrain(0, 2000, 20000, 3900, 'grass', screen, SCREEN_SIZE))
 
     controller = Controller(CONTROLLER_MODE)
-    simulator = DrivingEnv(graphics_mode=GRAPHICS_MODE)
+    simulator = DrivingEnv(graphics_mode=GRAPHICS_MODE, screenshot_dir=SCREENSHOT_DIR)
     #simulator = DrivingEnv(GRAPHICS_MODE, SCREEN_SIZE, screen, TERRAINS)
     states, actions, rewards = [], [], []
 
@@ -78,7 +80,7 @@ if __name__ == '__main__':
                 pygame.quit()
                 sys.exit()
 
-        action = controller.process_input()
+        action = controller.process_input(simulator)
         # Steering only
         action = action[0]
 

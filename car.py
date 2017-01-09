@@ -8,7 +8,7 @@ class Car(Rectangle):
     """
     Car object.
     """
-    def __init__(self, x, y, width=50, length=25, angle=0.0, vel=0.0, acc=0.0, max_vel=20.0, mass=100.0, screen=None, screen_size=0, texture='main'):
+    def __init__(self, x, y, width=50, length=25, angle=0.0, vel=0.0, acc=0.0, max_vel=20.0, mass=100.0, screen=None, screen_size=0, texture='main', graphics_mode=False):
         super(Car, self).__init__(x, y, width, length, angle)
         self.angle = angle
         self.vel_angle = angle
@@ -19,14 +19,16 @@ class Car(Rectangle):
         self.screen = screen
         self.screen_size = screen_size
         self.texture = texture
+        self.graphics_mode = graphics_mode
 
         car_textures = ['main', 'red', 'orange']
-        if texture in car_textures:
-            base_dir = os.path.dirname(__file__)
-            filename = os.path.join(base_dir, 'images', '{}_car_lite.png'.format(texture))
-            self.texture_image = pygame.image.load(filename)
-        else:
-            print('Error: invalid texture')
+        if self.graphics_mode:
+            if texture in car_textures:
+                base_dir = os.path.dirname(__file__)
+                filename = os.path.join(base_dir, 'images', '{}_car_lite.png'.format(texture))
+                self.texture_image = pygame.image.load(filename)
+            else:
+                print('Error: invalid car texture')
 
     def step(self, t=1):
         """
@@ -76,6 +78,7 @@ class Car(Rectangle):
         return state, info_dict
 
     def update_graphics(self, screen_coord):
+        assert self.graphics_mode is True
         corners, center, angle = self.get_corners(), self.get_pos(), self.angle
         x_offset = (np.abs((self.width - self.length) * np.cos(np.radians(angle))) + self.length) / 2
         y_offset = (np.abs((self.width - self.length) * np.sin(np.radians(angle))) + self.length) / 2

@@ -24,14 +24,16 @@ class Environment:
         lims = [[-400.0, 400.0], [-37.5, 37.5]]
         main_car_angle = np.random.choice(np.arange(-30, 31, 15))
         self.main_car = Car(x=0, y=0, angle=main_car_angle, max_vel=20.0, \
-            screen=self.screen, screen_size=self.screen_size, texture='main')
+            screen=self.screen, screen_size=self.screen_size, texture='main', \
+            graphics_mode=self.graphics_mode)
         # Create CPU-controlled cars, ensuring they are collision-free
         self.vehicles = []
         for _ in range(self.num_cpu_cars):
             collision = True
             while collision:
                 new_car = Car(x=np.random.uniform(lims[0][0], lims[0][1]), y=np.random.uniform(lims[1][0], lims[1][1]), \
-                angle=0.0, vel=10.0, screen=self.screen, screen_size=self.screen_size, texture=np.random.choice(self.cpu_car_textures))
+                angle=0.0, vel=10.0, screen=self.screen, screen_size=self.screen_size, \
+                texture=np.random.choice(self.cpu_car_textures), graphics_mode=self.graphics_mode)
                 collision = any([new_car.collide_rect(car) for car in self.vehicles])
             self.vehicles.append(new_car)
         state, info_dict = self.get_state()

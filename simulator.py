@@ -21,18 +21,25 @@ class DrivingEnv(gym.Env):
     #     'video.frames_per_second' : 50
     # }
 
-    def __init__(self, graphics_mode=False, screen_size=(500, 500), screen=None, terrain=None):
+    def __init__(self, graphics_mode=False, screen_size=(500, 500), screen=None, terrain=None, screenshot_dir='screenshots', screenshot_rate=10):
         # Default options for PyGame screen, terrain
         if screen is None:
             screen = pygame.display.set_mode(screen_size)
             pygame.display.set_caption('Driving Simulator')
+        self.screenshot_dir = screenshot_dir
+        if screenshot_dir is not None and not os.path.exists(screenshot_dir):
+            os.makedirs(screenshot_dir)
         if terrain is None:
             terrain = []
-            terrain.append(Terrain(0, -2000, 20000, 3900, 'grass', screen, screen_size))
-            terrain.append(Terrain(0, 0, 20000, 100, 'road', screen, screen_size))
-            terrain.append(Terrain(0, 2000, 20000, 3900, 'grass', screen, screen_size))
+            terrain.append(Terrain(x=0, y=-2000, width=20000, length=3900, texture='grass', \
+                screen=screen, screen_size=screen_size, graphics_mode=graphics_mode))
+            terrain.append(Terrain(x=0, y=0, width=20000, length=100, texture='road', \
+                screen=screen, screen_size=screen_size, graphics_mode=graphics_mode))
+            terrain.append(Terrain(x=0, y=2000, width=20000, length=3900, texture='grass', \
+                screen=screen, screen_size=screen_size, graphics_mode=graphics_mode))
+        self.screen = screen
         self.environment = Environment(graphics_mode, screen_size, screen, terrain)
-
+        self.graphics_mode = graphics_mode
         # 0, 1, 2 = Steer left, center, right
         self.action_space = spaces.Discrete(2)
         # Limits on x, y, angle
@@ -40,6 +47,8 @@ class DrivingEnv(gym.Env):
         high = np.array([10000.0, 10000.0, 360.0])
         self.observation_space = spaces.Box(low, high)
 
+        self.exp_count = self.iter_count = 0
+        self.screenshot_rate = screenshot_rate
         # self._seed()
         # self.reset()
         # self.viewer = None
@@ -57,14 +66,24 @@ class DrivingEnv(gym.Env):
     #     return [seed]
 
     def _step(self, action):
+        self.iter_count += 1
         action = np.array([action, 1.0])
         state, reward, done, info_dict = self.environment.take_action(action)
         # print(state, reward, done, info_dict)
+        if self.screenshot_dir is not None and self.iter_count % self.screenshot_rate == 0:
+            self.save_image()
         return state, reward, done, info_dict
         
     def _reset(self):
+        self.exp_count += 1
+        self.iter_count = 0
         state = self.environment.reset()
         return state
 
     def _render(self, mode='human', close=False):
         return None
+
+    def save_image(self):
+        image_name = 'exp_{}_iter_{}.png'.format(self.exp_count, self.iter_count)
+        image_path = os.path.join(self.screenshot_dir, image_name)
+        pygame.image.save(self.screen, image_path)
