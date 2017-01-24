@@ -21,7 +21,7 @@ class DrivingEnv(gym.Env):
     #     'video.frames_per_second' : 50
     # }
 
-    def __init__(self, graphics_mode=False, screen_size=(500, 500), screen=None, terrain=None, screenshot_dir=None, screenshot_rate=10):
+    def __init__(self, graphics_mode=False, screen_size=(500, 500), screen=None, terrain=None, screenshot_dir=None, screenshot_rate=10, num_cpu_cars=10):
         # Default options for PyGame screen, terrain
         if screen is None:
             screen = pygame.display.set_mode(screen_size)
@@ -31,20 +31,23 @@ class DrivingEnv(gym.Env):
             os.makedirs(screenshot_dir)
         if terrain is None:
             terrain = []
-            terrain.append(Terrain(x=0, y=-2000, width=20000, length=3900, texture='grass', \
+            terrain.append(Terrain(x=0, y=-2000, width=20000, length=3800, texture='grass', \
                 screen=screen, screen_size=screen_size, graphics_mode=graphics_mode))
-            terrain.append(Terrain(x=0, y=0, width=20000, length=100, texture='road', \
+            terrain.append(Terrain(x=0, y=0, width=20000, length=200, texture='road', \
                 screen=screen, screen_size=screen_size, graphics_mode=graphics_mode))
-            terrain.append(Terrain(x=0, y=2000, width=20000, length=3900, texture='grass', \
+            terrain.append(Terrain(x=0, y=2000, width=20000, length=3800, texture='grass', \
                 screen=screen, screen_size=screen_size, graphics_mode=graphics_mode))
         self.screen = screen
-        self.environment = Environment(graphics_mode, screen_size, screen, terrain)
+        self.environment = Environment(graphics_mode=graphics_mode, screen_size=screen_size, \
+                screen=screen, terrain=terrain, num_cpu_cars=num_cpu_cars)
         self.graphics_mode = graphics_mode
+
         # 0, 1, 2 = Steer left, center, right
         self.action_space = spaces.Discrete(2)
+
         # Limits on x, y, angle
-        low = np.array([-10000.0, -10000.0, 0.0])
-        high = np.array([10000.0, 10000.0, 360.0])
+        low = np.tile(np.array([-10000.0, -10000.0, 0.0]), num_cpu_cars + 1)
+        high = np.tile(np.array([10000.0, 10000.0, 360.0]), num_cpu_cars + 1)
         self.observation_space = spaces.Box(low, high)
 
         self.exp_count = self.iter_count = 0

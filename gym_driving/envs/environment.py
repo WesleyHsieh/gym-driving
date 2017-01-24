@@ -22,9 +22,9 @@ class Environment:
         self.reset()
 
     def reset(self):
-        lims = [[-400.0, 400.0], [-37.5, 37.5]]
+        lims = [[100.0, 1000.0], [-90.0, 90.0]]
         main_car_angle = np.random.choice(np.arange(-30, 31, 15))
-        self.main_car = Car(x=0, y=0, angle=main_car_angle, max_vel=20.0, \
+        self.main_car = Car(x=0.0, y=0.0, angle=main_car_angle, max_vel=20.0, \
             screen=self.screen, screen_size=self.screen_size, texture='main', \
             graphics_mode=self.graphics_mode)
         # Create CPU-controlled cars, ensuring they are collision-free
@@ -35,7 +35,7 @@ class Environment:
                 new_car = Car(x=np.random.uniform(lims[0][0], lims[0][1]), y=np.random.uniform(lims[1][0], lims[1][1]), \
                 angle=0.0, vel=10.0, screen=self.screen, screen_size=self.screen_size, \
                 texture=np.random.choice(self.cpu_car_textures), graphics_mode=self.graphics_mode)
-                collision = any([new_car.collide_rect(car) for car in self.vehicles])
+                collision = any([new_car.collide_rect(car) for car in self.vehicles]) or new_car.collide_rect(self.main_car)
             self.vehicles.append(new_car)
         state, info_dict = self.get_state()
         return state
@@ -72,11 +72,13 @@ class Environment:
             'other_cars': Position of other cars.
         """
         info_dict = {}
-        state, info_dict['main_car'] = self.main_car.get_state()
-        info_dict['other_cars'] = [vehicle.get_state()[1] for vehicle in self.vehicles]
-        info_dict['car_collisions'] = [self.main_car.collide_rect(car) for car in self.vehicles]
-        info_dict['num_car_collisions'] = sum(info_dict['car_collisions'])
-        info_dict['terrain_collisions'] = [self.main_car.collide_rect(terrain) for terrain in self.terrain]
+        main_car_state, info_dict['main_car'] = self.main_car.get_state()
+        x = [vehicle.get_state() for vehicle in self.vehicles]
+        car_states, info_dict['other_cars'] = zip(*[vehicle.get_state() for vehicle in self.vehicles])
+        # info_dict['car_collisions'] = [self.main_car.collide_rect(car) for car in self.vehicles]
+        # info_dict['num_car_collisions'] = sum(info_dict['car_collisions'])
+        # info_dict['terrain_collisions'] = [self.main_car.collide_rect(terrain) for terrain in self.terrain]
+        state = np.concatenate([main_car_state] + list(car_states))
         return state, info_dict
 
     def take_action(self, action):
@@ -99,7 +101,7 @@ class Environment:
         self.main_car.take_action(action_unpacked, terrain_collisions)
         self.step()
         state, info_dict = self.get_state()
-        done = any([t.texture == 'grass' for t in terrain_collisions])
+        done = any([t.texture == 'grass' for t in terrain_collisions]) or len(car_collisions) >= 1
         reward = 0 if done else 1
 
         return state, reward, done, info_dict
