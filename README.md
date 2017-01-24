@@ -8,8 +8,3 @@ To use this driving simulator, you will need to install PyGame and OpenAI Gym on
 To run the sim, execute:
 
 $ python2 run_simulator.py
-
-
-Example:
-<br />
-![alt tag](examples/driving.gif)
