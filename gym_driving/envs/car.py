@@ -22,7 +22,7 @@ class Car(Rectangle):
         self.texture = texture
         self.graphics_mode = graphics_mode
 
-        car_textures = ['main', 'red', 'orange']
+        car_textures = ['main', 'blue', 'green']
         if self.graphics_mode:
             if texture in car_textures:
                 base_dir = os.path.dirname(__file__)
@@ -60,7 +60,7 @@ class Car(Rectangle):
 
         # print('x,y', self.x, self.y)
         # print 'corners', self.get_corners()
-        action_steer, action_acc = action 
+        action_steer, action_acc = action
         self.angle += action_steer
         self.angle %= 360.0
         self.vel_angle = self.angle
