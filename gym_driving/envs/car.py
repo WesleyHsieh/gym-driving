@@ -46,7 +46,7 @@ class Car(Rectangle):
         self.vel += self.acc
         self.vel = max(min(self.vel, self.max_vel), 0.0)
 
-    def take_action(self, action, terrain_collisions):
+    def take_action(self, action):
         """
         Updates car state according to action.
         :param action_dict: dict
@@ -55,17 +55,16 @@ class Car(Rectangle):
         :return: None
         """
         # Get properties of terrain that the car is currently on
-        decel = np.sum([t.decel for t in terrain_collisions])
-        slip = np.sum([t.slip for t in terrain_collisions])
+        # decel = np.sum([t.decel for t in terrain_collisions])
+        # slip = np.sum([t.slip for t in terrain_collisions])
 
         # print('x,y', self.x, self.y)
         # print 'corners', self.get_corners()
         action_steer, action_acc = action 
         self.angle += action_steer
         self.angle %= 360.0
-        if slip == 0:
-            self.vel_angle = self.angle
-        self.acc = action_acc - decel
+        self.vel_angle = self.angle
+        self.acc = action_acc #- decel
         self.acc = max(min(self.acc, self.max_vel - self.vel), -self.vel)
 
     def get_state(self):
@@ -77,6 +76,13 @@ class Car(Rectangle):
         info_dict['angle'] = self.angle
         info_dict['vel_angle'] = self.vel_angle
         return state, info_dict
+
+    def set_state(self, x, y, vel, angle, vel_angle):
+        self.x = x
+        self.y = y
+        self.vel = vel
+        self.angle = angle
+        self.vel_angle = vel_angle
 
     def update_graphics(self, screen_coord):
         assert self.graphics_mode is True

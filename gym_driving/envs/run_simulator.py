@@ -28,7 +28,7 @@ TERRAINS = []
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GRAPHICS_MODE = True
-CONTROLLER_MODE = 'keyboard'
+CONTROLLER_MODE = 'agent'#'keyboard'
 SCREENSHOT_DIR = None
 # SCREENSHOT_DIR = 'screenshots'
 """
@@ -46,7 +46,37 @@ def draw_box_coords(rectangle, screen, SCREEN_COORD):
     pos = (int(c[0] - SCREEN_COORD[0]), int(c[1] - SCREEN_COORD[1]))
     pygame.draw.circle(screen, 0, pos, 5, 0)
 
-if __name__ == '__main__':
+def simulate_driving_agent():
+    pygame.init()
+    fpsClock = pygame.time.Clock()
+    if GRAPHICS_MODE:
+        screen = pygame.display.set_mode(SCREEN_SIZE)
+        pygame.display.set_caption('Driving Simulator')
+    else:
+        screen = None
+    controller = Controller(CONTROLLER_MODE)
+    simulator = DrivingEnv(graphics_mode=GRAPHICS_MODE, screenshot_dir=SCREENSHOT_DIR)
+
+    done = False
+    counter = 0
+    while counter <= 100 and not done:
+        # Checks for quit
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+
+        action = controller.process_input(simulator)
+        # Steering only
+        action = action[0]
+
+        state, reward, done, info_dict = simulator._step(action)
+        counter += 1
+    return counter
+
+    fpsClock.tick(FPS)
+
+def simulate_manual_control():
     # PyGame initializations
     pygame.init()
     fpsClock = pygame.time.Clock()
@@ -99,3 +129,12 @@ if __name__ == '__main__':
         if t == TIMESTEPS - 1:
             states.append(state)
         time.sleep(SLEEP_DELAY)
+
+if __name__ == '__main__':
+    counts = np.array([simulate_driving_agent() for _ in range(10)])
+    mean_time_survived = np.mean(counts)
+    print("Mean Time Survived", mean_time_survived)
+
+    # simulate_manual_control()
+
+    

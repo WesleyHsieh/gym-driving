@@ -22,6 +22,7 @@ class Controller:
             action = self.process_xbox_controller()
         elif self.mode == 'agent':
             action = self.process_agent(env)
+            print("Action Taken", action)
         return action
 
     def process_keys(self):
