@@ -65,13 +65,3 @@ class DrivingAgent():
 		print("Number of nodes expanded", self.counter)
 		self.counter = 0
 		return action_list[0]
-
-# Warm start: See if previously computed path is still valid, should decrease
-# Add noise to dynamics (angle +- epsilon), plan with expected action (no noise)
-# Speed as a control
-# Aim for ~4-5 seconds for rollout of 100
-# Save batches of images in memory, then save to disk after rollout
-
-# Experiments with runtime scaling with control space, search space
-# Email with experiments / ideas tried, Monday
-# get_state(), get_control()
