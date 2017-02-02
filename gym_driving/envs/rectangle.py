@@ -7,6 +7,7 @@ class Rectangle(object):
         self.angle = angle
         self.width = width
         self.length = length
+        self.corners = self.calculate_corners()
 
     def get_pos(self):
         """
@@ -17,6 +18,9 @@ class Rectangle(object):
         return self.x, self.y
         
     def get_corners(self):
+        return self.corners
+
+    def calculate_corners(self):
         """"
         Returns corners of rectangle. 
         :return: None
@@ -54,6 +58,18 @@ class Rectangle(object):
         """
         a, b, c, d = self.get_corners()
         AM, AB, AC = point - a, b - a, c - a
-        c1 = 0 <= np.dot(AM, AB) <= np.dot(AB, AB) 
+        c1 = 0 <= np.dot(AM, AB) <= np.dot(AB, AB)
+        # if not c1:
+        #     return False 
         c2 = 0 <= np.dot(AM, AC) <= np.dot(AC, AC)
         return c1 and c2
+        # return (0 <= np.dot(AM, AB) <= np.dot(AB, AB)) and (0 <= np.dot(AM, AC) <= np.dot(AC, AC))
+
+    def distance_to_rectangle(self, other_rect):
+        corners = self.get_corners()
+        other_corners = other_rect.get_corners()
+        distances = []
+        for c in corners:
+            for oc in other_corners:
+                distances.append(np.square(np.linalg.norm(c - oc)))
+        return min(distances)

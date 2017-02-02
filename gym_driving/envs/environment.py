@@ -11,7 +11,7 @@ class Environment:
     """
 
     def __init__(self, graphics_mode, screen_size, screen=None, terrain=[], num_cpu_cars=5):
-        self.cpu_car_textures = ['red', 'orange']
+        self.cpu_car_textures = ['blue', 'green']
         self.num_cpu_cars = num_cpu_cars
         self.screen_size = screen_size
         self.screen = screen
@@ -55,6 +55,7 @@ class Environment:
         main_car_pos = self.main_car.get_pos()
         screen_coord = (main_car_pos[0] - self.screen_size[0]/2, main_car_pos[1] - self.screen_size[1]/2)
 
+        # Update terrain, vehicles
         for t in self.terrain:
             t.update_graphics(screen_coord)
         self.main_car.update_graphics(screen_coord)
@@ -76,13 +77,28 @@ class Environment:
         x = [vehicle.get_state() for vehicle in self.vehicles]
         car_states, info_dict['other_cars'] = list(zip(*[vehicle.get_state() for vehicle in self.vehicles]))
         info_dict['car_collisions'] = [car for car in self.vehicles if self.main_car.collide_rect(car)]
-        info_dict['num_car_collisions'] = len(info_dict['car_collisions'])
+        # info_dict['num_car_collisions'] = len(info_dict['car_collisions'])
         info_dict['terrain_collisions'] = [terrain for terrain in self.terrain if self.main_car.collide_rect(terrain)]
-        info_dict['angle_diff'] = abs(main_car_state[2])
+        # info_dict['angle_diff'] = abs(main_car_state[2])
+        # info_dict['distance_to_nearest_car'] = min([self.main_car.distance_to_rectangle(vehicle) for vehicle in self.vehicles])
+
+        # Compact state
+        info_dict['compact_state'] = self.get_compact_state()
+
         state = np.concatenate([main_car_state] + list(car_states))
         return state, info_dict
 
-    def take_action(self, action, graphics_mode=True):
+    def get_compact_state(self):
+        _, main_car_info_dict = self.main_car.get_state() 
+        vehicle_info_dicts = list(zip(*[car.get_state() for car in self.vehicles]))[1]
+        return (main_car_info_dict, vehicle_info_dicts)
+
+    def set_state(self, main_car_state, vehicles_states):
+        self.main_car.set_state(**main_car_state)
+        for i in range(len(self.vehicles)):
+            self.vehicles[i].set_state(**vehicles_states[i])
+
+    def take_action(self, action, noise=0.1, graphics_mode=None):
         """
         Takes input action, updates environment.
         :param action: dict
@@ -90,15 +106,18 @@ class Environment:
         :return: array
             Reward.
         """
-
-        # terrain_collisions = [terrain for terrain in self.terrain if self.main_car.collide_rect(terrain)]
-        # car_collisions = [car for car in self.vehicles if self.main_car.collide_rect(car)]
-
-        # print("collision textures", [t.texture for t in terrain_collisions])
-        # print("car collision textures", [c.texture for c in car_collisions])
         # Convert numerical action vector to steering angle / acceleration
-        steer = action[0] - 1
+        # steer = action[0] - 1
+        steer = (action[0] - 2) / 2.0
         acc = action[1]
+
+        # Add noise
+        if steer != 0.0 and noise > 0.0:
+            steer += np.random.normal(loc=0.0, scale=noise)
+        if acc != 0.0 and noise > 0.0:
+            acc += np.random.normal(loc=0.0, scale=noise)
+
+        # Convert to action space, apply action
         action_unpacked = np.array([steer * self.steer_action, acc * self.acc_action])
         self.main_car.take_action(action_unpacked)
         self.step()
@@ -108,30 +127,32 @@ class Environment:
         done = any([t.texture == 'grass' for t in terrain_collisions]) or len(car_collisions) >= 1
         reward = 0 if done else 1
 
-        if graphics_mode:
+        if graphics_mode or (graphics_mode is None and self.graphics_mode):
             self.update_graphics()
 
         return state, reward, done, info_dict
 
-    def simulate_actions(self, actions):
+    def simulate_actions(self, actions, noise=0.0, compact_state=None):
         # Save copy of original states
         _, main_car_info_dict = self.main_car.get_state() 
         vehicle_info_dicts = list(zip(*[car.get_state() for car in self.vehicles]))[1]
 
+        if compact_state is not None:
+            main_car_state, vehicles_states = compact_state
+            self.set_state(main_car_state, vehicles_states)
+
         # Take actions
         states, rewards, dones, info_dicts, = [], [], [], []
         for action in actions:
-            state, reward, done, info_dict = self.take_action([action, 1.0], graphics_mode=False)
+            state, reward, done, info_dict = self.take_action([action, 1.0], noise=noise, graphics_mode=False)
             states.append(state)
             rewards.append(reward)
             dones.append(done)
             info_dicts.append(info_dict)
         
         # Restore cars to original states
-        self.main_car.set_state(**main_car_info_dict)
-        for i in range(len(self.vehicles)):
-            self.vehicles[i].set_state(**vehicle_info_dicts[i])
-
+        self.set_state(main_car_info_dict, vehicle_info_dicts)
 
         # Return new state after taking actions 
         return states, rewards, dones, info_dicts
+

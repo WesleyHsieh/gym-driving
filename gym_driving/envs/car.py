@@ -29,7 +29,7 @@ class Car(Rectangle):
                 filename = os.path.join(base_dir, 'images', '{}_car_lite.png'.format(texture))
                 self.texture_image = pygame.image.load(filename)
             else:
-                print('Error: invalid car texture')
+                raise Exception('Error: invalid car texture')
 
     def step(self, t=1):
         """
@@ -45,6 +45,7 @@ class Car(Rectangle):
         self.y += dy
         self.vel += self.acc
         self.vel = max(min(self.vel, self.max_vel), 0.0)
+        self.corners = self.calculate_corners()
 
     def take_action(self, action):
         """

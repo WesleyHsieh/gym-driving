@@ -8,8 +8,9 @@ import time
 import pygame, sys
 from pygame.locals import *
 import random
+import cProfile
 
-TIMESTEPS = 500
+TIMESTEPS = 100
 SLEEP_DELAY = .05
 ACC_ACTION = 5.0
 STEER_ACTION = 15.0
@@ -27,8 +28,10 @@ TERRAINS = []
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-GRAPHICS_MODE = True
-CONTROLLER_MODE = 'agent'#'keyboard'
+# GRAPHICS_MODE = True
+# CONTROLLER_MODE = 'keyboard'
+GRAPHICS_MODE = False #True
+CONTROLLER_MODE = 'agent'
 SCREENSHOT_DIR = None
 # SCREENSHOT_DIR = 'screenshots'
 """
@@ -46,7 +49,7 @@ def draw_box_coords(rectangle, screen, SCREEN_COORD):
     pos = (int(c[0] - SCREEN_COORD[0]), int(c[1] - SCREEN_COORD[1]))
     pygame.draw.circle(screen, 0, pos, 5, 0)
 
-def simulate_driving_agent():
+def simulate_driving_agent(search_horizon=3):
     pygame.init()
     fpsClock = pygame.time.Clock()
     if GRAPHICS_MODE:
@@ -54,19 +57,20 @@ def simulate_driving_agent():
         pygame.display.set_caption('Driving Simulator')
     else:
         screen = None
-    controller = Controller(CONTROLLER_MODE)
     simulator = DrivingEnv(graphics_mode=GRAPHICS_MODE, screenshot_dir=SCREENSHOT_DIR)
-
+    param_dict = {'search_horizon': search_horizon, 'driving_env': simulator}
+    controller = Controller(mode='agent', param_dict=param_dict)
+    
     done = False
     counter = 0
-    while counter <= 100 and not done:
+    while counter < 100 and not done:
         # Checks for quit
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
 
-        action = controller.process_input(simulator)
+        action = controller.process_input()
         # Steering only
         action = action[0]
 
@@ -75,6 +79,31 @@ def simulate_driving_agent():
     return counter
 
     fpsClock.tick(FPS)
+
+def run_driving_agent_experiment(num_experiments=50):
+    # search_horizons = [3, 5, 7]
+    search_horizons = [5]
+    result_dict = {}
+    for search_horizon in search_horizons:
+        print("Running Search Horizon: {}".format(search_horizon))
+        scores, times = [], []
+        param_dict = {'search_horizon': search_horizon}
+        for _ in range(num_experiments):
+            start = time.time()
+            scores.append(simulate_driving_agent(search_horizon))
+            end = time.time()
+            times.append(end - start)
+        result_dict[search_horizon] = {'mean_score': np.mean(np.array(scores)), \
+            'mean_time': np.mean(np.array(times))}
+        print("Results for search horizon = {}: ".format(search_horizon))
+        print("Scores: ", scores)
+        print("Times: ", times)
+        print(result_dict[search_horizon])
+
+    for search_horizon in search_horizons:
+        print("Results for search horizon = {}: ".format(search_horizon))
+        print(result_dict[search_horizon])
+
 
 def simulate_manual_control():
     # PyGame initializations
@@ -131,10 +160,35 @@ def simulate_manual_control():
         time.sleep(SLEEP_DELAY)
 
 if __name__ == '__main__':
-    counts = np.array([simulate_driving_agent() for _ in range(10)])
-    mean_time_survived = np.mean(counts)
-    print("Mean Time Survived", mean_time_survived)
+    # start = time.time()
+
+    # counts = np.array([simulate_driving_agent() for _ in range(10)])
+    # mean_time_survived = np.mean(counts)
+    # print("Mean Time Survived", mean_time_survived)
 
     # simulate_manual_control()
 
-    
+    # end = time.time()
+    # print("Time Elapsed: ", end - start)
+
+    # cProfile.run('run_driving_agent_experiment()')
+    run_driving_agent_experiment()
+
+    # pygame.init()
+    # fpsClock = pygame.time.Clock()
+    # if GRAPHICS_MODE:
+    #     screen = pygame.display.set_mode(SCREEN_SIZE)
+    #     pygame.display.set_caption('Driving Simulator')
+    # else:
+    #     screen = None
+    # #controller = Controller(mode='agent', param_dict=param_dict)
+    # simulator = DrivingEnv(graphics_mode=GRAPHICS_MODE, screenshot_dir=SCREENSHOT_DIR)
+
+    # # Test
+    # start = time.time()
+    # action = 0
+    # for _ in range(3125):
+    #     simulator._step(action)
+    # end = time.time()
+    # print("Time Elapsed: ", end - start)
+            

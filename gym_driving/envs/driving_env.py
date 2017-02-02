@@ -91,5 +91,5 @@ class DrivingEnv(gym.Env):
         image_path = os.path.join(self.screenshot_dir, image_name)
         pygame.image.save(self.screen, image_path)
 
-    def simulate_actions(self, actions):
-        return self.environment.simulate_actions(actions)
+    def simulate_actions(self, actions, noise=0.0, state=None):
+        return self.environment.simulate_actions(actions, noise, state)
