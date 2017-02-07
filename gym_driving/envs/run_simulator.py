@@ -70,7 +70,7 @@ def simulate_driving_agent(search_horizon=3):
                 pygame.quit()
                 sys.exit()
 
-        action = controller.process_input()
+        action = controller.process_input(simulator)
         # Steering only
         action = action[0]
 
@@ -192,3 +192,6 @@ if __name__ == '__main__':
     # end = time.time()
     # print("Time Elapsed: ", end - start)
             
+
+# Batch data by trajectory
+# Batches of image data, labels

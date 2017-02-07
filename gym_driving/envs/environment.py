@@ -37,6 +37,8 @@ class Environment:
                 texture=np.random.choice(self.cpu_car_textures), graphics_mode=self.graphics_mode)
                 collision = any([new_car.collide_rect(car) for car in self.vehicles]) or new_car.collide_rect(self.main_car)
             self.vehicles.append(new_car)
+        if self.graphics_mode:
+            self.update_graphics()
         state, info_dict = self.get_state()
         return state
 

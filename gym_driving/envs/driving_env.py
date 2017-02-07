@@ -8,6 +8,7 @@ import gym
 from gym import spaces
 from gym.utils import seeding
 import numpy as np
+import IPython
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +22,7 @@ class DrivingEnv(gym.Env):
     #     'video.frames_per_second' : 50
     # }
 
-    def __init__(self, graphics_mode=False, screen_size=(500, 500), screen=None, terrain=None, screenshot_dir=None, screenshot_rate=10, num_cpu_cars=10):
+    def __init__(self, graphics_mode=False, screen_size=(500, 500), screen=None, terrain=None, screenshot_dir=None, screenshot_rate=10, num_cpu_cars=10, time_horizon=100):
         # Default options for PyGame screen, terrain
         if screen is None:
             screen = pygame.display.set_mode(screen_size)
@@ -52,6 +53,7 @@ class DrivingEnv(gym.Env):
 
         self.exp_count = self.iter_count = 0
         self.screenshot_rate = screenshot_rate
+        self.time_horizon = time_horizon
         # self._seed()
         # self.reset()
         # self.viewer = None
@@ -75,12 +77,16 @@ class DrivingEnv(gym.Env):
         # print(state, reward, done, info_dict)
         if self.screenshot_dir is not None and self.iter_count % self.screenshot_rate == 0:
             self.save_image()
+        if self.iter_count >= self.time_horizon:
+            done = True
+        state = pygame.surfarray.array2d(self.screen).astype(np.uint8)
         return state, reward, done, info_dict
         
     def _reset(self):
         self.exp_count += 1
         self.iter_count = 0
         state = self.environment.reset()
+        state = pygame.surfarray.array2d(self.screen).astype(np.uint8)
         return state
 
     def _render(self, mode='human', close=False):

@@ -10,12 +10,17 @@ class DrivingAgent():
 	"""
 	Agent that autonomously drives a car.
 	"""
-	def __init__(self, param_dict):
-		self.search_horizon = param_dict['search_horizon']
-		self.driving_env = param_dict['driving_env']
+	def __init__(self, param_dict=None):
+		if param_dict is None:
+			self.search_horizon = 5
+		else:
+			self.search_horizon = param_dict['search_horizon']
+		# self.driving_env = param_dict['driving_env']
 		self.reset()
 
-	def driving_agent(self):
+	def rollout_policy(self, env, search_horizon=5):
+		self.driving_env = env
+		self.search_horizon = search_horizon
 		self.counter = 0
 		cost, curr_heuristic_cost, action_list = self.search_agent()
 		# print("Length of actions", len(action_list))

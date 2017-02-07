@@ -1,5 +1,5 @@
 from gym_driving.envs.xboxController import *
-from gym_driving.envs.driving_agent import *
+from gym_driving.envs.agents.driving_agent import *
 
 import numpy as np
 
@@ -15,13 +15,13 @@ class Controller:
         else:
             raise NotImplementedError
 
-    def process_input(self):
+    def process_input(self, env):
         if self.mode == 'keyboard':
             action = self.process_keys()
         elif self.mode == 'xbox':
             action = self.process_xbox_controller()
         elif self.mode == 'agent':
-            action = self.process_agent()
+            action = self.process_agent(env)
             # print("Action Taken", action)
         return action
 
@@ -51,8 +51,8 @@ class Controller:
         action = np.array([steer, acc])
         return action
 
-    def process_agent(self):
-        steer = self.agent.driving_agent()
+    def process_agent(self, env):
+        steer = self.agent.driving_agent(env)
         acc = 0
         action = np.array([steer, acc])
         return action
