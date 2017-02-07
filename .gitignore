@@ -93,3 +93,5 @@ ENV/
 .DS_Store
 
 *.envs
+*.pkl
+*.profile

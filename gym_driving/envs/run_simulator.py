@@ -9,6 +9,7 @@ import pygame, sys
 from pygame.locals import *
 import random
 import cProfile
+import IPython
 
 TIMESTEPS = 100
 SLEEP_DELAY = .05
@@ -23,7 +24,7 @@ CAR_Y = 0
 CAR_ANGLE = 0
 VEHICLES_X = [0, 0]
 VEHICLES_Y = [-100, 100]
-VEHICLES_ANGLE= [0, 0]
+VEHICLES_ANGLE = [0, 0]
 TERRAINS = []
 
 BLACK = (0, 0, 0)
@@ -34,6 +35,7 @@ GRAPHICS_MODE = False #True
 CONTROLLER_MODE = 'agent'
 SCREENSHOT_DIR = None
 # SCREENSHOT_DIR = 'screenshots'
+# os.environ["SDL_VIDEODRIVER"] = "dummy"
 """
 Controller Mode:
 keyboard: Up/Down to accelerate, Left/Right to steer

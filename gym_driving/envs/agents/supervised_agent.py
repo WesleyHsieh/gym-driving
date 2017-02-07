@@ -1,5 +1,6 @@
 import numpy as np
 from gym_driving.envs.agents.agent import * 
+import IPython
 
 class SupervisedAgent(Agent):
 	
@@ -61,8 +62,10 @@ class SupervisedAgent(Agent):
 		"""
 		Train/test accuracy, reward, surrogate loss
 		"""
-		train_accuracies, test_accuracies = self.learner.get_statistics()
-		return train_accuracies, test_accuracies, np.mean(self.rewards), np.mean(self.surrogate_losses)
+		train_loss, test_loss = self.learner.get_statistics()
+		return train_loss, test_loss, np.mean(self.rewards), np.mean(self.surrogate_losses)
 
-	def reset_statistics(self):
+	def reset(self):
+		self.learner.reset()
 		self.rewards, self.surrogate_losses = [], []
+		

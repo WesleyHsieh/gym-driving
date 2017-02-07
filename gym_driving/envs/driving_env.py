@@ -22,7 +22,7 @@ class DrivingEnv(gym.Env):
     #     'video.frames_per_second' : 50
     # }
 
-    def __init__(self, graphics_mode=False, screen_size=(500, 500), screen=None, terrain=None, screenshot_dir=None, screenshot_rate=10, num_cpu_cars=10, time_horizon=100):
+    def __init__(self, graphics_mode=False, screen_size=(512, 512), screen=None, terrain=None, screenshot_dir=None, screenshot_rate=10, num_cpu_cars=10, time_horizon=100):
         # Default options for PyGame screen, terrain
         if screen is None:
             screen = pygame.display.set_mode(screen_size)
