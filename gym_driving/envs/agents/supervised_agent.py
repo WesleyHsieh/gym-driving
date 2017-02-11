@@ -43,7 +43,7 @@ class SupervisedAgent(Agent):
 			actions.append(action)
 			rewards.append(reward)
 			supervisor_labels.append(supervisor_label)
-			surrogate_losses.append(action == supervisor_label)
+			surrogate_losses.append(action != supervisor_label)
 			state = next_state
 
 		self.rewards.append(sum(rewards))

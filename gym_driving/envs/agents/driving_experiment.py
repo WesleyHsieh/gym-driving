@@ -22,6 +22,7 @@ import matplotlib.pyplot as plt
 from deep_lfd.learning_driving.linear_learner import *
 # from deep_lfd.learning_driving.deep_learner import *
 from gym_driving.envs.agents.supervised_agent import *
+from gym_driving.envs.agents.dagger_agent import *
 from gym_driving.envs.agents.driving_agent import *
 from gym_driving.envs.driving_env import *
 
@@ -91,6 +92,7 @@ class Experiment():
         means, stds = np.mean(stats, axis=0), np.std(stats, axis=0)
         n_iters, n_stats = means.shape
         for i in range(n_stats):
+            plt.figure()
             stats_name = stats_names[i]
             stat_means, stat_stds = means[:, i], stds[:, i]
             plt.errorbar(range(len(stat_means)), stat_means, yerr=stat_stds)
@@ -102,18 +104,27 @@ class Experiment():
 if __name__ == '__main__':
     FILEPATH = ''
     # learners = [('linear_learner', LinearLearner()), ('deep_learner', DeepLearner())]
-    learners = [('linear_learner', LinearLearner())]
-    for agent_name, learner in learners:
-        # learner = LinearLearner()
-        # learner = DeepLearner()
-        start = time.time()
-        print('Running experiment with {}'.format(agent_name))
-        env = DrivingEnv(graphics_mode=True)
-        supervisor = DrivingAgent()
-        agent = SupervisedAgent(learner, env, supervisor)
-
-        exp_class = Experiment(FILEPATH)
-        exp_class.run_experiment(agent, agent_name)
-        end = time.time()
-        print("Time Elapsed: ", end - start)
+    learners = ['linear_learner']
+    agents = ['supervised', 'dagger']
+    for learner_name in learners:
+        if learner_name == 'linear_learner':
+            learner = LinearLearner()
+        elif learner_name == 'deep_learner':
+            learner = DeepLearner()
+        for agent_name in agents:
+            # learner = LinearLearner()
+            # learner = DeepLearner()
+            start = time.time()
+            print('Running experiment with {}'.format(learner_name))
+            env = DrivingEnv(graphics_mode=True)
+            supervisor = DrivingAgent()
+            if agent_name == 'supervised':
+                agent = SupervisedAgent(learner, env, supervisor)
+            elif agent_name == 'dagger':
+                agent = DaggerAgent(learner, env, supervisor)
+            exp_class = Experiment(FILEPATH)
+            experiment_name = '{}_{}'.format(learner_name, agent_name)
+            exp_class.run_experiment(agent, experiment_name)
+            end = time.time()
+            print("Time Elapsed: ", end - start)
 
