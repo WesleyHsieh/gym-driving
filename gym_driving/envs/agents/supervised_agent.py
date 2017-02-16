@@ -63,6 +63,8 @@ class SupervisedAgent(Agent):
 		params_zipped = zip(env_pool, supervisor_pool, learner_pool, seed_pool, action_mode_pool)
 		pool = multiprocessing.Pool(processes=min(multiprocessing.cpu_count() - 1, len(env_pool)))
 		result_lists = pool.map(collect_rollouts_wrapper, params_zipped)
+		pool.close()
+		pool.join()
 		# result_lists = [collect_rollouts_wrapper(param) for param in params_zipped]
 
 		state_list, action_list, reward_list, supervisor_label_list, surrogate_loss_list = zip(*result_lists)
