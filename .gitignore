@@ -95,3 +95,4 @@ ENV/
 *.envs
 *.pkl
 *.profile
+*.png

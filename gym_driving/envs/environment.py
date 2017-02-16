@@ -1,4 +1,5 @@
 from gym_driving.envs.car import Car
+from gym_driving.envs.terrain import *
 
 import numpy as np
 import pygame
@@ -21,7 +22,9 @@ class Environment:
         self.acc_action = 5.0
         self.reset()
 
-    def reset(self):
+    def reset(self, screen=None):
+        if screen is not None:
+            self.screen = screen
         lims = [[100.0, 1000.0], [-90.0, 90.0]]
         main_car_angle = np.random.choice(np.arange(-30, 31, 15))
         self.main_car = Car(x=0.0, y=0.0, angle=main_car_angle, max_vel=20.0, \
@@ -37,9 +40,19 @@ class Environment:
                 texture=np.random.choice(self.cpu_car_textures), graphics_mode=self.graphics_mode)
                 collision = any([new_car.collide_rect(car) for car in self.vehicles]) or new_car.collide_rect(self.main_car)
             self.vehicles.append(new_car)
+
+        self.terrain = []
+        self.terrain.append(Terrain(x=0, y=-2000, width=20000, length=3800, texture='grass', \
+            screen=self.screen, screen_size=self.screen_size, graphics_mode=self.graphics_mode))
+        self.terrain.append(Terrain(x=0, y=0, width=20000, length=200, texture='road', \
+            screen=self.screen, screen_size=self.screen_size, graphics_mode=self.graphics_mode))
+        self.terrain.append(Terrain(x=0, y=2000, width=20000, length=3800, texture='grass', \
+            screen=self.screen, screen_size=self.screen_size, graphics_mode=self.graphics_mode))
         if self.graphics_mode:
             self.update_graphics()
         state, info_dict = self.get_state()
+
+       
         return state
 
     def step(self):

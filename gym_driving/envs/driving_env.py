@@ -26,18 +26,10 @@ class DrivingEnv(gym.Env):
         # Default options for PyGame screen, terrain
         if screen is None:
             screen = pygame.display.set_mode(screen_size)
-            pygame.display.set_caption('Driving Simulator')
-        self.screenshot_dir = screenshot_dir
+            # pygame.display.set_caption('Driving Simulator')
+
         if screenshot_dir is not None and not os.path.exists(screenshot_dir):
             os.makedirs(screenshot_dir)
-        if terrain is None:
-            terrain = []
-            terrain.append(Terrain(x=0, y=-2000, width=20000, length=3800, texture='grass', \
-                screen=screen, screen_size=screen_size, graphics_mode=graphics_mode))
-            terrain.append(Terrain(x=0, y=0, width=20000, length=200, texture='road', \
-                screen=screen, screen_size=screen_size, graphics_mode=graphics_mode))
-            terrain.append(Terrain(x=0, y=2000, width=20000, length=3800, texture='grass', \
-                screen=screen, screen_size=screen_size, graphics_mode=graphics_mode))
         self.screen = screen
         self.environment = Environment(graphics_mode=graphics_mode, screen_size=screen_size, \
                 screen=screen, terrain=terrain, num_cpu_cars=num_cpu_cars)
@@ -52,7 +44,10 @@ class DrivingEnv(gym.Env):
         self.observation_space = spaces.Box(low, high)
 
         self.exp_count = self.iter_count = 0
+        self.screen_size = screen_size
+        self.screenshot_dir = screenshot_dir
         self.screenshot_rate = screenshot_rate
+        self.num_cpu_cars = num_cpu_cars
         self.time_horizon = time_horizon
         # self._seed()
         # self.reset()
@@ -85,7 +80,8 @@ class DrivingEnv(gym.Env):
     def _reset(self):
         self.exp_count += 1
         self.iter_count = 0
-        state = self.environment.reset()
+        self.screen = pygame.display.set_mode(self.screen_size)
+        state = self.environment.reset(self.screen)
         state = pygame.surfarray.array2d(self.screen).astype(np.uint8)
         return state
 
@@ -99,3 +95,10 @@ class DrivingEnv(gym.Env):
 
     def simulate_actions(self, actions, noise=0.0, state=None):
         return self.environment.simulate_actions(actions, noise, state)
+
+    def __deepcopy__(self, memo):
+        env = DrivingEnv(graphics_mode=self.graphics_mode, \
+            screen_size=self.screen_size, screen=None, terrain=None, \
+            screenshot_dir=self.screenshot_dir, screenshot_rate=self.screenshot_rate, \
+            num_cpu_cars=self.num_cpu_cars, time_horizon=self.time_horizon)
+        return env

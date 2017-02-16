@@ -31,7 +31,7 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 # GRAPHICS_MODE = True
 # CONTROLLER_MODE = 'keyboard'
-GRAPHICS_MODE = False #True
+GRAPHICS_MODE = True
 CONTROLLER_MODE = 'agent'
 SCREENSHOT_DIR = None
 # SCREENSHOT_DIR = 'screenshots'
@@ -65,6 +65,7 @@ def simulate_driving_agent(search_horizon=3):
     
     done = False
     counter = 0
+    simulator._reset()
     while counter < 100 and not done:
         # Checks for quit
         for event in pygame.event.get():

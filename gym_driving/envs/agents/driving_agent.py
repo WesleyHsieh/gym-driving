@@ -18,7 +18,7 @@ class DrivingAgent():
 		# self.driving_env = param_dict['driving_env']
 		self.reset()
 
-	def rollout_policy(self, env, search_horizon=5):
+	def eval_policy(self, env, search_horizon=5):
 		self.driving_env = env
 		self.search_horizon = search_horizon
 		self.counter = 0

@@ -16,7 +16,7 @@ import numpy as np, argparse
 import cPickle as pickle
 import time
 import matplotlib
-matplotlib.use('Agg')
+# matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import multiprocessing
 from functools import partial
@@ -38,8 +38,8 @@ class Experiment():
         # self.ITERATIONS = 20
         # self.TRIALS = 20
 
-        self.SAMPLES_PER_ROLLOUT = 2
-        self.SAMPLES_PER_EVAL = 2
+        self.SAMPLES_PER_ROLLOUT = 3
+        self.SAMPLES_PER_EVAL = 3
         self.ITERATIONS = 2
         self.TRIALS = 2
 
@@ -59,8 +59,12 @@ class Experiment():
         experiment_name = '{}_{}'.format(learner_name, agent_name)
         partial_func = partial(run_experiment_trial, learner_name=learner_name, agent_name=agent_name, \
             iterations=self.ITERATIONS, samples_per_rollout=self.SAMPLES_PER_ROLLOUT, samples_per_eval=self.SAMPLES_PER_EVAL)
-        pool = multiprocessing.Pool(processes=multiprocessing.cpu_count() - 1)
-        overall_stats = pool.map(partial_func, range(self.TRIALS))
+        # pool = multiprocessing.Pool(processes=multiprocessing.cpu_count() - 1)
+        # overall_stats = pool.map(partial_func, range(self.TRIALS))
+        overall_stats = []
+        for i in range(self.TRIALS):
+            overall_stats.append(partial_func(i))
+        # overall_stats = [partial_func(i) for i in range(self.TRIALS)]
         self.save_data(overall_stats, experiment_name)
 
     def plot_reward_curve(self, stats, experiment_name):
@@ -79,33 +83,29 @@ class Experiment():
         
 def run_experiment_trial(trial_number, learner_name, agent_name, iterations, samples_per_rollout, samples_per_eval):
     np.random.seed(trial_number)
+    num_processes = multiprocessing.cpu_count() - 1
     # Set up learner, agent
     if learner_name == 'linear_learner':
         learner = LinearLearner()
     elif learner_name == 'deep_learner':
         learner = DeepLearner()
-    env = DrivingEnv(graphics_mode=True)
-    supervisor = DrivingAgent()
+    env_list = [DrivingEnv(graphics_mode=True) for _ in range(samples_per_rollout)]
+    supervisor_list = [DrivingAgent() for _ in range(samples_per_rollout)]
     if agent_name == 'supervised':
-        agent = SupervisedAgent(learner, env, supervisor)
+        agent = SupervisedAgent(learner, env_list, supervisor_list)
     elif agent_name == 'dagger':
-        agent = DaggerAgent(learner, env, supervisor)
+        agent = DaggerAgent(learner, env_list, supervisor_list)
 
     # Run trial
     trial_stats = []
     for j in range(iterations):
         print("Agent {}: Trial {}, Iteration {}".format(agent_name, trial_number, j))
-        state_list, action_list = [], []
         # Collect samples 
-        for k in range(samples_per_rollout):   
-            states, actions = agent.rollout_algorithm()
-            state_list.append(states)
-            action_list.append(actions)
+        state_list, action_list = agent.rollout_algorithm(samples_per_rollout)
         # Update model
         agent.update_model(state_list, action_list)
         # Evaluate policy
-        for k in range(samples_per_eval):
-            agent.eval_policy()
+        agent.eval_policy(samples_per_eval)
         trial_stats.append(agent.get_statistics())
     print("Stats for Trial {}: ".format(trial_number))
     print("Train acc, Test acc, Reward, Surrogate Loss")
@@ -113,13 +113,18 @@ def run_experiment_trial(trial_number, learner_name, agent_name, iterations, sam
     return trial_stats
 
 if __name__ == '__main__':
-    FILEPATH = ''
+    FILEPATH = 'stats'
     # learners = ['linear_learner', 'deep_learner']
     learners = ['linear_learner']
-    agents = ['supervised', 'dagger']
+    agents = ['dagger', 'supervised']
+    # agents = ['supervised']
+    if not os.path.exists(FILEPATH):
+        os.makedirs(FILEPATH)
     for learner_name in learners:
         for agent_name in agents:
             print('Running experiment with {}'.format(learner_name))
             exp_class = Experiment(FILEPATH)
+            start = time.time()
             exp_class.run_experiment(learner_name, agent_name)
-
+            end = time.time()
+            print("time", end - start)

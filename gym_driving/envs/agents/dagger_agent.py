@@ -5,41 +5,26 @@ import IPython
 class DaggerAgent(SupervisedAgent):
 	def __init__(self, learner, env, supervisor):
 		super(DaggerAgent, self).__init__(learner, env, supervisor)
+		self.state_list, self.action_list = None, None
 
-	def rollout_algorithm(self):
+	def rollout_algorithm(self, n_trials=1):
 		"""
 		Rollout algorithm on underlying environment
 		for one trajectory, using supervisor.
 		"""
-		states, actions, rewards, supervisor_labels, surrogate_losses = [], [], [], [], []
-		done = False
-		state = self.env._reset()
-		while not done:
-			supervisor_label = self.supervisor.rollout_policy(self.env)
-			if len(self.learner.train_states) > 0:
-				action = self.learner.eval_policy(state)
-				surrogate_losses.append(action != supervisor_label)
-				next_state, reward, done, info_dict = self.env._step(action)
-			else:
-				action = supervisor_label
-				surrogate_losses.append(0)
-				next_state, reward, done, info_dict = self.env._step(action)
-				reward = 0
+		# Use rollouts from previous policy evaluation except for first iteration
+		if self.state_list is None and self.action_list is None:
+			return super(DaggerAgent, self).rollout_algorithm(n_trials)
+		else:
+			return self.state_list, self.action_list
 
-			states.append(state)
-			actions.append(supervisor_label)
-			rewards.append(reward)
-			supervisor_labels.append(supervisor_label)
-			
-			state = next_state
-
-		self.rewards.append(sum(rewards))
-		self.surrogate_losses.append(sum(surrogate_losses))
-
-		return states, actions
-
-	def eval_policy(self):
+	def eval_policy(self, n_trials=1):
 		"""
 		Evaluate underlying learner's policy. 
 		"""
-		return None
+		state_list, action_list, reward_list, supervisor_label_list, surrogate_loss_list = \
+			self.collect_rollouts(self.env_list, self.supervisor_list, self.learner_list, \
+				action_mode='learner')
+		self.state_list, self.action_list = state_list, action_list
+		self.rewards, self.surrogate_losses = reward_list, surrogate_loss_list
+		return state_list, action_list, reward_list, supervisor_label_list, surrogate_loss_list
