@@ -16,7 +16,7 @@ import numpy as np, argparse
 import cPickle as pickle
 import time
 import matplotlib
-# matplotlib.use('Agg')
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import multiprocessing
 from functools import partial
