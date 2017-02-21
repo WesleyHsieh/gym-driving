@@ -59,7 +59,7 @@ def save_data(self, stats, file_path="tmp/"):
 def train():
     TRIALS = 5
     ITERATIONS = 5
-    SAMPLES_PER_ROLLOUT = 1
+    SAMPLES_PER_ROLLOUT = 2
     SAMPLES_PER_EVAL = 5
     overall_stats = [] 
     main_agent = ray.env.agent
@@ -74,7 +74,7 @@ def train():
 
             rollouts = [rollout.remote(weight_id) for k in range(SAMPLES_PER_ROLLOUT)]
             results = ray.get(rollouts)
-
+            state_list, action_list = zip(*results)
 
             main_agent.update_model(state_list, action_list)
             for k in range(SAMPLES_PER_EVAL):
