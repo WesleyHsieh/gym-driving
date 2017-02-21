@@ -22,7 +22,13 @@ class DrivingEnv(gym.Env):
     #     'video.frames_per_second' : 50
     # }
 
-    def __init__(self, graphics_mode=False, screen_size=(512, 512), screen=None, terrain=None, screenshot_dir=None, screenshot_rate=10, num_cpu_cars=10, time_horizon=100):
+    def __init__(self, graphics_mode=False, screen_size=(512, 512), screen=None, terrain=None, screenshot_dir=None, screenshot_rate=10, time_horizon=100, param_dict=None):
+        if param_dict is None:
+            param_dict = {'num_cpu_cars': 10, 'main_car_starting_angles': np.linspace(-30, 30, 5), 'cpu_cars_bounding_box': [[100.0, 1000.0], [-90.0, 90.0]]}
+        self.num_cpu_cars = param_dict['num_cpu_cars']
+        self.main_car_starting_angles = param_dict['main_car_starting_angles']
+        self.cpu_cars_bounding_box = param_dict['cpu_cars_bounding_box']
+
         # Default options for PyGame screen, terrain
         if screen is None:
             screen = pygame.display.set_mode(screen_size)
@@ -32,23 +38,23 @@ class DrivingEnv(gym.Env):
             os.makedirs(screenshot_dir)
         self.screen = screen
         self.environment = Environment(graphics_mode=graphics_mode, screen_size=screen_size, \
-                screen=screen, terrain=terrain, num_cpu_cars=num_cpu_cars)
+                screen=screen, terrain=terrain, param_dict=param_dict)
         self.graphics_mode = graphics_mode
 
         # 0, 1, 2 = Steer left, center, right
         self.action_space = spaces.Discrete(2)
 
         # Limits on x, y, angle
-        low = np.tile(np.array([-10000.0, -10000.0, 0.0]), num_cpu_cars + 1)
-        high = np.tile(np.array([10000.0, 10000.0, 360.0]), num_cpu_cars + 1)
+        low = np.tile(np.array([-10000.0, -10000.0, 0.0]), self.num_cpu_cars + 1)
+        high = np.tile(np.array([10000.0, 10000.0, 360.0]), self.num_cpu_cars + 1)
         self.observation_space = spaces.Box(low, high)
 
         self.exp_count = self.iter_count = 0
         self.screen_size = screen_size
         self.screenshot_dir = screenshot_dir
         self.screenshot_rate = screenshot_rate
-        self.num_cpu_cars = num_cpu_cars
         self.time_horizon = time_horizon
+        self.param_dict = param_dict
         # self._seed()
         # self.reset()
         # self.viewer = None
@@ -100,5 +106,5 @@ class DrivingEnv(gym.Env):
         env = DrivingEnv(graphics_mode=self.graphics_mode, \
             screen_size=self.screen_size, screen=None, terrain=None, \
             screenshot_dir=self.screenshot_dir, screenshot_rate=self.screenshot_rate, \
-            num_cpu_cars=self.num_cpu_cars, time_horizon=self.time_horizon)
+            param_dict=self.param_dict)
         return env

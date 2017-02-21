@@ -11,22 +11,23 @@ class Environment:
     be done through simulator wrapper class.
     """
 
-    def __init__(self, graphics_mode, screen_size, screen=None, terrain=[], num_cpu_cars=5):
+    def __init__(self, graphics_mode, screen_size, screen=None, terrain=[], param_dict=None):
         self.cpu_car_textures = ['blue', 'green']
-        self.num_cpu_cars = num_cpu_cars
         self.screen_size = screen_size
         self.screen = screen
         self.terrain = terrain
         self.graphics_mode = graphics_mode
         self.steer_action = 15.0
         self.acc_action = 5.0
+        self.param_dict = param_dict
         self.reset()
 
     def reset(self, screen=None):
         if screen is not None:
             self.screen = screen
-        lims = [[100.0, 1000.0], [-90.0, 90.0]]
-        main_car_angle = np.random.choice(np.arange(-30, 31, 15))
+        self.num_cpu_cars = self.param_dict['num_cpu_cars']
+        lims = self.param_dict['cpu_cars_bounding_box']
+        main_car_angle = np.random.choice(self.param_dict['main_car_starting_angles'])
         self.main_car = Car(x=0.0, y=0.0, angle=main_car_angle, max_vel=20.0, \
             screen=self.screen, screen_size=self.screen_size, texture='main', \
             graphics_mode=self.graphics_mode)

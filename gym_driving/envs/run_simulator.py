@@ -30,9 +30,9 @@ TERRAINS = []
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 # GRAPHICS_MODE = True
-# CONTROLLER_MODE = 'keyboard'
+CONTROLLER_MODE = 'keyboard'
 GRAPHICS_MODE = True
-CONTROLLER_MODE = 'agent'
+# CONTROLLER_MODE = 'agent'
 SCREENSHOT_DIR = None
 # SCREENSHOT_DIR = 'screenshots'
 # os.environ["SDL_VIDEODRIVER"] = "dummy"
@@ -52,6 +52,7 @@ def draw_box_coords(rectangle, screen, SCREEN_COORD):
     pygame.draw.circle(screen, 0, pos, 5, 0)
 
 def simulate_driving_agent(search_horizon=3):
+    param_dict = {'num_cpu_cars': 10, 'main_car_starting_angles': np.linspace(-30, 30, 5), 'cpu_cars_bounding_box': [[100.0, 1000.0], [-90.0, 90.0]]}
     pygame.init()
     fpsClock = pygame.time.Clock()
     if GRAPHICS_MODE:
@@ -59,7 +60,7 @@ def simulate_driving_agent(search_horizon=3):
         pygame.display.set_caption('Driving Simulator')
     else:
         screen = None
-    simulator = DrivingEnv(graphics_mode=GRAPHICS_MODE, screenshot_dir=SCREENSHOT_DIR)
+    simulator = DrivingEnv(graphics_mode=GRAPHICS_MODE, screenshot_dir=SCREENSHOT_DIR, param_dict=param_dict)
     param_dict = {'search_horizon': search_horizon, 'driving_env': simulator}
     controller = Controller(mode='agent', param_dict=param_dict)
     

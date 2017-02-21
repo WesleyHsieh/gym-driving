@@ -55,10 +55,11 @@ class Experiment():
         pickle.dump(stats, open(data_filepath,'wb'))
         self.plot_reward_curve(stats, experiment_name)
 
-    def run_experiment(self, learner_name, agent_name):
+    def run_experiment(self, learner_name, agent_name, env_param_dict=None):
         experiment_name = '{}_{}'.format(learner_name, agent_name)
         partial_func = partial(run_experiment_trial, learner_name=learner_name, agent_name=agent_name, \
-            iterations=self.ITERATIONS, samples_per_rollout=self.SAMPLES_PER_ROLLOUT, samples_per_eval=self.SAMPLES_PER_EVAL)
+            iterations=self.ITERATIONS, samples_per_rollout=self.SAMPLES_PER_ROLLOUT, samples_per_eval=self.SAMPLES_PER_EVAL, \
+            env_param_dict=env_param_dict)
         # pool = multiprocessing.Pool(processes=multiprocessing.cpu_count() - 1)
         # overall_stats = pool.map(partial_func, range(self.TRIALS))
         overall_stats = []
@@ -81,7 +82,7 @@ class Experiment():
             plt.ylabel(stats_name)
             plt.savefig('stats/stats_{}_{}.png'.format(experiment_name, stats_name))
         
-def run_experiment_trial(trial_number, learner_name, agent_name, iterations, samples_per_rollout, samples_per_eval):
+def run_experiment_trial(trial_number, learner_name, agent_name, iterations, samples_per_rollout, samples_per_eval, env_param_dict=None):
     np.random.seed(trial_number)
     num_processes = multiprocessing.cpu_count() - 1
     # Set up learner, agent
@@ -89,7 +90,7 @@ def run_experiment_trial(trial_number, learner_name, agent_name, iterations, sam
         learner = LinearLearner()
     elif learner_name == 'deep_learner':
         learner = DeepLearner()
-    env_list = [DrivingEnv(graphics_mode=True) for _ in range(samples_per_rollout)]
+    env_list = [DrivingEnv(graphics_mode=True, param_dict=env_param_dict) for _ in range(samples_per_rollout)]
     supervisor_list = [DrivingAgent() for _ in range(samples_per_rollout)]
     if agent_name == 'supervised':
         agent = SupervisedAgent(learner, env_list, supervisor_list)
@@ -113,6 +114,16 @@ def run_experiment_trial(trial_number, learner_name, agent_name, iterations, sam
     return trial_stats
 
 if __name__ == '__main__':
+    """
+    env_param_dict
+
+    'num_cpu_cars': Number of cpu cars.
+    'main_car_starting_angles': List of possible starting angles for the main car,
+        will be chosen randomly from the list.
+    'cpu_cars_bounding_box': ((low_x, high_x), (low_y, high_y)) of the bounding box for the initial
+        positions of the cpu cars.
+    """
+    env_param_dict = {'num_cpu_cars': 10, 'main_car_starting_angles': np.linspace(-30, 30, 5), 'cpu_cars_bounding_box': [[100.0, 1000.0], [-90.0, 90.0]]}
     FILEPATH = 'stats'
     # learners = ['linear_learner', 'deep_learner']
     learners = ['linear_learner']
@@ -125,6 +136,6 @@ if __name__ == '__main__':
             print('Running experiment with {}'.format(learner_name))
             exp_class = Experiment(FILEPATH)
             start = time.time()
-            exp_class.run_experiment(learner_name, agent_name)
+            exp_class.run_experiment(learner_name, agent_name, env_param_dict)
             end = time.time()
             print("time", end - start)
