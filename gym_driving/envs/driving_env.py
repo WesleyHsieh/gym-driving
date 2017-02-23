@@ -1,7 +1,7 @@
 from gym_driving.envs.environment import *
 from gym_driving.envs.car import *
 from gym_driving.envs.terrain import *
-
+import cv2
 import logging
 import math
 import gym
@@ -22,7 +22,7 @@ class DrivingEnv(gym.Env):
     #     'video.frames_per_second' : 50
     # }
 
-    def __init__(self, graphics_mode=False, screen_size=(512, 512), screen=None, terrain=None, screenshot_dir=None, screenshot_rate=10, num_cpu_cars=10, time_horizon=100):
+    def __init__(self, graphics_mode=False, screen_size=(512, 512), screen=None, terrain=None, screenshot_dir=None, screenshot_rate=10, num_cpu_cars=5, time_horizon=100):
         # Default options for PyGame screen, terrain
         if screen is None:
             screen = pygame.display.set_mode(screen_size)
@@ -80,6 +80,7 @@ class DrivingEnv(gym.Env):
         if self.iter_count >= self.time_horizon:
             done = True
         state = pygame.surfarray.array2d(self.screen).astype(np.uint8)
+
         return state, reward, done, info_dict
         
     def _reset(self):

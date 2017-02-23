@@ -24,6 +24,7 @@ class Environment:
     def reset(self):
         lims = [[100.0, 1000.0], [-90.0, 90.0]]
         main_car_angle = np.random.choice(np.arange(-30, 31, 15))
+        
         self.main_car = Car(x=0.0, y=0.0, angle=main_car_angle, max_vel=20.0, \
             screen=self.screen, screen_size=self.screen_size, texture='main', \
             graphics_mode=self.graphics_mode)

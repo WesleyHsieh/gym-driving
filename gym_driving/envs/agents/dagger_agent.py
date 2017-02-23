@@ -16,7 +16,7 @@ class DaggerAgent(SupervisedAgent):
 		state = self.env._reset()
 		while not done:
 			supervisor_label = self.supervisor.rollout_policy(self.env)
-			if len(self.learner.train_states) > 0:
+			if self.iterations > 0:
 				action = self.learner.eval_policy(state)
 				surrogate_losses.append(action != supervisor_label)
 				next_state, reward, done, info_dict = self.env._step(action)
@@ -37,9 +37,3 @@ class DaggerAgent(SupervisedAgent):
 		self.surrogate_losses.append(sum(surrogate_losses))
 
 		return states, actions
-
-	def eval_policy(self):
-		"""
-		Evaluate underlying learner's policy. 
-		"""
-		return None

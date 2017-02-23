@@ -1,6 +1,8 @@
 import numpy as np
 from gym_driving.envs.agents.agent import * 
 import IPython
+import tensorflow as tf 
+import ray
 
 class SupervisedAgent(Agent):
 	
@@ -8,6 +10,19 @@ class SupervisedAgent(Agent):
 		super(SupervisedAgent, self).__init__(learner, env)
 		self.supervisor = supervisor
 		self.rewards, self.surrogate_losses = [], []
+		self.iterations = 0.0
+		self.initialized = False
+
+	def setup(self):
+		print "Setting up the session...."
+		self.learner.net.sess = tf.Session(graph=self.learner.net.g)
+		self.learner.net.sess.run(self.learner.net.initializer)
+
+		loss = self.learner.net.loss
+		sess = self.learner.net.sess
+
+		self.variables = ray.experimental.TensorFlowVariables(loss, sess)
+		self.initialized = True
 
 	def rollout_algorithm(self):
 		"""
@@ -37,6 +52,7 @@ class SupervisedAgent(Agent):
 		while not done:
 			supervisor_label = self.supervisor.rollout_policy(self.env)
 			action = self.learner.eval_policy(state)
+	
 			next_state, reward, done, info_dict = self.env._step(action)
 
 			states.append(state)
@@ -45,7 +61,7 @@ class SupervisedAgent(Agent):
 			supervisor_labels.append(supervisor_label)
 			surrogate_losses.append(action != supervisor_label)
 			state = next_state
-
+		
 		self.rewards.append(sum(rewards))
 		self.surrogate_losses.append(sum(surrogate_losses))
 
@@ -56,7 +72,8 @@ class SupervisedAgent(Agent):
 		Update model of underlying learner.
 		"""
 		self.learner.add_to_data(states, actions)
-		self.learner.train_learner()
+		self.learner.train_learner(self.iterations)
+		self.iterations +=1
 
 	def get_statistics(self):
 		"""
@@ -67,5 +84,6 @@ class SupervisedAgent(Agent):
 
 	def reset(self):
 		self.learner.reset()
+		self.iterations = 0
 		self.rewards, self.surrogate_losses = [], []
 		
