@@ -180,7 +180,7 @@ def train(alg_type):
             if(alg_type == 'dagger'):
                 params = [j]
             elif(alg_type == 'dart_off'):
-                params = 0.0#[main_agent.compute_eps()]
+                params = [0.0]#[main_agent.compute_eps()]
             elif(alg_type == 'off_d'):
                 params = [1]
             rollouts = [rollout.remote(weight_id, params,alg_type, c=k) for k in range(SAMPLES_PER_ROLLOUT)]
