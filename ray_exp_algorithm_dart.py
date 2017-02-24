@@ -96,8 +96,8 @@ def agent_reinit(agent):
 
 
 #ray.env.off_agent = ray.EnvironmentVariable(agent_off_init, agent_reinit)
-#ray.env.dart_agent = ray.EnvironmentVariable(agent_dart_init, agent_reinit)
-ray.env.dagger_agent = ray.EnvironmentVariable(agent_dagger_init, agent_reinit)
+ray.env.dart_agent = ray.EnvironmentVariable(agent_dart_init, agent_reinit)
+#ray.env.dagger_agent = ray.EnvironmentVariable(agent_dagger_init, agent_reinit)
 
 
 
@@ -180,7 +180,7 @@ def train(alg_type):
             if(alg_type == 'dagger'):
                 params = [j]
             elif(alg_type == 'dart_off'):
-                params = [main_agent.compute_eps()]
+                params = 0.0#[main_agent.compute_eps()]
             elif(alg_type == 'off_d'):
                 params = [1]
             rollouts = [rollout.remote(weight_id, params,alg_type, c=k) for k in range(SAMPLES_PER_ROLLOUT)]
@@ -235,6 +235,6 @@ if __name__ == '__main__':
 
     #train('off_d')
 
-    train('dagger')
+    #train('dagger')
 
-    #train('dart_off')
+    train('dart_off')
