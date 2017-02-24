@@ -54,7 +54,7 @@ def plot_reward_curve( stats, agent_name):
 
 
 def env_init():
-    return DrivingEnv(graphics_mode=True)
+    return DrivingEnv(graphics_mode=False)
 
 def env_reinit(env):
     return env
@@ -96,14 +96,14 @@ def agent_reinit(agent):
 
 
 #ray.env.off_agent = ray.EnvironmentVariable(agent_off_init, agent_reinit)
-ray.env.dart_agent = ray.EnvironmentVariable(agent_dart_init, agent_reinit)
-#ray.env.dagger_agent = ray.EnvironmentVariable(agent_dagger_init, agent_reinit)
+#ray.env.dart_agent = ray.EnvironmentVariable(agent_dart_init, agent_reinit)
+ray.env.dagger_agent = ray.EnvironmentVariable(agent_dagger_init, agent_reinit)
 
 
 
 @ray.remote
-def rollout(weights, params,alg_type):
-
+def rollout(weights, params,alg_type, c=0):
+    #"""
     if(alg_type == 'dagger'):
         agent = ray.env.dagger_agent
     elif(alg_type == 'off_d'):
@@ -117,11 +117,15 @@ def rollout(weights, params,alg_type):
         print "Setting up agent"
     agent.set_weights(weights)
     agent.set_params(params)
-    print("## Starting Rollout...")
+    print("## Starting Rollout %d..." % c)
     for i in range(5):
         x = agent.rollout_algorithm()
-    print("## Finished Rollout")
+    print("## Finished Rollout %d" % c)
     return x
+    #"""
+    #import time
+    #time.sleep(1)
+    #return np.zeros([100, 300, 300]), np.zeros([100, 5], dtype=int)
 
 
 def save_data(stats, alg_name):
@@ -133,7 +137,7 @@ def save_data(stats, alg_name):
 def train(alg_type):
     TRIALS = 5
     ITERATIONS = 4
-    SAMPLES_PER_ROLLOUT = 100
+    SAMPLES_PER_ROLLOUT = 100 # keep as multiple of 10
     SAMPLES_PER_EVAL = 20
 
     # TRIALS = 1
@@ -176,13 +180,31 @@ def train(alg_type):
             if(alg_type == 'dagger'):
                 params = [j]
             elif(alg_type == 'dart_off'):
-                params = [0.0]#[main_agent.compute_eps()]
+                params = [main_agent.compute_eps()]
             elif(alg_type == 'off_d'):
                 params = [1]
-            rollouts = [rollout.remote(weight_id, params,alg_type) for k in range(SAMPLES_PER_ROLLOUT)]
-            results = ray.get(rollouts)
+            rollouts = [rollout.remote(weight_id, params,alg_type, c=k) for k in range(SAMPLES_PER_ROLLOUT)]
+
+            results = []
+            for i in range(10):
+                batch_res, rollouts = ray.wait(rollouts, num_returns=SAMPLES_PER_ROLLOUT / 10)
+                batch_res_vals = ray.get(batch_res)
+                new_batch_res_vals = []
+                for x, y in batch_res_vals:
+                    new_x = np.empty_like(x)
+                    new_x[:] = x[:]
+                    new_y = np.empty_like(y)
+                    new_y[:] = y[:]
+                    new_batch_res_vals.append((new_x, new_y))
+                batch_res_vals = new_batch_res_vals
+
+                results.extend(batch_res_vals)
+                print "Collected batch of %d" % len(batch_res)
+
+            # results = ray.get(rollouts)
             print "Collected Rollouts"
             state_list, action_list = zip(*results)
+            #state_list = [np.copy(x) for x in state_list]
 
            
             main_agent.update_model(state_list, action_list)
@@ -213,6 +235,6 @@ if __name__ == '__main__':
 
     #train('off_d')
 
-    #train('dagger')
+    train('dagger')
 
-    train('dart_off')
+    #train('dart_off')
