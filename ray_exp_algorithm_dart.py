@@ -121,7 +121,7 @@ def rollout(weights, params,alg_type, c=0):
     for i in range(5):
         x = agent.rollout_algorithm()
     print("## Finished Rollout %d" % c)
-    return x
+    return [x] * 10
     #"""
     #import time
     #time.sleep(1)
@@ -137,7 +137,7 @@ def save_data(stats, alg_name):
 def train(alg_type):
     TRIALS = 5
     ITERATIONS = 4
-    SAMPLES_PER_ROLLOUT = 100 # keep as multiple of 10
+    SAMPLES_PER_ROLLOUT = 20 # keep as multiple of 10
     SAMPLES_PER_EVAL = 20
 
     # TRIALS = 1
@@ -186,24 +186,29 @@ def train(alg_type):
             rollouts = [rollout.remote(weight_id, params,alg_type, c=k) for k in range(SAMPLES_PER_ROLLOUT)]
 
             results = []
-            for i in range(10):
-                batch_res, rollouts = ray.wait(rollouts, num_returns=SAMPLES_PER_ROLLOUT / 10)
-                batch_res_vals = ray.get(batch_res)
-                new_batch_res_vals = []
-                for x, y in batch_res_vals:
-                    new_x = np.empty_like(x)
-                    new_x[:] = x[:]
-                    new_y = np.empty_like(y)
-                    new_y[:] = y[:]
-                    new_batch_res_vals.append((new_x, new_y))
-                batch_res_vals = new_batch_res_vals
+            # for i in range(10):
+            #     batch_res, rollouts = ray.wait(rollouts, num_returns=SAMPLES_PER_ROLLOUT / 10)
+            #     batch_res_vals = ray.get(batch_res)
+            #     new_batch_res_vals = []
+            #     for x, y in batch_res_vals:
+            #         new_x = np.empty_like(x)
+            #         new_x[:] = x[:]
+            #         new_y = np.empty_like(y)
+            #         new_y[:] = y[:]
+            #         new_batch_res_vals.append((new_x, new_y))
+            #     batch_res_vals = new_batch_res_vals
 
-                results.extend(batch_res_vals)
-                print "Collected batch of %d" % len(batch_res)
+            #     results.extend(batch_res_vals)
+            #     print "Collected batch of %d" % len(batch_res)
 
-            # results = ray.get(rollouts)
+            t_results = ray.get(rollouts)
+            t_results = [x[0] for x in t_results]
+            state_list = [np.array(res[0], copy=True) for res in t_results]
+            action_list = [np.array(res[1], copy=True) for res in t_results]
+            t_results = []
+
             print "Collected Rollouts"
-            state_list, action_list = zip(*results)
+            # state_list, action_list = zip(*results)
             #state_list = [np.copy(x) for x in state_list]
 
            
