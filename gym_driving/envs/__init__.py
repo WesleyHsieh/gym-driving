@@ -1,1 +1,2 @@
 from gym_driving.envs.driving_env import DrivingEnv
+from gym_driving.envs.supervisor_driving_env import SupervisorDrivingEnv

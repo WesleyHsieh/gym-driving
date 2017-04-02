@@ -52,7 +52,7 @@ class Controller:
         return action
 
     def process_agent(self, env):
-        steer = self.agent.eval_policy(env)
+        steer = self.agent.eval_policy(env, None)
         acc = 0
         action = np.array([steer, acc])
         return action

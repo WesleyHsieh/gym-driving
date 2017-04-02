@@ -123,8 +123,8 @@ class Environment:
             Reward.
         """
         # Convert numerical action vector to steering angle / acceleration
-        # steer = action[0] - 1
-        steer = (action[0] - 2) / 2.0
+        steer = action[0] - 1
+        # steer = (action[0] - 2) / 2.0
         acc = action[1]
 
         # Add noise

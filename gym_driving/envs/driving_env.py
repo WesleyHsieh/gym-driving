@@ -22,7 +22,7 @@ class DrivingEnv(gym.Env):
     #     'video.frames_per_second' : 50
     # }
 
-    def __init__(self, graphics_mode=False, screen_size=(512, 512), screen=None, terrain=None, screenshot_dir=None, screenshot_rate=10, time_horizon=100, param_dict=None):
+    def __init__(self, graphics_mode=True, screen_size=(512, 512), screen=None, terrain=None, screenshot_dir=None, screenshot_rate=10, time_horizon=100, param_dict=None):
         if param_dict is None:
             param_dict = {'num_cpu_cars': 10, 'main_car_starting_angles': np.linspace(-30, 30, 5), 'cpu_cars_bounding_box': [[100.0, 1000.0], [-90.0, 90.0]]}
         self.num_cpu_cars = param_dict['num_cpu_cars']
@@ -71,6 +71,9 @@ class DrivingEnv(gym.Env):
     #     self.np_random, seed = seeding.np_random(seed)
     #     return [seed]
 
+    def _render(self, mode='human', close=False):
+        pass
+
     def _step(self, action):
         self.iter_count += 1
         action = np.array([action, 1.0])
@@ -80,7 +83,7 @@ class DrivingEnv(gym.Env):
             self.save_image()
         if self.iter_count >= self.time_horizon:
             done = True
-        state = pygame.surfarray.array2d(self.screen).astype(np.uint8)
+        # state = pygame.surfarray.array2d(self.screen).astype(np.uint8)
         return state, reward, done, info_dict
         
     def _reset(self):
@@ -88,7 +91,7 @@ class DrivingEnv(gym.Env):
         self.iter_count = 0
         self.screen = pygame.display.set_mode(self.screen_size)
         state = self.environment.reset(self.screen)
-        state = pygame.surfarray.array2d(self.screen).astype(np.uint8)
+        # state = pygame.surfarray.array2d(self.screen).astype(np.uint8)
         return state
 
     def _render(self, mode='human', close=False):

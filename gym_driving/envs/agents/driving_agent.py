@@ -10,15 +10,16 @@ class DrivingAgent():
 	"""
 	Agent that autonomously drives a car.
 	"""
-	def __init__(self, param_dict=None):
+	def __init__(self, param_dict=None, env=None):
 		if param_dict is None:
 			self.search_horizon = 5
 		else:
 			self.search_horizon = param_dict['search_horizon']
 		# self.driving_env = param_dict['driving_env']
+		self.actions = [0, 1, 2, 3, 4]
 		self.reset()
 
-	def eval_policy(self, env, search_horizon=5):
+	def eval_policy(self, env, state, search_horizon=5):
 		self.driving_env = env
 		self.search_horizon = search_horizon
 		self.counter = 0
@@ -56,10 +57,8 @@ class DrivingAgent():
 					heapq.heappush(fringe, new_tuple)
 
 	def successor_func(self, action_list, simulator_state=None):
-		# actions = [0, 1, 2]
-		actions = [0, 1, 2, 3, 4]
 		successors = []
-		for action in actions:
+		for action in self.actions:
 			new_action_list = list(action_list) + [action]
 			successor = self.simulate_actions(new_action_list, simulator_state)
 			successors.append(successor)
