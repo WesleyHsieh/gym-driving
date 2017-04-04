@@ -9,6 +9,7 @@ from gym import spaces
 from gym.utils import seeding
 import numpy as np
 import IPython
+import pickle
 
 logger = logging.getLogger(__name__)
 
@@ -21,24 +22,44 @@ class DrivingEnv(gym.Env):
     #     'render.modes': ['human', 'rgb_array'],
     #     'video.frames_per_second' : 50
     # }
+    # def __init__(self, param_dict=None):
+    def __init__(self, graphics_mode=True, screen=None, config_filepath=None):
+        if config_filepath is None:
+            param_dict = {
+                'num_cpu_cars': 10, 
+                'main_car_starting_angles': np.linspace(-30, 30, 5), 
+                'cpu_cars_bounding_box': [[100.0, 1000.0], [-90.0, 90.0]],
+                'screen_size': (512, 512),
+                'screenshot_dir': None,
+                'screenshot_rate': 10,
+                'time_horizon': 100,
+                'terrain_params': [[0, -2000, 20000, 38000, 'grass'], [0, 0, 20000, 200, 'road'], [0, 2000, 20000, 3800, 'grass']],
+            }
+        else:
+            param_dict = pickle.load(open(config_filepath, 'r'))
+        print(config_filepath)
+        print(param_dict)
 
-    def __init__(self, graphics_mode=True, screen_size=(512, 512), screen=None, terrain=None, screenshot_dir=None, screenshot_rate=10, time_horizon=100, param_dict=None):
-        if param_dict is None:
-            param_dict = {'num_cpu_cars': 10, 'main_car_starting_angles': np.linspace(-30, 30, 5), 'cpu_cars_bounding_box': [[100.0, 1000.0], [-90.0, 90.0]]}
         self.num_cpu_cars = param_dict['num_cpu_cars']
         self.main_car_starting_angles = param_dict['main_car_starting_angles']
         self.cpu_cars_bounding_box = param_dict['cpu_cars_bounding_box']
+        self.screen_size = param_dict['screen_size']
+        self.screenshot_dir = param_dict['screenshot_dir']
+        self.screenshot_rate = param_dict['screenshot_rate']
+        self.time_horizon = param_dict['time_horizon']
+        self.terrain_params = param_dict['terrain_params']
+        self.param_dict = param_dict
 
         # Default options for PyGame screen, terrain
         if screen is None:
-            screen = pygame.display.set_mode(screen_size)
+            screen = pygame.display.set_mode(self.screen_size)
             # pygame.display.set_caption('Driving Simulator')
 
-        if screenshot_dir is not None and not os.path.exists(screenshot_dir):
-            os.makedirs(screenshot_dir)
+        if self.screenshot_dir is not None and not os.path.exists(self.screenshot_dir):
+            os.makedirs(self.screenshot_dir)
         self.screen = screen
-        self.environment = Environment(graphics_mode=graphics_mode, screen_size=screen_size, \
-                screen=screen, terrain=terrain, param_dict=param_dict)
+        self.environment = Environment(graphics_mode=graphics_mode, screen_size=self.screen_size, \
+                screen=self.screen, param_dict=self.param_dict)
         self.graphics_mode = graphics_mode
 
         # 0, 1, 2 = Steer left, center, right
@@ -50,11 +71,7 @@ class DrivingEnv(gym.Env):
         self.observation_space = spaces.Box(low, high)
 
         self.exp_count = self.iter_count = 0
-        self.screen_size = screen_size
-        self.screenshot_dir = screenshot_dir
-        self.screenshot_rate = screenshot_rate
-        self.time_horizon = time_horizon
-        self.param_dict = param_dict
+        
         # self._seed()
         # self.reset()
         # self.viewer = None

@@ -11,8 +11,8 @@ import random
 import cProfile
 import IPython
 
-TIMESTEPS = 100
-SLEEP_DELAY = .05
+TIMESTEPS = 1000
+SLEEP_DELAY = .005
 ACC_ACTION = 5.0
 STEER_ACTION = 15.0
 FPS = 30
@@ -130,9 +130,9 @@ def simulate_manual_control():
     # TERRAINS.append(Terrain(0, -2000, 20000, 3900, 'grass', screen, SCREEN_SIZE))
     # TERRAINS.append(Terrain(0, 0, 20000, 100, 'road', screen, SCREEN_SIZE))
     # TERRAINS.append(Terrain(0, 2000, 20000, 3900, 'grass', screen, SCREEN_SIZE))
-
+    config_filepath = 'configs/config.pkl'
     controller = Controller(CONTROLLER_MODE)
-    simulator = DrivingEnv(graphics_mode=GRAPHICS_MODE, screenshot_dir=SCREENSHOT_DIR)
+    simulator = DrivingEnv(graphics_mode=GRAPHICS_MODE, config_filepath=config_filepath)
     #simulator = DrivingEnv(GRAPHICS_MODE, SCREEN_SIZE, screen, TERRAINS)
     states, actions, rewards = [], [], []
 

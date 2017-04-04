@@ -11,11 +11,10 @@ class Environment:
     be done through simulator wrapper class.
     """
 
-    def __init__(self, graphics_mode, screen_size, screen=None, terrain=[], param_dict=None):
+    def __init__(self, graphics_mode, screen_size, screen=None, param_dict=None):
         self.cpu_car_textures = ['blue', 'green']
         self.screen_size = screen_size
         self.screen = screen
-        self.terrain = terrain
         self.graphics_mode = graphics_mode
         self.steer_action = 15.0
         self.acc_action = 5.0
@@ -42,13 +41,19 @@ class Environment:
                 collision = any([new_car.collide_rect(car) for car in self.vehicles]) or new_car.collide_rect(self.main_car)
             self.vehicles.append(new_car)
 
-        self.terrain = []
-        self.terrain.append(Terrain(x=0, y=-2000, width=20000, length=3800, texture='grass', \
-            screen=self.screen, screen_size=self.screen_size, graphics_mode=self.graphics_mode))
-        self.terrain.append(Terrain(x=0, y=0, width=20000, length=200, texture='road', \
-            screen=self.screen, screen_size=self.screen_size, graphics_mode=self.graphics_mode))
-        self.terrain.append(Terrain(x=0, y=2000, width=20000, length=3800, texture='grass', \
-            screen=self.screen, screen_size=self.screen_size, graphics_mode=self.graphics_mode))
+        
+        if self.param_dict['terrain_params'] is None:
+            self.terrain = []
+            self.terrain.append(Terrain(x=0, y=-2000, width=20000, length=3800, texture='grass', \
+                screen=self.screen, screen_size=self.screen_size, graphics_mode=self.graphics_mode))
+            self.terrain.append(Terrain(x=0, y=0, width=20000, length=200, texture='road', \
+                screen=self.screen, screen_size=self.screen_size, graphics_mode=self.graphics_mode))
+            self.terrain.append(Terrain(x=0, y=2000, width=20000, length=3800, texture='grass', \
+                screen=self.screen, screen_size=self.screen_size, graphics_mode=self.graphics_mode))
+        else:
+            self.terrain = [Terrain(x=x, y=y, width=width, length=length, texture=texture, \
+                screen=self.screen, screen_size=self.screen_size, graphics_mode=self.graphics_mode) \
+                for x, y, width, length, texture in self.param_dict['terrain_params']]
         if self.graphics_mode:
             self.update_graphics()
         state, info_dict = self.get_state()
