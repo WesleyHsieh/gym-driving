@@ -3,6 +3,7 @@ import numpy as np
 import pickle
 import IPython 
 import os 
+import pprint
 
 def get_filtered_input(key, description, default_args, num_args, num_inputs, generator_func):
 	"""
@@ -15,6 +16,7 @@ def get_filtered_input(key, description, default_args, num_args, num_inputs, gen
 	input_token_lists = []
 
 	for i in range(num_inputs):
+		print("-----")
 		print("Collecting input {} out of {}".format(i + 1, num_inputs))
 		input_tokens = input(input_prompt).split(' ')
 		if is_empty(input_tokens):
@@ -62,6 +64,12 @@ class ParamaterWrapper:
 		return int(time_horizon)
 	def get_terrain(self, x, y, width, length, texture):
 		return int(x), int(y), int(width), int(length), str(texture)
+	def get_main_car_params(self, x, y, vel, max_vel):
+		return int(x), int(y), float(vel), float(max_vel)
+	def get_steer_action(self, steer):
+		return float(steer)
+	def get_acc_action(self, acc):
+		return float(acc)
 
 class GenerateConfig:
 	def __init__(self):
@@ -77,7 +85,11 @@ class GenerateConfig:
 			'time_horizon': ('Time horizon for a rollout (int)', [100], 1, 1, self.paramater_wrapper.get_time_horizon), 
 			'terrain_params': ('x, y, width, length, texture (int, int, int, int, str)', \
 				[[0, -2000, 20000, 38000, 'grass'], [0, 0, 20000, 200, 'road'], [0, 2000, 20000, 3800, 'grass']], \
-				5, 100, self.paramater_wrapper.get_terrain)
+				5, 100, self.paramater_wrapper.get_terrain),
+			'main_car_params': ('x, y, starting_vel, max_vel (int, int, float, float)', [0, 0, 0.0, 20.0], \
+				4, 1, self.paramater_wrapper.get_main_car_params),
+			'steer_action': ('Angle change in degrees for a steer action (float)', [15.0], 1, 1, self.paramater_wrapper.get_steer_action),
+			'acc_action': ('Velocity change for an acceleration action (float)', [5.0], 1, 1, self.paramater_wrapper.get_acc_action),
 		}
 		self.command_dict = {
 			'help': self.help,
@@ -88,6 +100,7 @@ class GenerateConfig:
 			'load': self.load_config_dict,
 		}
 		self.config_dict = self.generate_default_config_dict()
+		self.printer = pprint.PrettyPrinter(indent=4)
 	
 	def generate_default_config_dict(self):
 		config_dict = {}
@@ -129,12 +142,15 @@ class GenerateConfig:
 
 	def show_config(self):
 		print("Config Dict")
-		print(self.config_dict)
+		self.printer.pprint(self.config_dict)
 
 	def save_config_dict(self):
-		prompt = 'Input the desired save location:\nInput: '
+		default_path = 'configs/config.pkl'
+		prompt = 'Input the desired save location: (default: {})\nInput: '.format(default_path)
 		input_str = input(prompt)
 		try:
+			if len(input_str) == 0:
+				input_str = default_path
 			pickle.dump(self.config_dict, open(input_str, 'w'))
 			print('Saved at {}'.format(input_str))
 		except IOError as e:
@@ -166,4 +182,5 @@ if __name__ == '__main__':
 	config = GenerateConfig()
 	config.config_loop()
 	config_dict = config.config_dict
-	print(config_dict)
+	pp = pprint.PrettyPrinter(indent=4)
+	pp.pprint(config_dict)

@@ -85,7 +85,7 @@ class Car(Rectangle):
         self.angle = angle
         self.vel_angle = vel_angle
 
-    def update_graphics(self, screen_coord):
+    def render(self, screen_coord):
         assert self.graphics_mode is True
         corners, center, angle = self.get_corners(), self.get_pos(), self.angle
         x_offset = (np.abs((self.width - self.length) * np.cos(np.radians(angle))) + self.length) / 2

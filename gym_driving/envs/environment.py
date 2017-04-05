@@ -12,13 +12,13 @@ class Environment:
     """
 
     def __init__(self, graphics_mode, screen_size, screen=None, param_dict=None):
+        self.param_dict = param_dict
         self.cpu_car_textures = ['blue', 'green']
         self.screen_size = screen_size
         self.screen = screen
         self.graphics_mode = graphics_mode
-        self.steer_action = 15.0
-        self.acc_action = 5.0
-        self.param_dict = param_dict
+        self.steer_action = self.param_dict['steer_action']
+        self.acc_action = self.param_dict['acc_action']
         self.reset()
 
     def reset(self, screen=None):
@@ -27,7 +27,8 @@ class Environment:
         self.num_cpu_cars = self.param_dict['num_cpu_cars']
         lims = self.param_dict['cpu_cars_bounding_box']
         main_car_angle = np.random.choice(self.param_dict['main_car_starting_angles'])
-        self.main_car = Car(x=0.0, y=0.0, angle=main_car_angle, max_vel=20.0, \
+        x, y, vel, max_vel = self.param_dict['main_car_params']
+        self.main_car = Car(x=x, y=y, angle=main_car_angle, vel=vel, max_vel=max_vel, \
             screen=self.screen, screen_size=self.screen_size, texture='main', \
             graphics_mode=self.graphics_mode)
         # Create CPU-controlled cars, ensuring they are collision-free
@@ -55,10 +56,8 @@ class Environment:
                 screen=self.screen, screen_size=self.screen_size, graphics_mode=self.graphics_mode) \
                 for x, y, width, length, texture in self.param_dict['terrain_params']]
         if self.graphics_mode:
-            self.update_graphics()
+            self.render()
         state, info_dict = self.get_state()
-
-       
         return state
 
     def step(self):
@@ -70,7 +69,7 @@ class Environment:
         for vehicle in self.vehicles:
             vehicle.step()
 
-    def update_graphics(self):
+    def render(self):
         # Clear screen
         self.screen.fill((255, 255, 255))
         main_car_pos = self.main_car.get_pos()
@@ -78,10 +77,10 @@ class Environment:
 
         # Update terrain, vehicles
         for t in self.terrain:
-            t.update_graphics(screen_coord)
-        self.main_car.update_graphics(screen_coord)
+            t.render(screen_coord)
+        self.main_car.render(screen_coord)
         for c in self.vehicles:
-            c.update_graphics(screen_coord)
+            c.render(screen_coord)
         
         pygame.display.update()
 
@@ -149,7 +148,7 @@ class Environment:
         reward = 0 if done else 1
 
         if graphics_mode or (graphics_mode is None and self.graphics_mode):
-            self.update_graphics()
+            self.render()
 
         return state, reward, done, info_dict
 

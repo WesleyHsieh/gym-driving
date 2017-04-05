@@ -43,7 +43,7 @@ class Terrain(Rectangle):
                 # Top left corners of each 100x100 tile
                 self.tile_coords.append((x + i, y + k))
 
-    def update_graphics(self, screen_coord):
+    def render(self, screen_coord):
         assert self.graphics_mode is True
         # Subtract screen_coord to get screen pos
         for coord in self.tile_coords:
