@@ -4,6 +4,7 @@ import pickle
 import IPython 
 import os 
 import pprint
+import json
 
 def get_filtered_input(key, description, default_args, num_args, num_inputs, generator_func):
 	"""
@@ -48,10 +49,10 @@ class ParamaterWrapper:
 		return int(num)
 	def get_main_car_starting_angles(self, low, high, step):
 		low, high, step = map(float, [low, high, step])
-		return np.linspace(low, high, step)
+		return np.linspace(low, high, step).tolist()
 	def get_cpu_cars_bounding_box(self, x_low, x_high, y_low, y_high):
 		x_low, x_high, y_low, y_high = map(float, [x_low, x_high, y_low, y_high])
-		return np.array([[x_low, x_high], [y_low, y_high]])
+		return [[x_low, x_high], [y_low, y_high]]
 	def get_screen_size(self, x, y):
 		return (int(x), int(y))
 	def get_screenshot_dir(self, screenshot_dir):
@@ -101,7 +102,7 @@ class GenerateConfig:
 		}
 		self.config_dict = self.generate_default_config_dict()
 		self.printer = pprint.PrettyPrinter(indent=4)
-	
+		self.default_filepath = 'configs/config.json'
 	def generate_default_config_dict(self):
 		config_dict = {}
 		for key in self.config_dict_defaults.keys():
@@ -145,22 +146,23 @@ class GenerateConfig:
 		self.printer.pprint(self.config_dict)
 
 	def save_config_dict(self):
-		default_path = 'configs/config.pkl'
-		prompt = 'Input the desired save location: (default: {})\nInput: '.format(default_path)
+		prompt = 'Input the desired save location: (default: {})\nInput: '.format(self.default_filepath)
 		input_str = input(prompt)
 		try:
 			if len(input_str) == 0:
-				input_str = default_path
-			pickle.dump(self.config_dict, open(input_str, 'w'))
+				input_str = self.default_filepath
+			json.dump(self.config_dict, open(input_str, 'w'), indent=4)
 			print('Saved at {}'.format(input_str))
 		except IOError as e:
 			print(e)
 
 	def load_config_dict(self):
-		prompt = 'Input the desired load location:\nInput: '
+		prompt = 'Input the desired load location: (default: {})\nInput: '.format(self.default_filepath)
 		input_str = input(prompt)
 		try:
-			self.config_dict = pickle.load(open(input_str, 'r'))
+			if len(input_str) == 0:
+				input_str = self.default_filepath
+			self.config_dict = json.load(open(input_str, 'r'))
 			print('Loaded from {}'.format(input_str))
 		except IOError as e:
 			print(e)
