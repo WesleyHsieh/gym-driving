@@ -12,7 +12,6 @@ class Car(Rectangle):
     def __init__(self, x, y, width=50, length=25, angle=0.0, vel=0.0, acc=0.0, max_vel=20.0, mass=100.0, screen=None, screen_size=0, texture='main', graphics_mode=False):
         super(Car, self).__init__(x, y, width, length, angle)
         self.angle = angle
-        self.vel_angle = angle
         self.vel = vel
         self.acc = acc
         self.max_vel = max_vel
@@ -39,8 +38,8 @@ class Car(Rectangle):
         :return: None
         """
         dist = self.vel * t + 0.5 * self.acc * (t ** 2)
-        dx = dist * np.cos(np.radians(self.vel_angle))
-        dy = dist * np.sin(np.radians(self.vel_angle))
+        dx = dist * np.cos(np.radians(self.angle))
+        dy = dist * np.sin(np.radians(self.angle))
         self.x += dx
         self.y += dy
         self.vel += self.acc
@@ -64,7 +63,7 @@ class Car(Rectangle):
         action_steer, action_acc = action
         self.angle += action_steer
         self.angle %= 360.0
-        self.vel_angle = self.angle
+        self.angle = self.angle
         self.acc = action_acc #- decel
         self.acc = max(min(self.acc, self.max_vel - self.vel), -self.vel)
 
@@ -75,15 +74,13 @@ class Car(Rectangle):
         info_dict['y'] = self.y
         info_dict['vel'] = self.vel
         info_dict['angle'] = self.angle
-        info_dict['vel_angle'] = self.vel_angle
         return state, info_dict
 
-    def set_state(self, x, y, vel, angle, vel_angle):
+    def set_state(self, x, y, vel, angle):
         self.x = x
         self.y = y
         self.vel = vel
         self.angle = angle
-        self.vel_angle = vel_angle
 
     def render(self, screen_coord):
         assert self.graphics_mode is True

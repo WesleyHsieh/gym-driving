@@ -130,7 +130,7 @@ def simulate_manual_control():
     # TERRAINS.append(Terrain(0, -2000, 20000, 3900, 'grass', screen, SCREEN_SIZE))
     # TERRAINS.append(Terrain(0, 0, 20000, 100, 'road', screen, SCREEN_SIZE))
     # TERRAINS.append(Terrain(0, 2000, 20000, 3900, 'grass', screen, SCREEN_SIZE))
-    config_filepath = 'configs/config.pkl'
+    config_filepath = 'configs/config.json'
     controller = Controller(CONTROLLER_MODE)
     simulator = DrivingEnv(graphics_mode=GRAPHICS_MODE, config_filepath=config_filepath)
     #simulator = DrivingEnv(GRAPHICS_MODE, SCREEN_SIZE, screen, TERRAINS)

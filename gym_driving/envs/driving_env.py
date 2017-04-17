@@ -10,6 +10,7 @@ from gym.utils import seeding
 import numpy as np
 import IPython
 import pickle
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -30,13 +31,13 @@ class DrivingEnv(gym.Env):
                 'main_car_starting_angles': np.linspace(-30, 30, 5), 
                 'cpu_cars_bounding_box': [[100.0, 1000.0], [-90.0, 90.0]],
                 'screen_size': (512, 512),
-                'screenshot_dir': None,
-                'screenshot_rate': 10,
+                'logging_dir': None,
+                'logging_rate': 10,
                 'time_horizon': 100,
                 'terrain_params': [[0, -2000, 20000, 38000, 'grass'], [0, 0, 20000, 200, 'road'], [0, 2000, 20000, 3800, 'grass']],
             }
         else:
-            param_dict = pickle.load(open(config_filepath, 'r'))
+            param_dict = json.load(open(config_filepath, 'r'))
         print(config_filepath)
         print(param_dict)
 
@@ -44,10 +45,12 @@ class DrivingEnv(gym.Env):
         self.main_car_starting_angles = param_dict['main_car_starting_angles']
         self.cpu_cars_bounding_box = param_dict['cpu_cars_bounding_box']
         self.screen_size = param_dict['screen_size']
-        self.screenshot_dir = param_dict['screenshot_dir']
-        self.screenshot_rate = param_dict['screenshot_rate']
+        self.logging_dir = param_dict['logging_dir']
+        self.logging_rate = param_dict['logging_rate']
         self.time_horizon = param_dict['time_horizon']
         self.terrain_params = param_dict['terrain_params']
+        self.state_space = param_dict['state_space']
+        self.control_space = param_dict['control_space']
         self.param_dict = param_dict
 
         # Default options for PyGame screen, terrain
@@ -55,21 +58,30 @@ class DrivingEnv(gym.Env):
             screen = pygame.display.set_mode(self.screen_size)
             # pygame.display.set_caption('Driving Simulator')
 
-        if self.screenshot_dir is not None and not os.path.exists(self.screenshot_dir):
-            os.makedirs(self.screenshot_dir)
+        if self.logging_dir is not None and not os.path.exists(self.logging_dir):
+            os.makedirs(self.logging_dir)
         self.screen = screen
         self.environment = Environment(graphics_mode=graphics_mode, screen_size=self.screen_size, \
                 screen=self.screen, param_dict=self.param_dict)
         self.graphics_mode = graphics_mode
 
-        # 0, 1, 2 = Steer left, center, right
-        self.action_space = spaces.Discrete(2)
+        low, high, step = param_dict['steer_action']
+        if self.control_space == 'discrete':
+            # 0, 1, 2 = Steer left, center, right
+            action_space = np.linspace(low, high, step)
+            self.action_space = spaces.Discrete(len(action_space) - 1)
+        elif self.control_space == 'continuous':
+            self.action_space = spaces.Box(low=low, high=high, shape=(1,))
 
+        # TODO: Handle observation space for images
         # Limits on x, y, angle
-        low = np.tile(np.array([-10000.0, -10000.0, 0.0]), self.num_cpu_cars + 1)
-        high = np.tile(np.array([10000.0, 10000.0, 360.0]), self.num_cpu_cars + 1)
-        self.observation_space = spaces.Box(low, high)
-
+        if self.state_space == 'positions':
+            low = np.tile(np.array([-10000.0, -10000.0, 0.0]), self.num_cpu_cars + 1)
+            high = np.tile(np.array([10000.0, 10000.0, 360.0]), self.num_cpu_cars + 1)
+            self.observation_space = spaces.Box(low, high)
+        elif self.state_space == 'image':
+            w, h = param_dict['screen_size']
+            self.observation_space = spaces.Box(low=0, high=255, shape=(w, h))
         self.exp_count = self.iter_count = 0
         
         # self._seed()
@@ -93,14 +105,13 @@ class DrivingEnv(gym.Env):
 
     def _step(self, action):
         self.iter_count += 1
-        action = np.array([action, 1.0])
+        action = np.array([action, 2])
         state, reward, done, info_dict = self.environment.take_action(action)
         # print(state, reward, done, info_dict)
-        if self.screenshot_dir is not None and self.iter_count % self.screenshot_rate == 0:
-            self.save_image()
+        if self.logging_dir is not None and self.iter_count % self.logging_rate == 0:
+            self.log_state(state)
         if self.iter_count >= self.time_horizon:
             done = True
-        # state = pygame.surfarray.array2d(self.screen).astype(np.uint8)
         return state, reward, done, info_dict
         
     def _reset(self):
@@ -114,10 +125,15 @@ class DrivingEnv(gym.Env):
     def _render(self, mode='human', close=False):
         return None
 
-    def save_image(self):
-        image_name = 'exp_{}_iter_{}.png'.format(self.exp_count, self.iter_count)
-        image_path = os.path.join(self.screenshot_dir, image_name)
-        pygame.image.save(self.screen, image_path)
+    def log_state(self, state):
+        if self.state_space == 'positions':
+            file_name = 'log.txt'
+            with open(file_name, 'a') as outfile:
+                outfile.write(state)
+        elif self.state_space == 'image':
+            image_name = 'exp_{}_iter_{}.png'.format(self.exp_count, self.iter_count)
+            image_path = os.path.join(self.logging_dir, image_name)
+            pygame.image.save(self.screen, image_path)
 
     def simulate_actions(self, actions, noise=0.0, state=None):
         return self.environment.simulate_actions(actions, noise, state)
@@ -125,6 +141,6 @@ class DrivingEnv(gym.Env):
     def __deepcopy__(self, memo):
         env = DrivingEnv(graphics_mode=self.graphics_mode, \
             screen_size=self.screen_size, screen=None, terrain=None, \
-            screenshot_dir=self.screenshot_dir, screenshot_rate=self.screenshot_rate, \
+            logging_dir=self.logging_dir, logging_rate=self.logging_rate, \
             param_dict=self.param_dict)
         return env

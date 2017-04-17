@@ -3,6 +3,8 @@ from gym_driving.envs.terrain import *
 
 import numpy as np
 import pygame
+import cv2 
+import IPython
 
 class Environment:
     """
@@ -19,6 +21,9 @@ class Environment:
         self.graphics_mode = graphics_mode
         self.steer_action = self.param_dict['steer_action']
         self.acc_action = self.param_dict['acc_action']
+        self.downsampled_size = self.param_dict['downsampled_size']
+        self.state_space = self.param_dict['state_space']
+        self.control_space = self.param_dict['control_space']
         self.reset()
 
     def reset(self, screen=None):
@@ -26,7 +31,21 @@ class Environment:
             self.screen = screen
         self.num_cpu_cars = self.param_dict['num_cpu_cars']
         lims = self.param_dict['cpu_cars_bounding_box']
-        main_car_angle = np.random.choice(self.param_dict['main_car_starting_angles'])
+
+        # Main car starting angle
+        low, high, step = self.param_dict['main_car_starting_angles']
+        if step is None:
+            main_car_angle = np.random.uniform(low=low, high=high)
+        else:
+            main_car_angle = np.random.choice(np.linspace(low, high, step))
+
+        # Control space
+        if self.param_dict['control_space'] == 'discrete':
+            low, high, step = self.param_dict['steer_action']
+            self.steer_space = np.linspace(low, high, step)
+            low, high, step = self.param_dict['acc_action']
+            self.acc_space = np.linspace(low, high, step)
+
         x, y, vel, max_vel = self.param_dict['main_car_params']
         self.main_car = Car(x=x, y=y, angle=main_car_angle, vel=vel, max_vel=max_vel, \
             screen=self.screen, screen_size=self.screen_size, texture='main', \
@@ -41,7 +60,6 @@ class Environment:
                 texture=np.random.choice(self.cpu_car_textures), graphics_mode=self.graphics_mode)
                 collision = any([new_car.collide_rect(car) for car in self.vehicles]) or new_car.collide_rect(self.main_car)
             self.vehicles.append(new_car)
-
         
         if self.param_dict['terrain_params'] is None:
             self.terrain = []
@@ -94,7 +112,7 @@ class Environment:
         """
         info_dict = {}
         main_car_state, info_dict['main_car'] = self.main_car.get_state()
-        x = [vehicle.get_state() for vehicle in self.vehicles]
+        # x = [vehicle.get_state() for vehicle in self.vehicles]
         car_states, info_dict['other_cars'] = list(zip(*[vehicle.get_state() for vehicle in self.vehicles]))
         info_dict['car_collisions'] = [car for car in self.vehicles if self.main_car.collide_rect(car)]
         # info_dict['num_car_collisions'] = len(info_dict['car_collisions'])
@@ -105,8 +123,20 @@ class Environment:
         # Compact state
         info_dict['compact_state'] = self.get_compact_state()
 
-        state = np.concatenate([main_car_state] + list(car_states))
+        if self.state_space == 'positions':
+            state = np.concatenate([main_car_state] + list(car_states))
+        elif self.state_space == 'image':
+            state = pygame.surfarray.array2d(self.screen).astype(np.uint8)
+            self.downsample(state, self.downsampled_size)
+        # IPython.embed()
         return state, info_dict
+
+    def downsample(self, state, output_size):
+        w, h = state.shape
+        while w > output_size and h > output_size:
+            state = cv2.pyrDown(state, dstsize = (w / 2, h / 2))
+            w, h = state.shape
+        return state
 
     def get_compact_state(self):
         _, main_car_info_dict = self.main_car.get_state() 
@@ -127,18 +157,23 @@ class Environment:
             Reward.
         """
         # Convert numerical action vector to steering angle / acceleration
-        steer = action[0] - 1
-        # steer = (action[0] - 2) / 2.0
-        acc = action[1]
-
+        steer = int(action[0])
+        acc = int(action[1])
+        
+        if self.control_space == 'discrete':
+            steer = self.steer_space[steer]
+            acc = self.acc_space[acc]
+        elif self.control_space == 'continuous':
+            steer, acc = action[0], action[1]
         # Add noise
         if steer != 0.0 and noise > 0.0:
-            steer += np.random.normal(loc=0.0, scale=noise)
+            steer *= 1.0 + np.random.normal(loc=0.0, scale=noise)
         if acc != 0.0 and noise > 0.0:
-            acc += np.random.normal(loc=0.0, scale=noise)
-
+            acc *= 1.0 + np.random.normal(loc=0.0, scale=noise)
+            
+        # IPython.embed()
         # Convert to action space, apply action
-        action_unpacked = np.array([steer * self.steer_action, acc * self.acc_action])
+        action_unpacked = np.array([steer, acc])
         self.main_car.take_action(action_unpacked)
         self.step()
         state, info_dict = self.get_state()
