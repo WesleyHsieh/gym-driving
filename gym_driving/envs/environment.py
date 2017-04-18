@@ -1,4 +1,6 @@
 from gym_driving.envs.car import Car
+from gym_driving.envs.kinematic_car import KinematicCar
+
 from gym_driving.envs.terrain import *
 
 import numpy as np
@@ -47,7 +49,7 @@ class Environment:
             self.acc_space = np.linspace(low, high, step)
 
         x, y, vel, max_vel = self.param_dict['main_car_params']
-        self.main_car = Car(x=x, y=y, angle=main_car_angle, vel=vel, max_vel=max_vel, \
+        self.main_car = KinematicCar(x=x, y=y, angle=main_car_angle, vel=vel, max_vel=max_vel, \
             screen=self.screen, screen_size=self.screen_size, texture='main', \
             graphics_mode=self.graphics_mode)
         # Create CPU-controlled cars, ensuring they are collision-free
@@ -77,15 +79,6 @@ class Environment:
             self.render()
         state, info_dict = self.get_state()
         return state
-
-    def step(self):
-        """
-        Updates environment by one timestep.
-        :return: None
-        """
-        self.main_car.step()
-        for vehicle in self.vehicles:
-            vehicle.step()
 
     def render(self):
         # Clear screen
@@ -148,7 +141,7 @@ class Environment:
         for i in range(len(self.vehicles)):
             self.vehicles[i].set_state(**vehicles_states[i])
 
-    def take_action(self, action, noise=0.1, graphics_mode=None):
+    def step(self, action, noise=0.1, graphics_mode=None):
         """
         Takes input action, updates environment.
         :param action: dict
@@ -174,8 +167,12 @@ class Environment:
         # IPython.embed()
         # Convert to action space, apply action
         action_unpacked = np.array([steer, acc])
-        self.main_car.take_action(action_unpacked)
-        self.step()
+        # self.main_car.take_action(action_unpacked)
+        
+        self.main_car.step(action_unpacked)
+        for vehicle in self.vehicles:
+            vehicle.step(None)
+
         state, info_dict = self.get_state()
         terrain_collisions = info_dict['terrain_collisions']
         car_collisions = info_dict['car_collisions']

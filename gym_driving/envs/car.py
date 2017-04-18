@@ -30,13 +30,24 @@ class Car(Rectangle):
             else:
                 raise Exception('Error: invalid car texture')
 
-    def step(self, t=1):
+    def step(self, action):
         """
         Updates car by one timestep.
         :param t: int
             Timestep.
         :return: None
         """
+        if action is None:
+            action_steer, action_acc = 0.0, 0.0
+        else:
+            action_steer, action_acc = action
+        self.angle += action_steer
+        self.angle %= 360.0
+        self.angle = self.angle
+        self.acc = action_acc
+        self.acc = max(min(self.acc, self.max_vel - self.vel), -self.vel)
+
+        t = 1
         dist = self.vel * t + 0.5 * self.acc * (t ** 2)
         dx = dist * np.cos(np.radians(self.angle))
         dy = dist * np.sin(np.radians(self.angle))
@@ -45,27 +56,7 @@ class Car(Rectangle):
         self.vel += self.acc
         self.vel = max(min(self.vel, self.max_vel), 0.0)
         self.corners = self.calculate_corners()
-
-    def take_action(self, action):
-        """
-        Updates car state according to action.
-        :param action_dict: dict
-            'steer': Change in steering angle.
-            'acc': Acceleration.
-        :return: None
-        """
-        # Get properties of terrain that the car is currently on
-        # decel = np.sum([t.decel for t in terrain_collisions])
-        # slip = np.sum([t.slip for t in terrain_collisions])
-
-        # print('x,y', self.x, self.y)
-        # print 'corners', self.get_corners()
-        action_steer, action_acc = action
-        self.angle += action_steer
-        self.angle %= 360.0
-        self.angle = self.angle
-        self.acc = action_acc #- decel
-        self.acc = max(min(self.acc, self.max_vel - self.vel), -self.vel)
+        
 
     def get_state(self):
         state = np.array([self.x, self.y, self.angle])
