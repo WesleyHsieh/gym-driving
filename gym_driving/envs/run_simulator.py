@@ -145,7 +145,7 @@ def simulate_manual_control():
 
         action = controller.process_input(simulator)
         # Steering only
-        action = action[0]
+        # action = action[0]
 
         state, reward, done, info_dict = simulator._step(action)
 

@@ -105,7 +105,7 @@ class DrivingEnv(gym.Env):
 
     def _step(self, action):
         self.iter_count += 1
-        action = np.array([action, 2])
+        # action = np.array([action, 2])
         state, reward, done, info_dict = self.environment.step(action)
         # print(state, reward, done, info_dict)
         if self.logging_dir is not None and self.iter_count % self.logging_rate == 0:

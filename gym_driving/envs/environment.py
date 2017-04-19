@@ -1,5 +1,6 @@
 from gym_driving.envs.car import Car
 from gym_driving.envs.kinematic_car import KinematicCar
+from gym_driving.envs.dynamic_car import DynamicCar
 
 from gym_driving.envs.terrain import *
 
@@ -49,7 +50,7 @@ class Environment:
             self.acc_space = np.linspace(low, high, step)
 
         x, y, vel, max_vel = self.param_dict['main_car_params']
-        self.main_car = KinematicCar(x=x, y=y, angle=main_car_angle, vel=vel, max_vel=max_vel, \
+        self.main_car = DynamicCar(x=x, y=y, angle=main_car_angle, vel=vel, max_vel=max_vel, \
             screen=self.screen, screen_size=self.screen_size, texture='main', \
             graphics_mode=self.graphics_mode)
         # Create CPU-controlled cars, ensuring they are collision-free
@@ -152,7 +153,7 @@ class Environment:
         # Convert numerical action vector to steering angle / acceleration
         steer = int(action[0])
         acc = int(action[1])
-        
+
         if self.control_space == 'discrete':
             steer = self.steer_space[steer]
             acc = self.acc_space[acc]
@@ -163,8 +164,7 @@ class Environment:
             steer *= 1.0 + np.random.normal(loc=0.0, scale=noise)
         if acc != 0.0 and noise > 0.0:
             acc *= 1.0 + np.random.normal(loc=0.0, scale=noise)
-            
-        # IPython.embed()
+
         # Convert to action space, apply action
         action_unpacked = np.array([steer, acc])
         # self.main_car.take_action(action_unpacked)
