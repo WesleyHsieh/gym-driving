@@ -60,10 +60,11 @@ class DynamicCar(Car):
             a = ddx_body ** 2 + ddy_body ** 2
             b = 2 * (ddx_body * self.dx_body + ddy_body * self.dy_body)
             c = self.dx_body ** 2 + self.dy_body ** 2 - self.max_vel ** 2
-            # if b ** 2 - 4 * a * c < 0:
-            #     IPython.embed()
-            ratios = (-b + np.sqrt(b**2 - 4*a*c)) / (2*a) , (-b - np.sqrt(b**2 - 4*a*c)) / (2*a) 
-            ratio = max(ratios)
+            if b ** 2 - 4 * a * c < 0:
+                ratio = 0.0
+            else:
+                ratios = (-b + np.sqrt(b**2 - 4*a*c)) / (2*a) , (-b - np.sqrt(b**2 - 4*a*c)) / (2*a) 
+                ratio = max(ratios)
             ddx_body, ddy_body = ddx_body * ratio, ddy_body * ratio
             # ddx_body, ddy_body = 0.0, 0.0
 

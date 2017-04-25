@@ -21,7 +21,7 @@ class Car(Rectangle):
         self.texture = texture
         self.graphics_mode = graphics_mode
 
-        car_textures = ['main', 'blue', 'green']
+        car_textures = ['main', 'blue', 'green', 'orange', 'red']
         if self.graphics_mode:
             if texture in car_textures:
                 base_dir = os.path.dirname(__file__)

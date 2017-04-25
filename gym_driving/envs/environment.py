@@ -18,7 +18,7 @@ class Environment:
 
     def __init__(self, graphics_mode, screen_size, screen=None, param_dict=None):
         self.param_dict = param_dict
-        self.cpu_car_textures = ['blue', 'green']
+        self.cpu_car_textures = ['orange', 'red']
         self.screen_size = screen_size
         self.screen = screen
         self.graphics_mode = graphics_mode
@@ -96,6 +96,13 @@ class Environment:
         
         pygame.display.update()
 
+    def downsample(self, state, output_size):
+        w, h = state.shape
+        while w > output_size and h > output_size:
+            state = cv2.pyrDown(state, dstsize = (w / 2, h / 2))
+            w, h = state.shape
+        return state
+
     def get_state(self):
         """
         Returns current state, corresponding
@@ -122,15 +129,7 @@ class Environment:
         elif self.state_space == 'image':
             state = pygame.surfarray.array2d(self.screen).astype(np.uint8)
             self.downsample(state, self.downsampled_size)
-        # IPython.embed()
         return state, info_dict
-
-    def downsample(self, state, output_size):
-        w, h = state.shape
-        while w > output_size and h > output_size:
-            state = cv2.pyrDown(state, dstsize = (w / 2, h / 2))
-            w, h = state.shape
-        return state
 
     def get_compact_state(self):
         _, main_car_info_dict = self.main_car.get_state() 
@@ -167,7 +166,6 @@ class Environment:
 
         # Convert to action space, apply action
         action_unpacked = np.array([steer, acc])
-        # self.main_car.take_action(action_unpacked)
         
         self.main_car.step(action_unpacked)
         for vehicle in self.vehicles:

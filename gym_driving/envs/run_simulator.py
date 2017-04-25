@@ -12,7 +12,7 @@ import cProfile
 import IPython
 
 TIMESTEPS = 1000
-SLEEP_DELAY = .005
+SLEEP_DELAY = .01
 ACC_ACTION = 5.0
 STEER_ACTION = 15.0
 FPS = 30
