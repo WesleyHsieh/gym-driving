@@ -30,7 +30,7 @@ class Car(Rectangle):
             else:
                 raise Exception('Error: invalid car texture')
 
-    def step(self, action):
+    def step(self, action, info_dict=None):
         """
         Updates car by one timestep.
         :param t: int

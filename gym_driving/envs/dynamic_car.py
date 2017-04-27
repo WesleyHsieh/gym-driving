@@ -24,8 +24,9 @@ class DynamicCar(Car):
         self.l_f = self.l_r = width / 2.0
         self.dangle = self.a_f = self.dx_body = self.dy_body = 0.0
         self.count = 0
+        self.friction = 0.9
 
-    def step(self, action):
+    def step(self, action, info_dict=None):
         self.count += 1
         delta_f, a_f = action
 
@@ -37,7 +38,14 @@ class DynamicCar(Car):
         alpha_r = delta_f
 
         # Friction coefficient
-        mu = 0.9 #0.9, 0.6, 0.2, 0.05
+        if info_dict is None:
+            mu = 0.9
+        else:
+            collisions = info_dict['terrain_collisions']
+            if len(collisions) == 0:
+                mu = 0.9
+            else:
+                mu = min([terrain.friction for terrain in collisions])
 
         # Yaw Inertia
         I_z = 2510.15
@@ -60,13 +68,14 @@ class DynamicCar(Car):
             a = ddx_body ** 2 + ddy_body ** 2
             b = 2 * (ddx_body * self.dx_body + ddy_body * self.dy_body)
             c = self.dx_body ** 2 + self.dy_body ** 2 - self.max_vel ** 2
-            if b ** 2 - 4 * a * c < 0:
+            sqrt_term = b**2 - 4*a*c
+            epsilon = 0.0001
+            if sqrt_term < epsilon:
                 ratio = 0.0
             else:
                 ratios = (-b + np.sqrt(b**2 - 4*a*c)) / (2*a) , (-b - np.sqrt(b**2 - 4*a*c)) / (2*a) 
                 ratio = max(ratios)
             ddx_body, ddy_body = ddx_body * ratio, ddy_body * ratio
-            # ddx_body, ddy_body = 0.0, 0.0
 
         ddangle = (2 / I_z) * (self.l_f * F_cf - self.l_r * F_cr)
         dx = self.dx_body * np.cos(rad_angle) - self.dy_body * np.sin(rad_angle)

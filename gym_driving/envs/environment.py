@@ -28,6 +28,14 @@ class Environment:
         self.state_space = self.param_dict['state_space']
         self.control_space = self.param_dict['control_space']
         self.reset()
+        self.frictions = {
+            'road': 0.9,
+            'grass': 0.6,
+            'patchy': 0.6,
+            'dirt': 0.6,
+            'ice': 0.05,
+            'icegrass': 0.2,
+        }
 
     def reset(self, screen=None):
         if screen is not None:
@@ -78,6 +86,7 @@ class Environment:
                 for x, y, width, length, texture in self.param_dict['terrain_params']]
         if self.graphics_mode:
             self.render()
+        self.update_state()
         state, info_dict = self.get_state()
         return state
 
@@ -104,6 +113,9 @@ class Environment:
         return state
 
     def get_state(self):
+        return self.state, self.info_dict
+
+    def update_state(self):
         """
         Returns current state, corresponding
         to locations of all cars.
@@ -129,7 +141,7 @@ class Environment:
         elif self.state_space == 'image':
             state = pygame.surfarray.array2d(self.screen).astype(np.uint8)
             self.downsample(state, self.downsampled_size)
-        return state, info_dict
+        self.state, self.info_dict = state, info_dict
 
     def get_compact_state(self):
         _, main_car_info_dict = self.main_car.get_state() 
@@ -167,10 +179,13 @@ class Environment:
         # Convert to action space, apply action
         action_unpacked = np.array([steer, acc])
         
-        self.main_car.step(action_unpacked)
+        # Get old state, step
+        state, info_dict = self.get_state()
+        self.main_car.step(action_unpacked, info_dict)
         for vehicle in self.vehicles:
             vehicle.step(None)
 
+        self.update_state()
         state, info_dict = self.get_state()
         terrain_collisions = info_dict['terrain_collisions']
         car_collisions = info_dict['car_collisions']

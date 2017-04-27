@@ -16,12 +16,12 @@ class Terrain(Rectangle):
     def __init__(self, x, y, width, length, texture, screen, screen_size, angle=0.0, graphics_mode=False):
         super(Terrain, self).__init__(x, y, width, length, angle)
         self.terrain_properties = {
-            'road': {'decel': 0, 'slip': 0},
-            'grass': {'decel': 1, 'slip': 0},
-            'patchy': {'decel': 1, 'slip': 0},
-            'dirt': {'decel': 2, 'slip': 0},
-            'ice': {'decel': 0, 'slip': 1},
-            'icegrass': {'decel': 1, 'slip': 1},
+            'road': {'friction': 0.9},
+            'grass': {'friction': 0.6},
+            'patchy': {'friction': 0.9},
+            'dirt': {'friction': 0.9},
+            'ice': {'friction': 0.05},
+            'icegrass': {'friction': 0.2},
         }
         self.graphics_mode = graphics_mode
         if self.graphics_mode:
@@ -32,8 +32,7 @@ class Terrain(Rectangle):
             else:
                 print('Error: invalid terrain texture')
         self.texture = texture
-        self.decel = self.terrain_properties[texture]['decel']
-        self.slip = self.terrain_properties[texture]['slip']
+        self.friction = self.terrain_properties[texture]['friction']
         self.screen = screen
         self.screen_size = screen_size
         self.tile_coords = []

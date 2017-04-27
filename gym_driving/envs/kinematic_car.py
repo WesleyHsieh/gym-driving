@@ -16,7 +16,7 @@ class KinematicCar(Car):
         super(KinematicCar, self).__init__(x, y, width, length, angle, vel, acc, max_vel, mass, screen, screen_size, texture, graphics_mode)
         self.l_f = self.l_r = width / 2.0
 
-    def step(self, action):
+    def step(self, action, info_dict=None):
         """
         Updates car by one timestep.
         :param t: int
