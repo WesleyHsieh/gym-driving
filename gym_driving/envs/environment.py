@@ -58,9 +58,10 @@ class Environment:
             self.acc_space = np.linspace(low, high, step)
 
         x, y, vel, max_vel = self.param_dict['main_car_params']
-        self.main_car = DynamicCar(x=x, y=y, angle=main_car_angle, vel=vel, max_vel=max_vel, \
+        self.main_car = KinematicCar(x=x, y=y, angle=main_car_angle, vel=vel, max_vel=max_vel, \
             screen=self.screen, screen_size=self.screen_size, texture='main', \
             graphics_mode=self.graphics_mode)
+
         # Create CPU-controlled cars, ensuring they are collision-free
         self.vehicles = []
         for _ in range(self.num_cpu_cars):

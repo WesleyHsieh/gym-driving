@@ -171,7 +171,7 @@ class GenerateConfig:
 			'logging_rate': ('Logging every n steps (int)', [10], 1, 1, self.paramater_wrapper.get_logging_rate), 
 			'time_horizon': ('Time horizon for a rollout (int)', [100], 1, 1, self.paramater_wrapper.get_time_horizon), 
 			'terrain_params': ('x, y, width, length, texture (int, int, int, int, str)', \
-				[[0, -2000, 20000, 38000, 'grass'], [0, 0, 20000, 200, 'road'], [0, 2000, 20000, 3800, 'grass']], \
+				[[0, -2000, 20000, 3800, 'grass'], [0, 0, 20000, 200, 'road'], [0, 2000, 20000, 3800, 'grass']], \
 				5, 100, self.paramater_wrapper.get_terrain),
 			'main_car_params': ('x, y, starting_vel, max_vel (int, int, float, float)', [0, 0, 0.0, 20.0], \
 				4, 1, self.paramater_wrapper.get_main_car_params),

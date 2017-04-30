@@ -69,6 +69,8 @@ class DynamicCar(Car):
             b = 2 * (ddx_body * self.dx_body + ddy_body * self.dy_body)
             c = self.dx_body ** 2 + self.dy_body ** 2 - self.max_vel ** 2
             sqrt_term = b**2 - 4*a*c
+
+            # Truncate if ratio is too small to avoid floating point error
             epsilon = 0.0001
             if sqrt_term < epsilon:
                 ratio = 0.0

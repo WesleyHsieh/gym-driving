@@ -12,7 +12,7 @@ import cProfile
 import IPython
 
 TIMESTEPS = 1000
-SLEEP_DELAY = .01
+SLEEP_DELAY = .0001
 ACC_ACTION = 5.0
 STEER_ACTION = 15.0
 FPS = 30
@@ -161,7 +161,7 @@ def simulate_manual_control():
 
         if t == TIMESTEPS - 1:
             states.append(state)
-        time.sleep(SLEEP_DELAY)
+        # time.sleep(SLEEP_DELAY)
 
 if __name__ == '__main__':
     simulate_manual_control()
