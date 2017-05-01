@@ -15,11 +15,11 @@ from gym_driving.envs.driving_env import *
 agent_name = "test"
 NUM_WORKERS = 4
 os.environ["SDL_VIDEODRIVER"] = "dummy"
-
+config_filepath = "gym_driving/envs/configs/config.json"
 ray.init(num_workers=NUM_WORKERS)
 
 def env_init():
-    return DrivingEnv(graphics_mode=False)
+    return DrivingEnv(graphics_mode=True, config_filepath=config_filepath)
 
 def env_reinit(env):
     return env
