@@ -1,7 +1,7 @@
 from gym_driving.envs.environment import *
 from gym_driving.envs.car import *
 from gym_driving.envs.terrain import *
-
+import cv2
 import logging
 import math
 import gym
