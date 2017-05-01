@@ -58,7 +58,7 @@ class Environment:
             self.acc_space = np.linspace(low, high, step)
 
         x, y, vel, max_vel = self.param_dict['main_car_params']
-        self.main_car = KinematicCar(x=x, y=y, angle=main_car_angle, vel=vel, max_vel=max_vel, \
+        self.main_car = Car(x=x, y=y, angle=main_car_angle, vel=vel, max_vel=max_vel, \
             screen=self.screen, screen_size=self.screen_size, texture='main', \
             graphics_mode=self.graphics_mode)
 
@@ -106,11 +106,12 @@ class Environment:
         
         pygame.display.update()
 
-    def downsample(self, state, output_size):
-        w, h = state.shape
-        while w > output_size and h > output_size:
-            state = cv2.pyrDown(state, dstsize = (w / 2, h / 2))
+    def downsample(self, state, output_size=None):
+        if output_size is not None:
             w, h = state.shape
+            while w > output_size and h > output_size:
+                state = cv2.pyrDown(state, dstsize = (w / 2, h / 2))
+                w, h = state.shape
         return state
 
     def get_state(self):

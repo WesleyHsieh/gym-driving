@@ -26,8 +26,8 @@
     ], 
     "logging_dir": null, 
     "screen_size": [
-        512, 
-        512
+        1024, 
+        1024
     ], 
     "main_car_params": [
         0, 
@@ -35,7 +35,7 @@
         15.0, 
         20.0
     ], 
-    "state_space": "image", 
+    "state_space": "positions", 
     "steer_action": [
         -15.0, 
         15.0, 
