@@ -41,10 +41,10 @@ class Experiment():
         # self.ITERATIONS = 20
         # self.TRIALS = 10
 
-        self.SAMPLES_PER_ROLLOUT = 10
-        self.SAMPLES_PER_EVAL = 10
-        self.ITERATIONS = 15
-        self.TRIALS = 5
+        self.SAMPLES_PER_ROLLOUT = 2
+        self.SAMPLES_PER_EVAL = 2
+        self.ITERATIONS = 2
+        self.TRIALS = 2
 
         self.file_path = file_path 
 
@@ -58,15 +58,10 @@ class Experiment():
         pickle.dump(stats, open(data_filepath,'wb'))
         self.plot_reward_curve(stats, experiment_name)
 
-    def run_experiment(self, learner_name, agent_name, env_param_dict=None):
+    def run_experiment(self, learner_name, agent_name):
         experiment_name = '{}_{}'.format(learner_name, agent_name)
         partial_func = partial(run_experiment_trial, learner_name=learner_name, agent_name=agent_name, \
-            iterations=self.ITERATIONS, samples_per_rollout=self.SAMPLES_PER_ROLLOUT, samples_per_eval=self.SAMPLES_PER_EVAL, \
-            env_param_dict=env_param_dict)
-        # pool = multiprocessing.Pool(processes=multiprocessing.cpu_count() - 1)
-        # overall_stats = pool.map(partial_func, range(self.TRIALS))
-        # pool.close()
-        # pool.join()
+            iterations=self.ITERATIONS, samples_per_rollout=self.SAMPLES_PER_ROLLOUT, samples_per_eval=self.SAMPLES_PER_EVAL)
         overall_stats = [partial_func(i) for i in range(self.TRIALS)]
         self.save_data(overall_stats, experiment_name)
 
@@ -89,9 +84,9 @@ class Experiment():
             # plt.ylabel(stats_name)
         plt.savefig('stats/stats_{}.png'.format(experiment_name))
         
-def run_experiment_trial(trial_number, learner_name, agent_name, iterations, samples_per_rollout, samples_per_eval, env_param_dict=None):
+def run_experiment_trial(trial_number, learner_name, agent_name, iterations, samples_per_rollout, samples_per_eval):
     np.random.seed(trial_number)
-    num_processes = multiprocessing.cpu_count() - 1
+    # num_processes = multiprocessing.cpu_count() - 1
     # Set up learner, agent
     if learner_name == 'linear_learner':
         learner = LinearLearner()
@@ -99,12 +94,15 @@ def run_experiment_trial(trial_number, learner_name, agent_name, iterations, sam
         learner = DeepLearner()
     # env_list = [DrivingEnv(graphics_mode=True, param_dict=env_param_dict) for _ in range(samples_per_rollout)]
     # supervisor_list = [DrivingAgent(env=env) for env in env_list]
-    env_list = [BipedalWalker() for _ in range(samples_per_rollout)]
-    supervisor_list = [BipedalSupervisor(env=env) for env in env_list]
+    # env_list = [BipedalWalker() for _ in range(samples_per_rollout)]
+    # supervisor_list = [BipedalSupervisor(env=env) for env in env_list]
+    config_filepath = "../configs/driving_experiment_config.json"
+    env = DrivingEnv(graphics_mode=True, config_filepath=config_filepath)
+    supervisor = DrivingAgent(env=env)
     if agent_name == 'supervised':
-        agent = SupervisedAgent(learner, env_list, supervisor_list)
+        agent = SupervisedAgent(learner, env, supervisor)
     elif agent_name == 'dagger':
-        agent = DaggerAgent(learner, env_list, supervisor_list)
+        agent = DaggerAgent(learner, env, supervisor)
 
     # Run trial
     trial_stats = []
@@ -112,7 +110,11 @@ def run_experiment_trial(trial_number, learner_name, agent_name, iterations, sam
         print("Agent {}: Trial {}, Iteration {}".format(agent_name, trial_number, j))
         # Collect samples 
         # print("rolling out algorithm")
-        state_list, action_list = agent.rollout_algorithm(samples_per_rollout)
+        state_list, action_list = [], []
+        for _ in range(samples_per_rollout):
+            states, actions = agent.rollout_algorithm()
+            state_list.append(states)
+            action_list.append(actions)
         # Update model
         # print("updating model")
         agent.update_model(state_list, action_list)
@@ -135,7 +137,6 @@ if __name__ == '__main__':
     'cpu_cars_bounding_box': ((low_x, high_x), (low_y, high_y)) of the bounding box for the initial
         positions of the cpu cars.
     """
-    env_param_dict = {'num_cpu_cars': 10, 'main_car_starting_angles': np.linspace(-30, 30, 5), 'cpu_cars_bounding_box': [[100.0, 800.0], [-90.0, 90.0]]}
     FILEPATH = 'stats'
     # learners = ['linear_learner', 'deep_learner']
     learners = ['linear_learner']
@@ -148,6 +149,6 @@ if __name__ == '__main__':
             print('Running experiment with {}'.format(learner_name))
             exp_class = Experiment(FILEPATH)
             start = time.time()
-            exp_class.run_experiment(learner_name, agent_name, env_param_dict)
+            exp_class.run_experiment(learner_name, agent_name)
             end = time.time()
             print("time", end - start)

@@ -15,15 +15,17 @@ class DaggerAgent(SupervisedAgent):
 		done = False
 		state = self.env._reset()
 		while not done:
-			supervisor_label = self.supervisor.rollout_policy(self.env)
+			supervisor_label = self.supervisor.eval_policy(self.env)
 			if self.iterations > 0:
 				action = self.learner.eval_policy(state)
-				surrogate_losses.append(action != supervisor_label)
-				next_state, reward, done, info_dict = self.env._step(action)
+				surrogate_losses.append(action != supervisor_label)					
+				action_packed = [action, 1.0]
+				next_state, reward, done, info_dict = self.env._step(action_packed)
 			else:
 				action = supervisor_label
 				surrogate_losses.append(0)
-				next_state, reward, done, info_dict = self.env._step(action)
+				action_packed = [action, 1.0]
+				next_state, reward, done, info_dict = self.env._step(action_packed)
 				reward = 0
 
 			states.append(state)

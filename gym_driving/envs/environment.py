@@ -211,7 +211,7 @@ class Environment:
         # Take actions
         states, rewards, dones, info_dicts, = [], [], [], []
         for action in actions:
-            state, reward, done, info_dict = self.take_action([action, 1.0], noise=noise, graphics_mode=False)
+            state, reward, done, info_dict = self.step([action, 1.0], noise=noise, graphics_mode=False)
             states.append(state)
             rewards.append(reward)
             dones.append(done)

@@ -19,7 +19,7 @@ class DrivingAgent():
 		self.actions = [0, 1, 2, 3, 4]
 		self.reset()
 
-	def eval_policy(self, env, state, search_horizon=5):
+	def eval_policy(self, env, search_horizon=5):
 		self.driving_env = env
 		self.search_horizon = search_horizon
 		self.counter = 0

@@ -35,7 +35,7 @@
         15.0, 
         20.0
     ], 
-    "state_space": "positions", 
+    "state_space": "image", 
     "steer_action": [
         -15.0, 
         15.0, 

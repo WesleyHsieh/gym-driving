@@ -33,8 +33,9 @@ class SupervisedAgent(Agent):
 		done = False
 		state = self.env._reset()
 		while not done:
-			supervisor_label = self.supervisor.rollout_policy(self.env)
-			next_state, _, done, _ = self.env._step(supervisor_label)
+			supervisor_label = self.supervisor.eval_policy(self.env)
+			action_packed = [supervisor_label, 1.0]
+			next_state, _, done, _ = self.env._step(action_packed)
 
 			states.append(state)
 			actions.append(supervisor_label)
@@ -50,10 +51,10 @@ class SupervisedAgent(Agent):
 		done = False
 		state = self.env._reset()
 		while not done:
-			supervisor_label = self.supervisor.rollout_policy(self.env)
+			supervisor_label = self.supervisor.eval_policy(self.env)
 			action = self.learner.eval_policy(state)
-	
-			next_state, reward, done, info_dict = self.env._step(action)
+			action_packed = [action, 1.0]
+			next_state, reward, done, info_dict = self.env._step(action_packed)
 
 			states.append(state)
 			actions.append(action)
@@ -73,7 +74,7 @@ class SupervisedAgent(Agent):
 		"""
 		self.learner.add_to_data(states, actions)
 		self.learner.train_learner(self.iterations)
-		self.iterations +=1
+		self.iterations += 1
 
 	def get_statistics(self):
 		"""
