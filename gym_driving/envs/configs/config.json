@@ -26,8 +26,8 @@
     ], 
     "logging_dir": null, 
     "screen_size": [
-        1024, 
-        1024
+        512, 
+        512
     ], 
     "main_car_params": [
         0, 

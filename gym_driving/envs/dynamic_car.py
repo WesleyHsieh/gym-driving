@@ -2,6 +2,7 @@ import numpy as np
 import pygame
 import os
 import IPython
+from scipy.integrate import odeint
 
 from gym_driving.envs.rectangle import Rectangle
 from gym_driving.envs.car import Car
@@ -33,10 +34,6 @@ class DynamicCar(Car):
         # Convert to radians 
         delta_f, rad_angle, rad_dangle = np.radians(delta_f), np.radians(self.angle), np.radians(self.dangle)
 
-        # Slip angles
-        alpha_f = delta_f
-        alpha_r = delta_f
-
         # Friction coefficient
         if info_dict is None:
             mu = 0.9
@@ -47,8 +44,30 @@ class DynamicCar(Car):
             else:
                 mu = min([terrain.friction for terrain in collisions])
 
+        # Differential equations
+        ode_state = [self.x, self.y, self.dx_body, self.dy_body, rad_angle, rad_dangle]
+        aux_state = (mu, delta_f, a_f)
+        t = np.arange(0.0, 1.0, 0.1)
+        delta_ode_state = odeint(self.integrator, ode_state, t, args=aux_state)
+        x, y, dx_body, dy_body, rad_angle, rad_dangle = delta_ode_state[-1]
+
+        # Update car 
+        self.x, self.y, self.dx_body, self.dy_body, self.angle, self.dangle = \
+            x, y, dx_body, dy_body, np.rad2deg(rad_angle), np.rad2deg(rad_dangle)
+        self.body_vel = np.sqrt(self.dx_body ** 2 + self.dy_body ** 2)
+        self.angle %= 360.0
+        min_dangle = 15.0
+        self.dangle = max(min(self.dangle, min_dangle), -min_dangle)
+        self.corners = self.calculate_corners()
+
+    def integrator(self, state, t, mu, delta_f, a_f):
+        x, y, dx_body, dy_body, rad_angle, rad_dangle = state
         # Yaw Inertia
-        I_z = 2510.15
+        I_z = 2510.15 * 25.0
+
+        # Slip angles
+        alpha_f = -delta_f
+        alpha_r = 0.0
 
         # Tire cornering stiffness
         c_f_est = self.mass * (self.l_r / (self.l_f + self.l_r))
@@ -59,15 +78,15 @@ class DynamicCar(Car):
         F_cr = -c_r * alpha_r
 
         # Differential equations
-        ddx_body = rad_dangle * self.dy_body + a_f
-        ddy_body = -rad_dangle * self.dx_body + (2 / self.mass) * (F_cf * np.cos(delta_f) + F_cr)
+        ddx_body = rad_dangle * dy_body + a_f
+        ddy_body = -rad_dangle * dx_body + (2 / self.mass) * (F_cf * np.cos(delta_f) + F_cr)
         
         # Clamp acceleration if above maximum velocity
-        body_vel = np.sqrt((ddx_body + self.dx_body) ** 2 + (ddy_body + self.dy_body) ** 2)
+        body_vel = np.sqrt((ddx_body + dx_body) ** 2 + (ddy_body + dy_body) ** 2)
         if body_vel > self.max_vel:
             a = ddx_body ** 2 + ddy_body ** 2
-            b = 2 * (ddx_body * self.dx_body + ddy_body * self.dy_body)
-            c = self.dx_body ** 2 + self.dy_body ** 2 - self.max_vel ** 2
+            b = 2 * (ddx_body * dx_body + ddy_body * dy_body)
+            c = dx_body ** 2 + dy_body ** 2 - self.max_vel ** 2
             sqrt_term = b**2 - 4*a*c
 
             # Truncate if ratio is too small to avoid floating point error
@@ -79,31 +98,19 @@ class DynamicCar(Car):
                 ratio = max(ratios)
             ddx_body, ddy_body = ddx_body * ratio, ddy_body * ratio
 
-        ddangle = (2 / I_z) * (self.l_f * F_cf - self.l_r * F_cr)
-        dx = self.dx_body * np.cos(rad_angle) - self.dy_body * np.sin(rad_angle)
-        dy = self.dx_body * np.sin(rad_angle) + self.dy_body * np.sin(rad_angle)
+        dangle = (2 / I_z) * (self.l_f * F_cf - self.l_r * F_cr)
+        ddangle = 0.0
+        # dangle = rad_dangle
+        # ddangle = (2 / I_z) * (self.l_f * F_cf - self.l_r * F_cr)
 
+        dx = dx_body * np.cos(rad_angle) - dy_body * np.sin(rad_angle)
+        dy = dx_body * np.sin(rad_angle) + dy_body * np.sin(rad_angle)
+        
         # Clamp velocity
         vel = np.sqrt(dx ** 2 + dy ** 2)
         if vel > self.max_vel:
             ratio = self.max_vel / vel
             dx, dy = dx * ratio, dy * ratio
-            
-        # Update car 
-        self.angle += np.rad2deg(rad_dangle + 0.5 * ddangle ** 2)
-        self.angle %= 360.0
-        self.dx_body = max(self.dx_body + ddx_body, 0.0)
-        self.dy_body = max(self.dy_body + ddy_body, 0.0)
-        self.x += dx
-        self.y += dy
-        self.dangle = np.rad2deg(delta_f)
-        self.a_f = a_f
-        self.body_vel = np.sqrt(self.dx_body ** 2 + self.dy_body ** 2)
-        self.vel = np.sqrt(dx ** 2 + dy ** 2)
 
-        # debug_list = ['action', 'dx', 'dy', 'self.vel', 'self.body_vel', 'self.dx_body', 'self.dy_body', \
-        # 'ddx_body', 'ddy_body', 'ddangle', 'rad_dangle', 'a_f']
-        # for item in debug_list:
-        #     print(item, eval(item))
-        # if self.count % 20 == 0:
-        #     IPython.embed()
+        output = [dx, dy, ddx_body, ddy_body, dangle, ddangle]
+        return output
