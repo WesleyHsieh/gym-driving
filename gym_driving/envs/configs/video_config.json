@@ -1,5 +1,5 @@
 {
-    "num_cpu_cars": 10, 
+    "num_cpu_cars": 30, 
     "control_space": "discrete", 
     "terrain_params": [
         [
@@ -26,14 +26,14 @@
     ], 
     "logging_dir": null, 
     "screen_size": [
-        512, 
-        512
+        1024, 
+        1024
     ], 
     "main_car_params": [
         0, 
         0, 
         0.0, 
-        20.0
+        15.0
     ], 
     "state_space": "positions", 
     "steer_action": [
@@ -44,7 +44,7 @@
     "cpu_cars_bounding_box": [
         [
             200.0, 
-            1000.0
+            3000.0
         ], 
         [
             -90.0, 
@@ -52,8 +52,8 @@
         ]
     ], 
     "acc_action": [
-        -5.0, 
-        5.0, 
+        1.0, 
+        1.0, 
         3.0
     ], 
     "time_horizon": 100, 
