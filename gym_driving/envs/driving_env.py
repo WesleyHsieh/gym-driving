@@ -26,18 +26,8 @@ class DrivingEnv(gym.Env):
     # def __init__(self, param_dict=None):
     def __init__(self, graphics_mode=True, screen=None, config_filepath=None):
         if config_filepath is None:
-            param_dict = {
-                'num_cpu_cars': 10, 
-                'main_car_starting_angles': np.linspace(-30, 30, 5), 
-                'cpu_cars_bounding_box': [[100.0, 1000.0], [-90.0, 90.0]],
-                'screen_size': (512, 512),
-                'logging_dir': None,
-                'logging_rate': 10,
-                'time_horizon': 100,
-                'terrain_params': [[0, -2000, 20000, 38000, 'grass'], [0, 0, 20000, 200, 'road'], [0, 2000, 20000, 3800, 'grass']],
-            }
-        else:
-            param_dict = json.load(open(config_filepath, 'r'))
+            config_filepath = 'configs/config.json'
+        param_dict = json.load(open(config_filepath, 'r'))
         print(config_filepath)
         print(param_dict)
 
@@ -102,7 +92,8 @@ class DrivingEnv(gym.Env):
 
     def _render(self, mode='human', close=False):
         pass
-
+    def render(self, mode='human', close=False):
+        pass
     def _step(self, action):
         self.iter_count += 1
         # action = np.array([action, 2])

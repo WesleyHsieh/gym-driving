@@ -10,6 +10,7 @@ from pygame.locals import *
 import random
 import cProfile
 import IPython
+import argparse
 
 TIMESTEPS = 1000
 SLEEP_DELAY = .0001
@@ -109,7 +110,8 @@ def run_driving_agent_experiment(num_experiments=50):
         print(result_dict[search_horizon])
 
 
-def simulate_manual_control():
+def simulate_manual_control(config_filepath=None):
+    print('config_filepath', config_filepath)
     # PyGame initializations
     pygame.init()
     fpsClock = pygame.time.Clock()
@@ -127,14 +129,13 @@ def simulate_manual_control():
     # for i in random.sample(xrange(0, 32), 12):
     #     TERRAINS.append(Terrain(-2048 + i*128, 384 + (i%2) * 128, 128, 128, 'icegrass', screen, SCREEN_SIZE))
 
-    # TERRAINS.append(Terrain(0, -2000, 20000, 3900, 'grass', screen, SCREEN_SIZE))
-    # TERRAINS.append(Terrain(0, 0, 20000, 100, 'road', screen, SCREEN_SIZE))
-    # TERRAINS.append(Terrain(0, 2000, 20000, 3900, 'grass', screen, SCREEN_SIZE))
-    config_filepath = 'configs/config.json'
+    if config_filepath is None:
+        config_filepath = 'configs/config.json'
     controller = Controller(CONTROLLER_MODE)
     simulator = DrivingEnv(graphics_mode=GRAPHICS_MODE, config_filepath=config_filepath)
-    #simulator = DrivingEnv(GRAPHICS_MODE, SCREEN_SIZE, screen, TERRAINS)
     states, actions, rewards = [], [], []
+
+    time.sleep(3)
 
     for t in range(TIMESTEPS):
         # Checks for quit
@@ -152,10 +153,6 @@ def simulate_manual_control():
         states.append(state)
         actions.append(action)
         rewards.append(reward)
-        # print("State, Action, Next State")
-        # print(states[t-1])
-        # print(action)
-        # print(states[t])
 
         fpsClock.tick(FPS)
 
@@ -164,7 +161,10 @@ def simulate_manual_control():
         # time.sleep(SLEEP_DELAY)
 
 if __name__ == '__main__':
-    simulate_manual_control()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-c", "--config", help="config filepath", default=None)
+    args = parser.parse_args()
 
-    # cProfile.run('run_driving_agent_experiment()')
-    # run_driving_agent_experiment()
+    config_filepath = args.config
+    simulate_manual_control(config_filepath)
+

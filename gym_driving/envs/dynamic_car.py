@@ -7,6 +7,13 @@ from scipy.integrate import odeint
 from gym_driving.envs.rectangle import Rectangle
 from gym_driving.envs.car import Car
 
+def dampen_val(val, lim, coef):
+    damped = val * coef
+    if np.abs(damped) < lim:
+        return 0.0
+    else:
+        return damped
+
 class DynamicCar(Car):
     """
     Car object.
@@ -54,10 +61,13 @@ class DynamicCar(Car):
         # Update car 
         self.x, self.y, self.dx_body, self.dy_body, self.angle, self.dangle = \
             x, y, dx_body, dy_body, np.rad2deg(rad_angle), np.rad2deg(rad_dangle)
+
+        self.dy_body = dampen_val(self.dy_body, lim=0.1, coef=0.75)
         self.body_vel = np.sqrt(self.dx_body ** 2 + self.dy_body ** 2)
         self.angle %= 360.0
-        min_dangle = 15.0
-        self.dangle = max(min(self.dangle, min_dangle), -min_dangle)
+
+        self.dangle = dampen_val(self.dangle, lim=0.1, coef=0.75)
+
         self.corners = self.calculate_corners()
 
     def integrator(self, state, t, mu, delta_f, a_f):
@@ -65,8 +75,16 @@ class DynamicCar(Car):
         # Yaw Inertia
         I_z = 2510.15 * 25.0
 
+        # Limit backwards acceleration
+        dx_body = max(dx_body, 0.0)
+
+        # Slip angle calculation
+        beta = np.arctan((self.l_r / (self.l_f + self.l_r)) * np.tan(delta_f))
+        vel = np.sqrt(dx_body ** 2 + dy_body ** 2)
+        slip_angle = (vel / self.l_r) * np.sin(beta)
+
         # Slip angles
-        alpha_f = -delta_f
+        alpha_f = -slip_angle
         alpha_r = 0.0
 
         # Tire cornering stiffness
@@ -98,10 +116,8 @@ class DynamicCar(Car):
                 ratio = max(ratios)
             ddx_body, ddy_body = ddx_body * ratio, ddy_body * ratio
 
-        dangle = (2 / I_z) * (self.l_f * F_cf - self.l_r * F_cr)
-        ddangle = 0.0
-        # dangle = rad_dangle
-        # ddangle = (2 / I_z) * (self.l_f * F_cf - self.l_r * F_cr)
+        dangle = rad_dangle
+        ddangle = (2 / I_z) * (self.l_f * F_cf - self.l_r * F_cr)
 
         dx = dx_body * np.cos(rad_angle) - dy_body * np.sin(rad_angle)
         dy = dx_body * np.sin(rad_angle) + dy_body * np.sin(rad_angle)

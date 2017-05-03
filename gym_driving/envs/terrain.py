@@ -20,8 +20,8 @@ class Terrain(Rectangle):
             'grass': {'friction': 0.6},
             'patchy': {'friction': 0.9},
             'dirt': {'friction': 0.9},
-            'ice': {'friction': 0.05},
-            'icegrass': {'friction': 0.2},
+            'ice': {'friction': 0.2},
+            'icegrass': {'friction': 0.6},
         }
         self.graphics_mode = graphics_mode
         if self.graphics_mode:
