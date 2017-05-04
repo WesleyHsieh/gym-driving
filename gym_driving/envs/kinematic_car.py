@@ -2,6 +2,7 @@ import numpy as np
 import pygame
 import os
 import IPython
+from scipy.integrate import odeint
 
 from gym_driving.envs.rectangle import Rectangle
 from gym_driving.envs.car import Car
@@ -34,17 +35,26 @@ class KinematicCar(Car):
             a = - self.vel
 
         # Differential equations
-        beta = np.arctan((self.l_r / (self.l_f + self.l_r)) * np.tan(delta_f))
-        dx = self.vel * np.cos(rad_angle + beta)
-        dy = self.vel * np.sin(rad_angle + beta)
-        dangle = (self.vel / self.l_r) * np.sin(beta)
-        dvel = a 
+        ode_state = [self.x, self.y, self.vel, rad_angle]
+        aux_state = (a, delta_f)
+        t = np.arange(0.0, 1.0, 0.1)
+        delta_ode_state = odeint(self.integrator, ode_state, t, args=aux_state)
+        x, y, vel, angle = delta_ode_state[-1]
 
         # Update car
-        self.x += dx
-        self.y += dy
-        self.angle += np.rad2deg(dangle)
-        self.vel += dvel
+        self.x, self.y, self.vel, self.angle = x, y, vel, np.rad2deg(angle)
         self.angle %= 360.0
-        self.acc = max(min(a, self.max_vel - self.vel), -self.vel)
         self.corners = self.calculate_corners()
+
+    def integrator(self, state, t, acc, delta_f):
+        x, y, vel, rad_angle = state
+
+        # Differential equations
+        beta = np.arctan((self.l_r / (self.l_f + self.l_r)) * np.tan(delta_f))
+        dx = vel * np.cos(rad_angle + beta)
+        dy = vel * np.sin(rad_angle + beta)
+        dangle = (vel / self.l_r) * np.sin(beta)
+        dvel = acc
+        output = [dx, dy, dvel, dangle]
+        return output
+

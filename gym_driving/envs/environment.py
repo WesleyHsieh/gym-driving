@@ -58,7 +58,7 @@ class Environment:
             self.acc_space = np.linspace(low, high, step)
 
         x, y, vel, max_vel = self.param_dict['main_car_params']
-        self.main_car = Car(x=x, y=y, angle=main_car_angle, vel=vel, max_vel=max_vel, \
+        self.main_car = DynamicCar(x=x, y=y, angle=main_car_angle, vel=vel, max_vel=max_vel, \
             screen=self.screen, screen_size=self.screen_size, texture='main', \
             graphics_mode=self.graphics_mode)
 
@@ -85,6 +85,7 @@ class Environment:
             self.terrain = [Terrain(x=x, y=y, width=width, length=length, texture=texture, \
                 screen=self.screen, screen_size=self.screen_size, graphics_mode=self.graphics_mode) \
                 for x, y, width, length, texture in self.param_dict['terrain_params']]
+            self.terrain = sorted(self.terrain, key=lambda x: x.friction)
         if self.graphics_mode:
             self.render()
         self.update_state()
@@ -128,7 +129,8 @@ class Environment:
         info_dict = {}
         main_car_state, info_dict['main_car'] = self.main_car.get_state()
         # x = [vehicle.get_state() for vehicle in self.vehicles]
-        car_states, info_dict['other_cars'] = list(zip(*[vehicle.get_state() for vehicle in self.vehicles]))
+        if self.num_cpu_cars > 0:
+            car_states, info_dict['other_cars'] = list(zip(*[vehicle.get_state() for vehicle in self.vehicles]))
         info_dict['car_collisions'] = [car for car in self.vehicles if self.main_car.collide_rect(car)]
         # info_dict['num_car_collisions'] = len(info_dict['car_collisions'])
         info_dict['terrain_collisions'] = [terrain for terrain in self.terrain if self.main_car.collide_rect(terrain)]
@@ -139,7 +141,10 @@ class Environment:
         info_dict['compact_state'] = self.get_compact_state()
 
         if self.state_space == 'positions':
-            state = np.concatenate([main_car_state] + list(car_states))
+            if self.num_cpu_cars > 0:
+                state = np.concatenate([main_car_state] + list(car_states))
+            else:
+                state = main_car_state
         elif self.state_space == 'image':
             state = pygame.surfarray.array2d(self.screen).astype(np.uint8)
             self.downsample(state, self.downsampled_size)
@@ -147,7 +152,10 @@ class Environment:
 
     def get_compact_state(self):
         _, main_car_info_dict = self.main_car.get_state() 
-        vehicle_info_dicts = list(zip(*[car.get_state() for car in self.vehicles]))[1]
+        if self.num_cpu_cars > 0:
+            vehicle_info_dicts = list(zip(*[car.get_state() for car in self.vehicles]))[1]
+        else:
+            vehicle_info_dicts = []
         return (main_car_info_dict, vehicle_info_dicts)
 
     def set_state(self, main_car_state, vehicles_states):

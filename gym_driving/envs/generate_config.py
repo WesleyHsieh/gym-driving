@@ -165,18 +165,18 @@ class GenerateConfig:
 		self.config_dict_defaults = {
 			'num_cpu_cars': ('Number of CPU cars (int)', [10], 1, 1, self.paramater_wrapper.get_num_cpu_cars), 
 			'main_car_starting_angles': ('Low, High, Step Size (float, float, float/None)', [-30, 30, 5], 3, 1, self.paramater_wrapper.get_main_car_starting_angles),
-			'cpu_cars_bounding_box': ('x_low, x_high, y_low, y_high (float, float, float, float)', [100.0, 1000.0, -90.0, 90.0], 4, 1, self.paramater_wrapper.get_cpu_cars_bounding_box),
+			'cpu_cars_bounding_box': ('x_low, x_high, y_low, y_high (float, float, float, float)', [200.0, 1000.0, -90.0, 90.0], 4, 1, self.paramater_wrapper.get_cpu_cars_bounding_box),
 			'screen_size': ('Width, Height of Screen (int, int)', [512, 512], 2, 1, self.paramater_wrapper.get_screen_size), 
 			'logging_dir': ('Directory for logging (str)', [None], 1, 1, self.paramater_wrapper.get_logging_dir), 
 			'logging_rate': ('Logging every n steps (int)', [10], 1, 1, self.paramater_wrapper.get_logging_rate), 
 			'time_horizon': ('Time horizon for a rollout (int)', [100], 1, 1, self.paramater_wrapper.get_time_horizon), 
 			'terrain_params': ('x, y, width, length, texture (int, int, int, int, str)', \
-				[[0, -2000, 20000, 3800, 'grass'], [0, 0, 20000, 200, 'road'], [0, 2000, 20000, 3800, 'grass']], \
+				[[0, -2000, 30000, 3800, 'grass'], [0, 0, 30000, 200, 'road'], [0, 2000, 30000, 3800, 'grass']], \
 				5, 100, self.paramater_wrapper.get_terrain),
 			'main_car_params': ('x, y, starting_vel, max_vel (int, int, float, float)', [0, 0, 0.0, 20.0], \
 				4, 1, self.paramater_wrapper.get_main_car_params),
-			'steer_action': ('Low, High, Step Size (float, float, float/None)', [-15.0, 15.0, 3], 1, 1, self.paramater_wrapper.get_steer_action),
-			'acc_action': ('Low, High, Step Size (float, float, float/None)', [-5.0, 5.0, 3], 1, 1, self.paramater_wrapper.get_acc_action),
+			'steer_action': ('Low, High, Step Size (float, float, float/None)', [-15.0, 15.0, 3.0], 1, 1, self.paramater_wrapper.get_steer_action),
+			'acc_action': ('Low, High, Step Size (float, float, float/None)', [-5.0, 5.0, 3.0], 1, 1, self.paramater_wrapper.get_acc_action),
 			'control_space': ('Control space (str, {discrete, continuous})', ['discrete'], 1, 1, self.paramater_wrapper.get_control_space),
 			'downsampled_size': ('Downsampled size (int)', [None], 2, 1, self.paramater_wrapper.get_downsampled_size),
 			'state_space': ('State space (str, {positions, image})', ['positions'], 1, 1, self.paramater_wrapper.get_state_space)

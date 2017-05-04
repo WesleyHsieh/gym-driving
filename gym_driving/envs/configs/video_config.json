@@ -32,8 +32,8 @@
     "main_car_params": [
         0, 
         0, 
-        15.0, 
-        20.0
+        0.0, 
+        15.0
     ], 
     "state_space": "positions", 
     "steer_action": [
@@ -52,16 +52,16 @@
         ]
     ], 
     "acc_action": [
-        -5.0, 
-        5.0, 
+        1.0, 
+        1.0, 
         3.0
     ], 
     "time_horizon": 100, 
     "logging_rate": 10, 
     "main_car_starting_angles": [
-        0.0, 
-        0.0, 
-        1.0
+        -30.0, 
+        30.0, 
+        5.0
     ], 
     "downsampled_size": null
 }

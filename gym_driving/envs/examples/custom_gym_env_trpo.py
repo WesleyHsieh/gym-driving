@@ -13,7 +13,7 @@ from rllab.envs.box2d.cartpole_env import CartpoleEnv
 def run_task(*_):
     import gym_driving
     # env = normalize(GymEnv('DrivingEnv-v0'))
-    env = normalize(GymEnv('SupervisorDrivingEnv-v0'))
+    env = normalize(GymEnv('DrivingEnv-v0'))
     
     policy = CategoricalMLPPolicy(
         env_spec=env.spec,
