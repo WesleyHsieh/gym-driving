@@ -109,9 +109,10 @@ class Environment:
 
     def downsample(self, state, output_size):
         w, h = state.shape
-        while w > output_size and h > output_size:
-            state = cv2.pyrDown(state, dstsize = (w / 2, h / 2))
-            w, h = state.shape
+        if output_size is not None:
+            while w > output_size and h > output_size:
+                state = cv2.pyrDown(state, dstsize = (w / 2, h / 2))
+                w, h = state.shape
         return state
 
     def get_state(self):
