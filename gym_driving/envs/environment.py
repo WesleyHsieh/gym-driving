@@ -56,9 +56,14 @@ class Environment:
             self.steer_space = np.linspace(low, high, step)
             low, high, step = self.param_dict['acc_action']
             self.acc_space = np.linspace(low, high, step)
+        else:
+            low, high, step = self.param_dict['steer_action']
+            self.steer_space = [low, high]
+            low, high, step = self.param_dict['acc_action']
+            self.acc_space = [low, high]
 
         x, y, vel, max_vel = self.param_dict['main_car_params']
-        self.main_car = DynamicCar(x=x, y=y, angle=main_car_angle, vel=vel, max_vel=max_vel, \
+        self.main_car = Car(x=x, y=y, angle=main_car_angle, vel=vel, max_vel=max_vel, \
             screen=self.screen, screen_size=self.screen_size, texture='main', \
             graphics_mode=self.graphics_mode)
 
@@ -172,14 +177,21 @@ class Environment:
             Reward.
         """
         # Convert numerical action vector to steering angle / acceleration
-        steer = int(action[0])
-        acc = int(action[1])
-
         if self.control_space == 'discrete':
-            steer = self.steer_space[steer]
-            acc = self.acc_space[acc]
+            if type(action) is int:
+                steer = action 
+                acc = 0.0
+            else:
+                steer = self.steer_space[action[0]]
+                acc = self.acc_space[action[1]]
         elif self.control_space == 'continuous':
-            steer, acc = action[0], action[1]
+            if type(action) is float:
+                steer = action
+                acc = 0.0
+            else:
+                steer = action[0]
+                acc = action[1]
+
         # Add noise
         if steer != 0.0 and noise > 0.0:
             steer *= 1.0 + np.random.normal(loc=0.0, scale=noise)

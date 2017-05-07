@@ -6,7 +6,7 @@ from scipy.integrate import odeint
 
 from gym_driving.envs.rectangle import Rectangle
 from gym_driving.envs.car import Car
-
+ 
 def dampen_val(val, lim, coef):
     damped = val * coef
     if np.abs(damped) < lim:
@@ -66,7 +66,7 @@ class DynamicCar(Car):
         self.body_vel = np.sqrt(self.dx_body ** 2 + self.dy_body ** 2)
         self.angle %= 360.0
 
-        self.dangle = dampen_val(self.dangle, lim=0.1, coef=0.75)
+        self.dangle = dampen_val(self.dangle, lim=0.1, coef=0.95)
 
         self.corners = self.calculate_corners()
 

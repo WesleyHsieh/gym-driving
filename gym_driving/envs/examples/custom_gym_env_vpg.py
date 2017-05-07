@@ -1,16 +1,9 @@
-from rllab.algos.trpo import TRPO
+from rllab.algos.vpg import VPG
 from rllab.baselines.linear_feature_baseline import LinearFeatureBaseline
 from rllab.envs.gym_env import GymEnv
 from rllab.envs.normalized_env import normalize
 from rllab.misc.instrument import run_experiment_lite
 from rllab.policies.categorical_mlp_policy import CategoricalMLPPolicy
-
-# from rllab.policies.gaussian_mlp_policy import GaussianMLPPolicy
-# from rllab.policies.gaussian_gru_policy import GaussianGRUPolicy
-# from rllab.policies.categorical_mlp_policy import CategoricalMLPPolicy
-# from rllab.policies.categorical_gru_policy import CategoricalGRUPolicy
-# from rllab.optimizers.conjugate_gradient_optimizer import ConjugateGradientOptimizer, FiniteDifferenceHvp
-# from rllab.envs.box2d.cartpole_env import CartpoleEnv
 
 def run_task(*_):
     import gym_driving
@@ -25,7 +18,7 @@ def run_task(*_):
 
     baseline = LinearFeatureBaseline(env_spec=env.spec)
 
-    algo = TRPO(
+    algo = VPG(
         env=env,
         policy=policy,
         baseline=baseline,
