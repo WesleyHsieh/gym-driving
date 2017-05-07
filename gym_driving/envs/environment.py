@@ -147,7 +147,14 @@ class Environment:
 
         if self.state_space == 'positions':
             if self.num_cpu_cars > 0:
-                state = np.concatenate([main_car_state] + list(car_states))
+                # state = np.concatenate([main_car_state] + list(car_states))
+                filtered_car_states = np.concatenate([car_state[:2] - main_car_state[:2] \
+                    for car_state in car_states], axis=0)
+                screen_lims = self.screen_size[0]
+                filtered_car_states[filtered_car_states > screen_lims] = screen_lims
+                filtered_car_states[filtered_car_states < -screen_lims] = -screen_lims
+                main_car_state[0] = 0.0
+                state = np.concatenate([main_car_state, filtered_car_states])
             else:
                 state = main_car_state
         elif self.state_space == 'image':

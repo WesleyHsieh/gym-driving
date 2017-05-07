@@ -67,8 +67,16 @@ class DrivingEnv(gym.Env):
 
         # Limits on x, y, angle
         if self.state_space == 'positions':
-            low = np.tile(np.array([-10000.0, -10000.0, 0.0]), self.num_cpu_cars + 1)
-            high = np.tile(np.array([10000.0, 10000.0, 360.0]), self.num_cpu_cars + 1)
+            # low = np.tile(np.array([-10000.0, -10000.0, 0.0]), self.num_cpu_cars + 1)
+            # high = np.tile(np.array([10000.0, 10000.0, 360.0]), self.num_cpu_cars + 1)
+
+            low = np.tile(np.array([-10000.0, -10000.0]), self.num_cpu_cars)
+            high = np.tile(np.array([10000.0, 10000.0]), self.num_cpu_cars)
+            low = np.concatenate([low, [-10000.0, -10000.0, 0.0]])
+            high = np.concatenate([high, [10000.0, 10000.0, 360.0]])
+
+            # low = np.array([-10000.0, -10000.0, 0.0])
+            # high = np.array([10000.0, 10000.0, 360.0])
             self.observation_space = spaces.Box(low, high)
         elif self.state_space == 'image':
             w, h = param_dict['screen_size']
