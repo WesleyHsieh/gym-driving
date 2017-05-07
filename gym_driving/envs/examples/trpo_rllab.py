@@ -20,7 +20,7 @@ def run_task(*_):
 
     policy = CategoricalMLPPolicy(
         env_spec=env.spec,
-        hidden_sizes=(32, 32)
+        hidden_sizes=(64, 64)
     )
 
     baseline = LinearFeatureBaseline(env_spec=env.spec)

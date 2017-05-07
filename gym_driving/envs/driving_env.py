@@ -12,7 +12,7 @@ import IPython
 import pickle
 import json
 import os
-
+os.environ["SDL_VIDEODRIVER"] = "dummy"
 logger = logging.getLogger(__name__)
 
 class DrivingEnv(gym.Env):
