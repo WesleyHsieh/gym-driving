@@ -12,9 +12,13 @@ from rllab.envs.gym_env import GymEnv
 from rllab.envs.normalized_env import normalize
 from rllab.misc.instrument import run_experiment_lite
 from rllab.policies.categorical_mlp_policy import CategoricalMLPPolicy
+import gym_driving
+
+import IPython
 
 def run_task(*_):
     import gym_driving
+    # IPython.embed()
     env = normalize(GymEnv('DrivingEnv-v0'))
     # env = normalize(GymEnv('CartPole-v0'))
 
@@ -43,7 +47,7 @@ def run_task(*_):
 run_experiment_lite(
     run_task,
     # Number of parallel workers for sampling
-    n_parallel=1,
+    n_parallel=4,
     # Only keep the snapshot parameters for the last iteration
     snapshot_mode="last",
     exp_name='trpo',
