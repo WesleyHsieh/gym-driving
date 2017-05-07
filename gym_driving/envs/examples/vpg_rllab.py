@@ -43,7 +43,7 @@ def run_task(*_):
 run_experiment_lite(
     run_task,
     # Number of parallel workers for sampling
-    n_parallel=4,
+    n_parallel=6,
     # Only keep the snapshot parameters for the last iteration
     snapshot_mode="last",
     exp_name='vpg',
