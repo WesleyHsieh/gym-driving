@@ -20,7 +20,7 @@ def run_task(*_):
 
     policy = CategoricalMLPPolicy(
         env_spec=env.spec,
-        hidden_sizes=(32, 32)
+        hidden_sizes=(64, 64)
     )
 
     baseline = LinearFeatureBaseline(env_spec=env.spec)
@@ -29,9 +29,9 @@ def run_task(*_):
         env=env,
         policy=policy,
         baseline=baseline,
-        batch_size=5000,
+        batch_size=40000,
         max_path_length=env.horizon,
-        n_itr=500,
+        n_itr=250,
         discount=0.99,
         step_size=0.0001,
         # Uncomment both lines (this and the plot parameter below) to enable plotting
@@ -46,6 +46,7 @@ run_experiment_lite(
     n_parallel=1,
     # Only keep the snapshot parameters for the last iteration
     snapshot_mode="last",
+    exp_name='tnpg',
     # Specifies the seed for the experiment. If this is not provided, a random seed
     # will be used
     seed=1,
