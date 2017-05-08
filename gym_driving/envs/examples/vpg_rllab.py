@@ -31,9 +31,9 @@ def run_task(*_):
         baseline=baseline,
         batch_size=40000,
         max_path_length=env.horizon,
-        n_itr=250,
+        n_itr=500,
         discount=0.99,
-        step_size=0.0001,
+        step_size=0.01,
         # Uncomment both lines (this and the plot parameter below) to enable plotting
         # plot=True,
     )
