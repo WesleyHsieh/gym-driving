@@ -16,26 +16,23 @@ class Environment:
     be done through simulator wrapper class.
     """
 
-    def __init__(self, graphics_mode, screen_size, screen=None, param_dict=None):
+    def __init__(self, render_mode, screen_size, screen=None, param_dict=None):
         self.param_dict = param_dict
         self.cpu_car_textures = ['orange', 'red']
         self.screen_size = screen_size
         self.screen = screen
-        self.graphics_mode = graphics_mode
+        self.render_mode = render_mode
         self.steer_action = self.param_dict['steer_action']
         self.acc_action = self.param_dict['acc_action']
         self.downsampled_size = self.param_dict['downsampled_size']
         self.state_space = self.param_dict['state_space']
         self.control_space = self.param_dict['control_space']
-        self.reset()
-        self.frictions = {
-            'road': 0.9,
-            'grass': 0.6,
-            'patchy': 0.6,
-            'dirt': 0.6,
-            'ice': 0.05,
-            'icegrass': 0.2,
+        self.main_car_types = {
+            'point': Car,
+            'kinematic': KinematicCar,
+            'dynamic': DynamicCar,
         }
+        self.reset()
 
     def reset(self, screen=None):
         if screen is not None:
@@ -44,28 +41,29 @@ class Environment:
         lims = self.param_dict['cpu_cars_bounding_box']
 
         # Main car starting angle
-        low, high, step = self.param_dict['main_car_starting_angles']
-        if step is None:
+        low, high, num = self.param_dict['main_car_starting_angles']
+        if num is None:
             main_car_angle = np.random.uniform(low=low, high=high)
         else:
-            main_car_angle = np.random.choice(np.linspace(low, high, step))
+            main_car_angle = np.random.choice(np.linspace(low, high, num))
 
         # Control space
         if self.param_dict['control_space'] == 'discrete':
-            low, high, step = self.param_dict['steer_action']
-            self.steer_space = np.linspace(low, high, step)
-            low, high, step = self.param_dict['acc_action']
-            self.acc_space = np.linspace(low, high, step)
+            low, high, num = self.param_dict['steer_action']
+            self.steer_space = np.linspace(low, high, num)
+            low, high, num = self.param_dict['acc_action']
+            self.acc_space = np.linspace(low, high, num)
         else:
-            low, high, step = self.param_dict['steer_action']
+            low, high, num = self.param_dict['steer_action']
             self.steer_space = [low, high]
-            low, high, step = self.param_dict['acc_action']
+            low, high, num = self.param_dict['acc_action']
             self.acc_space = [low, high]
 
         x, y, vel, max_vel = self.param_dict['main_car_params']
-        self.main_car = Car(x=x, y=y, angle=main_car_angle, vel=vel, max_vel=max_vel, \
+        main_car_dynamics = self.main_car_types[self.param_dict['main_car_dynamics']]
+        self.main_car = main_car_dynamics(x=x, y=y, angle=main_car_angle, vel=vel, max_vel=max_vel, \
             screen=self.screen, screen_size=self.screen_size, texture='main', \
-            graphics_mode=self.graphics_mode)
+            render_mode=self.render_mode)
 
         # Create CPU-controlled cars, ensuring they are collision-free
         self.vehicles = []
@@ -74,24 +72,24 @@ class Environment:
             while collision:
                 new_car = Car(x=np.random.uniform(lims[0][0], lims[0][1]), y=np.random.uniform(lims[1][0], lims[1][1]), \
                 angle=0.0, vel=10.0, screen=self.screen, screen_size=self.screen_size, \
-                texture=np.random.choice(self.cpu_car_textures), graphics_mode=self.graphics_mode)
+                texture=np.random.choice(self.cpu_car_textures), render_mode=self.render_mode)
                 collision = any([new_car.collide_rect(car) for car in self.vehicles]) or new_car.collide_rect(self.main_car)
             self.vehicles.append(new_car)
         
         if self.param_dict['terrain_params'] is None:
             self.terrain = []
             self.terrain.append(Terrain(x=0, y=-2000, width=20000, length=3800, texture='grass', \
-                screen=self.screen, screen_size=self.screen_size, graphics_mode=self.graphics_mode))
+                screen=self.screen, screen_size=self.screen_size, render_mode=self.render_mode))
             self.terrain.append(Terrain(x=0, y=0, width=20000, length=200, texture='road', \
-                screen=self.screen, screen_size=self.screen_size, graphics_mode=self.graphics_mode))
+                screen=self.screen, screen_size=self.screen_size, render_mode=self.render_mode))
             self.terrain.append(Terrain(x=0, y=2000, width=20000, length=3800, texture='grass', \
-                screen=self.screen, screen_size=self.screen_size, graphics_mode=self.graphics_mode))
+                screen=self.screen, screen_size=self.screen_size, render_mode=self.render_mode))
         else:
             self.terrain = [Terrain(x=x, y=y, width=width, length=length, texture=texture, \
-                screen=self.screen, screen_size=self.screen_size, graphics_mode=self.graphics_mode) \
+                screen=self.screen, screen_size=self.screen_size, render_mode=self.render_mode) \
                 for x, y, width, length, texture in self.param_dict['terrain_params']]
             self.terrain = sorted(self.terrain, key=lambda x: x.friction)
-        if self.graphics_mode:
+        if self.render_mode:
             self.render()
         self.update_state()
         state, info_dict = self.get_state()
@@ -175,7 +173,7 @@ class Environment:
         for i in range(len(self.vehicles)):
             self.vehicles[i].set_state(**vehicles_states[i])
 
-    def step(self, action, noise=0.1, graphics_mode=None):
+    def step(self, action, noise=0.1, render_mode=None):
         """
         Takes input action, updates environment.
         :param action: dict
@@ -221,7 +219,7 @@ class Environment:
         done = any([t.texture == 'grass' for t in terrain_collisions]) or len(car_collisions) >= 1
         reward = 0 if done else 1
 
-        if graphics_mode or (graphics_mode is None and self.graphics_mode):
+        if render_mode or (render_mode is None and self.render_mode):
             self.render()
 
         return state, reward, done, info_dict
@@ -238,7 +236,7 @@ class Environment:
         # Take actions
         states, rewards, dones, info_dicts, = [], [], [], []
         for action in actions:
-            state, reward, done, info_dict = self.take_action([action, 1.0], noise=noise, graphics_mode=False)
+            state, reward, done, info_dict = self.take_action([action, 1.0], noise=noise, render_mode=False)
             states.append(state)
             rewards.append(reward)
             dones.append(done)

@@ -12,7 +12,7 @@ import IPython
 import pickle
 import json
 import os
-os.environ["SDL_VIDEODRIVER"] = "dummy"
+# os.environ["SDL_VIDEODRIVER"] = "dummy"
 logger = logging.getLogger(__name__)
 
 class DrivingEnv(gym.Env):
@@ -24,8 +24,7 @@ class DrivingEnv(gym.Env):
     #     'render.modes': ['human', 'rgb_array'],
     #     'video.frames_per_second' : 50
     # }
-    # def __init__(self, param_dict=None):
-    def __init__(self, graphics_mode=False, screen=None, config_filepath=None):
+    def __init__(self, render_mode=True, screen=None, config_filepath=None):
         if config_filepath is None:
             base_dir = os.path.dirname(__file__)
             config_filepath = os.path.join(base_dir, 'configs/config.json')
@@ -53,10 +52,9 @@ class DrivingEnv(gym.Env):
         if self.logging_dir is not None and not os.path.exists(self.logging_dir):
             os.makedirs(self.logging_dir)
         self.screen = screen
-        self.environment = Environment(graphics_mode=graphics_mode, screen_size=self.screen_size, \
+        self.environment = Environment(render_mode=render_mode, screen_size=self.screen_size, \
                 screen=self.screen, param_dict=self.param_dict)
-        self.graphics_mode = graphics_mode
-
+        self.render_mode = render_mode
         low, high, step = param_dict['steer_action']
         if self.control_space == 'discrete':
             # 0, 1, 2 = Steer left, center, right
@@ -136,7 +134,7 @@ class DrivingEnv(gym.Env):
         return self.environment.simulate_actions(actions, noise, state)
 
     def __deepcopy__(self, memo):
-        env = DrivingEnv(graphics_mode=self.graphics_mode, \
+        env = DrivingEnv(render_mode=self.render_mode, \
             screen_size=self.screen_size, screen=None, terrain=None, \
             logging_dir=self.logging_dir, logging_rate=self.logging_rate, \
             param_dict=self.param_dict)

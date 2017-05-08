@@ -154,6 +154,8 @@ class ParamaterWrapper:
 		return size
 	def get_state_space(self, space):
 		return str(space)
+	def get_main_car_dynamics(self, dynamics):
+		return str(dynamics)
 
 # TODO: Nested dictionary data structure for param_dict, description should give examples, arguments should be based on each other
 # Example: action -> continuous / discrete -> boundaries
@@ -164,7 +166,7 @@ class GenerateConfig:
 		# parameter: (description, default_args, num_args, num_inputs, generator_func)
 		self.config_dict_defaults = {
 			'num_cpu_cars': ('Number of CPU cars (int)', [10], 1, 1, self.paramater_wrapper.get_num_cpu_cars), 
-			'main_car_starting_angles': ('Low, High, Step Size (float, float, float/None)', [-30, 30, 5], 3, 1, self.paramater_wrapper.get_main_car_starting_angles),
+			'main_car_starting_angles': ('Low, High, Num (float, float, float/None)', [-30, 30, 5], 3, 1, self.paramater_wrapper.get_main_car_starting_angles),
 			'cpu_cars_bounding_box': ('x_low, x_high, y_low, y_high (float, float, float, float)', [200.0, 1000.0, -90.0, 90.0], 4, 1, self.paramater_wrapper.get_cpu_cars_bounding_box),
 			'screen_size': ('Width, Height of Screen (int, int)', [512, 512], 2, 1, self.paramater_wrapper.get_screen_size), 
 			'logging_dir': ('Directory for logging (str)', [None], 1, 1, self.paramater_wrapper.get_logging_dir), 
@@ -175,11 +177,12 @@ class GenerateConfig:
 				5, 100, self.paramater_wrapper.get_terrain),
 			'main_car_params': ('x, y, starting_vel, max_vel (int, int, float, float)', [0, 0, 0.0, 20.0], \
 				4, 1, self.paramater_wrapper.get_main_car_params),
-			'steer_action': ('Low, High, Step Size (float, float, float/None)', [-15.0, 15.0, 3.0], 1, 1, self.paramater_wrapper.get_steer_action),
-			'acc_action': ('Low, High, Step Size (float, float, float/None)', [-5.0, 5.0, 3.0], 1, 1, self.paramater_wrapper.get_acc_action),
+			'steer_action': ('Low, High, Num (float, float, float/None)', [-15.0, 15.0, 3.0], 1, 1, self.paramater_wrapper.get_steer_action),
+			'acc_action': ('Low, High, Num (float, float, float/None)', [-5.0, 5.0, 3.0], 1, 1, self.paramater_wrapper.get_acc_action),
 			'control_space': ('Control space (str, {discrete, continuous})', ['discrete'], 1, 1, self.paramater_wrapper.get_control_space),
 			'downsampled_size': ('Downsampled size (int)', [None], 2, 1, self.paramater_wrapper.get_downsampled_size),
-			'state_space': ('State space (str, {positions, image})', ['positions'], 1, 1, self.paramater_wrapper.get_state_space)
+			'state_space': ('State space (str, {positions, image})', ['positions'], 1, 1, self.paramater_wrapper.get_state_space),
+			'main_car_dynamics': ('Main car dynamics model (str, {point, kinematic, dynamic})', ['kinematic'], 1, 1, self.paramater_wrapper.get_main_car_dynamics),
 		}
 		self.command_dict = {
 			'help': self.help,

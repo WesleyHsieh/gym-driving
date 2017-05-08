@@ -25,6 +25,7 @@
         ]
     ], 
     "logging_dir": null, 
+    "main_car_dynamics": "kinematic", 
     "screen_size": [
         512, 
         512

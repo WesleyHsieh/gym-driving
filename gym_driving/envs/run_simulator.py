@@ -30,9 +30,9 @@ TERRAINS = []
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-# GRAPHICS_MODE = True
+# RENDER_MODE = True
 CONTROLLER_MODE = 'keyboard'
-GRAPHICS_MODE = True
+RENDER_MODE = True
 # CONTROLLER_MODE = 'agent'
 SCREENSHOT_DIR = None
 # SCREENSHOT_DIR = 'screenshots'
@@ -56,12 +56,12 @@ def simulate_driving_agent(search_horizon=3):
     param_dict = {'num_cpu_cars': 5, 'main_car_starting_angles': np.linspace(-30, 30, 5), 'cpu_cars_bounding_box': [[-100.0, 1000.0], [-90.0, 90.0]]}
     pygame.init()
     fpsClock = pygame.time.Clock()
-    if GRAPHICS_MODE:
+    if RENDER_MODE:
         screen = pygame.display.set_mode(SCREEN_SIZE)
         pygame.display.set_caption('Driving Simulator')
     else:
         screen = None
-    simulator = DrivingEnv(graphics_mode=GRAPHICS_MODE, screenshot_dir=SCREENSHOT_DIR, param_dict=param_dict)
+    simulator = DrivingEnv(render_mode=RENDER_MODE, screenshot_dir=SCREENSHOT_DIR, param_dict=param_dict)
     param_dict = {'search_horizon': search_horizon, 'driving_env': simulator}
     controller = Controller(mode='agent', param_dict=param_dict)
     
@@ -115,7 +115,7 @@ def simulate_manual_control(config_filepath=None):
     # PyGame initializations
     pygame.init()
     fpsClock = pygame.time.Clock()
-    if GRAPHICS_MODE:
+    if RENDER_MODE:
         screen = pygame.display.set_mode(SCREEN_SIZE)
         pygame.display.set_caption('Driving Simulator')
     else:
@@ -132,7 +132,7 @@ def simulate_manual_control(config_filepath=None):
     if config_filepath is None:
         config_filepath = 'configs/config.json'
     controller = Controller(CONTROLLER_MODE)
-    simulator = DrivingEnv(graphics_mode=GRAPHICS_MODE, config_filepath=config_filepath)
+    simulator = DrivingEnv(render_mode=RENDER_MODE, config_filepath=config_filepath)
     states, actions, rewards = [], [], []
 
     time.sleep(3)
@@ -153,7 +153,6 @@ def simulate_manual_control(config_filepath=None):
         states.append(state)
         actions.append(action)
         rewards.append(reward)
-
         fpsClock.tick(FPS)
 
         if t == TIMESTEPS - 1:
