@@ -13,7 +13,7 @@ class Terrain(Rectangle):
         'road' or 'grass'.
     :param screen: PyGame screen object
     """
-    def __init__(self, x, y, width, length, texture, screen, screen_size, angle=0.0, graphics_mode=False):
+    def __init__(self, x, y, width, length, texture, screen, screen_size, angle=0.0, render_mode=False):
         super(Terrain, self).__init__(x, y, width, length, angle)
         self.terrain_properties = {
             'road': {'friction': 0.9},
@@ -23,8 +23,8 @@ class Terrain(Rectangle):
             'ice': {'friction': 0.2},
             'icegrass': {'friction': 0.6},
         }
-        self.graphics_mode = graphics_mode
-        if self.graphics_mode:
+        self.render_mode = render_mode
+        if self.render_mode:
             if texture in self.terrain_properties:
                 base_dir = os.path.dirname(__file__)
                 filename = os.path.join(base_dir, 'images', '{}_tile_lite.jpg'.format(texture))
@@ -43,7 +43,7 @@ class Terrain(Rectangle):
                 self.tile_coords.append((x + i, y + k))
 
     def render(self, screen_coord):
-        assert self.graphics_mode is True
+        assert self.render_mode is True
         # Subtract screen_coord to get screen pos
         for coord in self.tile_coords:
             if -100 <= coord[0] - screen_coord[0] <= self.screen_size[0] and -100 <= coord[1] - screen_coord[1] <= self.screen_size[1]:

@@ -13,8 +13,8 @@ class KinematicCar(Car):
     Kinematic bicycle model:
         http://www.me.berkeley.edu/~frborrel/pdfpub/IV_KinematicMPC_jason.pdf
     """
-    def __init__(self, x, y, width=50, length=25, angle=0.0, vel=0.0, acc=0.0, max_vel=20.0, mass=100.0, screen=None, screen_size=0, texture='main', graphics_mode=False):
-        super(KinematicCar, self).__init__(x, y, width, length, angle, vel, acc, max_vel, mass, screen, screen_size, texture, graphics_mode)
+    def __init__(self, x, y, width=50, length=25, angle=0.0, vel=0.0, acc=0.0, max_vel=20.0, mass=100.0, screen=None, screen_size=0, texture='main', render_mode=False):
+        super(KinematicCar, self).__init__(x, y, width, length, angle, vel, acc, max_vel, mass, screen, screen_size, texture, render_mode)
         self.l_f = self.l_r = width / 2.0
 
     def step(self, action, info_dict=None):

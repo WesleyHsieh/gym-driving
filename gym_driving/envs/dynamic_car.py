@@ -6,6 +6,13 @@ from scipy.integrate import odeint
 
 from gym_driving.envs.rectangle import Rectangle
 from gym_driving.envs.car import Car
+ 
+def dampen_val(val, lim, coef):
+    damped = val * coef
+    if np.abs(damped) < lim:
+        return 0.0
+    else:
+        return damped
 
 def dampen_val(val, lim, coef):
     damped = val * coef
@@ -26,8 +33,8 @@ class DynamicCar(Car):
     Friction coefficients:
         http://www.gipsa-lab.grenoble-inp.fr/~moustapha.doumiati/MED2010.pdf
     """
-    def __init__(self, x, y, width=50, length=25, angle=0.0, vel=0.0, acc=0.0, max_vel=20.0, mass=100.0, screen=None, screen_size=0, texture='main', graphics_mode=False):
-        super(DynamicCar, self).__init__(x, y, width, length, angle, vel, acc, max_vel, mass, screen, screen_size, texture, graphics_mode)
+    def __init__(self, x, y, width=50, length=25, angle=0.0, vel=0.0, acc=0.0, max_vel=20.0, mass=100.0, screen=None, screen_size=0, texture='main', render_mode=False):
+        super(DynamicCar, self).__init__(x, y, width, length, angle, vel, acc, max_vel, mass, screen, screen_size, texture, render_mode)
         self.mass = 1000.0
         self.l_f = self.l_r = width / 2.0
         self.dangle = self.a_f = self.dx_body = self.dy_body = 0.0
@@ -65,8 +72,7 @@ class DynamicCar(Car):
         self.dy_body = dampen_val(self.dy_body, lim=0.1, coef=0.75)
         self.body_vel = np.sqrt(self.dx_body ** 2 + self.dy_body ** 2)
         self.angle %= 360.0
-
-        self.dangle = dampen_val(self.dangle, lim=0.1, coef=0.75)
+        self.dangle = dampen_val(self.dangle, lim=0.1, coef=0.95)
 
         self.corners = self.calculate_corners()
 

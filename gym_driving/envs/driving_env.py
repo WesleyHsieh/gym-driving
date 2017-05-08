@@ -11,7 +11,8 @@ import numpy as np
 import IPython
 import pickle
 import json
-
+import os
+# os.environ["SDL_VIDEODRIVER"] = "dummy"
 logger = logging.getLogger(__name__)
 
 class DrivingEnv(gym.Env):
@@ -23,10 +24,10 @@ class DrivingEnv(gym.Env):
     #     'render.modes': ['human', 'rgb_array'],
     #     'video.frames_per_second' : 50
     # }
-    # def __init__(self, param_dict=None):
-    def __init__(self, graphics_mode=True, screen=None, config_filepath=None):
+    def __init__(self, render_mode=True, screen=None, config_filepath=None):
         if config_filepath is None:
-            config_filepath = 'configs/config.json'
+            base_dir = os.path.dirname(__file__)
+            config_filepath = os.path.join(base_dir, 'configs/config.json')
         param_dict = json.load(open(config_filepath, 'r'))
         print(config_filepath)
         print(param_dict)
@@ -51,23 +52,29 @@ class DrivingEnv(gym.Env):
         if self.logging_dir is not None and not os.path.exists(self.logging_dir):
             os.makedirs(self.logging_dir)
         self.screen = screen
-        self.environment = Environment(graphics_mode=graphics_mode, screen_size=self.screen_size, \
+        self.environment = Environment(render_mode=render_mode, screen_size=self.screen_size, \
                 screen=self.screen, param_dict=self.param_dict)
-        self.graphics_mode = graphics_mode
-
+        self.render_mode = render_mode
         low, high, step = param_dict['steer_action']
         if self.control_space == 'discrete':
             # 0, 1, 2 = Steer left, center, right
             action_space = np.linspace(low, high, step)
-            self.action_space = spaces.Discrete(len(action_space) - 1)
+            self.action_space = spaces.Discrete(len(action_space))
         elif self.control_space == 'continuous':
             self.action_space = spaces.Box(low=low, high=high, shape=(1,))
 
-        # TODO: Handle observation space for images
         # Limits on x, y, angle
         if self.state_space == 'positions':
-            low = np.tile(np.array([-10000.0, -10000.0, 0.0]), self.num_cpu_cars + 1)
-            high = np.tile(np.array([10000.0, 10000.0, 360.0]), self.num_cpu_cars + 1)
+            # low = np.tile(np.array([-10000.0, -10000.0, 0.0]), self.num_cpu_cars + 1)
+            # high = np.tile(np.array([10000.0, 10000.0, 360.0]), self.num_cpu_cars + 1)
+
+            low = np.tile(np.array([-10000.0, -10000.0]), self.num_cpu_cars)
+            high = np.tile(np.array([10000.0, 10000.0]), self.num_cpu_cars)
+            low = np.concatenate([low, [-10000.0, -10000.0, 0.0]])
+            high = np.concatenate([high, [10000.0, 10000.0, 360.0]])
+
+            # low = np.array([-10000.0, -10000.0, 0.0])
+            # high = np.array([10000.0, 10000.0, 360.0])
             self.observation_space = spaces.Box(low, high)
         elif self.state_space == 'image':
             w, h = param_dict['screen_size']
@@ -96,21 +103,18 @@ class DrivingEnv(gym.Env):
         pass
     def _step(self, action):
         self.iter_count += 1
-        # action = np.array([action, 2])
         state, reward, done, info_dict = self.environment.step(action)
-        # print(state, reward, done, info_dict)
         if self.logging_dir is not None and self.iter_count % self.logging_rate == 0:
             self.log_state(state)
         if self.iter_count >= self.time_horizon:
             done = True
-        return state, reward, done, info_dict
+        return state, reward, done, {}
         
     def _reset(self):
         self.exp_count += 1
         self.iter_count = 0
         self.screen = pygame.display.set_mode(self.screen_size)
         state = self.environment.reset(self.screen)
-        # state = pygame.surfarray.array2d(self.screen).astype(np.uint8)
         return state
 
     def _render(self, mode='human', close=False):
@@ -130,7 +134,7 @@ class DrivingEnv(gym.Env):
         return self.environment.simulate_actions(actions, noise, state)
 
     def __deepcopy__(self, memo):
-        env = DrivingEnv(graphics_mode=self.graphics_mode, \
+        env = DrivingEnv(render_mode=self.render_mode, \
             screen_size=self.screen_size, screen=None, terrain=None, \
             logging_dir=self.logging_dir, logging_rate=self.logging_rate, \
             param_dict=self.param_dict)
