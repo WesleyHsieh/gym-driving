@@ -25,7 +25,7 @@ def run_task(*_):
 
     baseline = LinearFeatureBaseline(env_spec=env.spec)
 
-    algo = TNPG(
+    algo = ERWR(
         env=env,
         policy=policy,
         baseline=baseline,
@@ -46,7 +46,7 @@ run_experiment_lite(
     n_parallel=6,
     # Only keep the snapshot parameters for the last iteration
     snapshot_mode="last",
-    exp_name='tnpg',
+    exp_name='erwr',
     # Specifies the seed for the experiment. If this is not provided, a random seed
     # will be used
     seed=1,
