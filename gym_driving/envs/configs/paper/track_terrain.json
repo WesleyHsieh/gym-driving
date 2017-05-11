@@ -1,0 +1,79 @@
+{
+    "num_random_cpu_cars": 10, 
+    "cpu_car_params": [
+        null
+    ], 
+    "control_space": "discrete", 
+    "terrain_params": [
+        [
+            0, 
+            -2000, 
+            30000, 
+            30000, 
+            "icegrass"
+        ], 
+        [
+            0, 
+            0, 
+            30000, 
+            400, 
+            "road"
+        ], 
+        [
+            -400, 
+            100, 
+            500, 
+            200, 
+            "ice"
+        ], 
+        [
+            400, 
+            -100, 
+            500, 
+            200, 
+            "ice"
+        ]
+    ], 
+    "logging_dir": null, 
+    "main_car_dynamics": "kinematic", 
+    "screen_size": [
+        1024, 
+        1024
+    ], 
+    "main_car_params": [
+        -250, 
+        0, 
+        0.0, 
+        20.0, 
+        0.0
+    ], 
+    "state_space": "positions", 
+    "steer_action": [
+        -15.0, 
+        15.0, 
+        3.0
+    ], 
+    "cpu_cars_bounding_box": [
+        [
+            -400.0, 
+            500.0
+        ], 
+        [
+            -180.0, 
+            180.0
+        ]
+    ], 
+    "main_car_starting_angles": [
+        0.0, 
+        0.0, 
+        1.0
+    ], 
+    "time_horizon": 100, 
+    "logging_rate": 10, 
+    "acc_action": [
+        -5.0, 
+        5.0, 
+        3.0
+    ], 
+    "downsampled_size": null
+}

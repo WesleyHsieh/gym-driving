@@ -1,5 +1,28 @@
 {
-    "num_cpu_cars": 10, 
+    "num_random_cpu_cars": 0, 
+    "cpu_car_params": [
+        [
+            100, 
+            0, 
+            0.0, 
+            0.0, 
+            0.0
+        ], 
+        [
+            150, 
+            75, 
+            0.0, 
+            0.0, 
+            0.0
+        ], 
+        [
+            0, 
+            90, 
+            0.0, 
+            0.0, 
+            0.0
+        ]
+    ], 
     "control_space": "discrete", 
     "terrain_params": [
         [
@@ -34,7 +57,8 @@
         0, 
         0, 
         0.0, 
-        20.0
+        20.0, 
+        0.0
     ], 
     "state_space": "positions", 
     "steer_action": [
@@ -52,17 +76,17 @@
             90.0
         ]
     ], 
+    "main_car_starting_angles": [
+        0.0, 
+        0.0, 
+        1.0
+    ], 
+    "time_horizon": 100, 
+    "main_car_dynamics": "point", 
     "acc_action": [
         -5.0, 
         5.0, 
         3.0
-    ], 
-    "time_horizon": 100, 
-    "main_car_dynamics": "point", 
-    "main_car_starting_angles": [
-        -30.0, 
-        30.0, 
-        5.0
     ], 
     "downsampled_size": null
 }
