@@ -27,11 +27,10 @@ def ray_exp(num_workers):
 			env.step(0)
 			count += 1
 		return count
-
-	iters = 100 / num_workers
+	start = time.time()
+	iters = 10000 / num_workers
 	ray.env.env = ray.EnvironmentVariable(env_init, env_reinit)
 	rollouts = [rollout.remote(iters) for k in range(num_workers)]
-	start = time.time()
 	results = ray.get(rollouts)
 	end = time.time()
 	print(results)
@@ -45,7 +44,7 @@ if __name__ == '__main__':
 
 	num_workers = int(args.num_workers)
 	ray.init(num_workers=num_workers)
-	num_experiments = 10
+	num_experiments = 100
 	results = [ray_exp(num_workers) for _ in range(num_experiments)]
 
 	if num_workers == 1:
