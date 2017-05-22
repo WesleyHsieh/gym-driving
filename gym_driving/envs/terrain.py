@@ -7,13 +7,23 @@ import os
 class Terrain(Rectangle):
     """
     Terrain for environment.
-    :param width/length: int
-        multiple of 128.
-    :param texture: string
-        'road' or 'grass'.
-    :param screen: PyGame screen object
     """
     def __init__(self, x, y, width, length, texture, screen, screen_size, angle=0.0, render_mode=False):
+        """
+        Initializes terrain object.
+
+        Args:
+            x: float, starting x position.
+            y: float, starting y position.
+            width: int, width of terrain.
+            length: int, length of terrain.
+            texture: str, texture of terrain for rendering, 
+                must be one of the options in textures.
+            screen: PyGame screen object, used for rendering.
+            screen_size: 1x2 array, size of screen in pixels.
+            angle: float, angle of object in degrees.
+            render_mode: boolean, whether to render.
+        """
         super(Terrain, self).__init__(x, y, width, length, angle)
         self.terrain_properties = {
             'road': {'friction': 0.9},
@@ -43,6 +53,12 @@ class Terrain(Rectangle):
                 self.tile_coords.append((x + i, y + k))
 
     def render(self, screen_coord):
+        """
+        Renders terrain.
+
+        Args:
+            screen_coord: 1x2 array, coordinates of center of screen
+        """
         assert self.render_mode is True
         # Subtract screen_coord to get screen pos
         for coord in self.tile_coords:

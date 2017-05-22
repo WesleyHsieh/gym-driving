@@ -10,6 +10,25 @@ class Car(Rectangle):
     Car object.
     """
     def __init__(self, x, y, width=50, length=25, angle=0.0, vel=0.0, acc=0.0, max_vel=20.0, mass=100.0, screen=None, screen_size=0, texture='main', render_mode=False):
+        """
+        Initializes car object.
+
+        Args:
+            x: float, starting x position.
+            y: float, starting y position.
+            width: int, width of car.
+            length: int, length of car.
+            angle: float, starting angle of car in degrees.
+            vel: float, starting velocity of car.
+            acc: float, starting acceleration of car.
+            max_vel: float, maximum velocity of car.
+            mass: float, mass of car.
+            screen: PyGame screen object, used for rendering.
+            screen_size: 1x2 array, size of screen in pixels.
+            texture: str, texture of car for rendering, 
+                must be one of the options in car_textures.
+            render_mode: boolean, whether to render.
+        """
         super(Car, self).__init__(x, y, width, length, angle)
         self.angle = angle
         self.vel = vel
@@ -32,10 +51,11 @@ class Car(Rectangle):
 
     def step(self, action, info_dict=None):
         """
-        Updates car by one timestep.
-        :param t: int
-            Timestep.
-        :return: None
+        Updates the car for one timestep.
+
+        Args:
+            action: 1x2 array, steering / acceleration action.
+            info_dict: dict, contains information about the environment.
         """
         if action is None:
             action_steer, action_acc = 0.0, 0.0
@@ -57,8 +77,14 @@ class Car(Rectangle):
         self.vel = max(min(self.vel, self.max_vel), 0.0)
         self.corners = self.calculate_corners()
         
-
     def get_state(self):
+        """
+        Get state. 
+
+        Returns:
+            state: 1x3 array, contains x, y, angle of car.
+            info_dict: dict, contains information about car.
+        """
         state = np.array([self.x, self.y, self.angle])
         info_dict = {}
         info_dict['x'] = self.x
@@ -68,12 +94,27 @@ class Car(Rectangle):
         return state, info_dict
 
     def set_state(self, x, y, vel, angle):
+        """
+        Sets the state of the car. 
+
+        Args:
+            x: float, x position.
+            y: float, y position.
+            vel: float, velocity.
+            angle: float, angle in degrees
+        """
         self.x = x
         self.y = y
         self.vel = vel
         self.angle = angle
 
     def render(self, screen_coord):
+        """
+        Renders car.
+
+        Args:
+            screen_coord: 1x2 array, coordinates of center of screen.
+        """
         assert self.render_mode is True
         corners, center, angle = self.get_corners(), self.get_pos(), self.angle
         x_offset = (np.abs((self.width - self.length) * np.cos(np.radians(angle))) + self.length) / 2

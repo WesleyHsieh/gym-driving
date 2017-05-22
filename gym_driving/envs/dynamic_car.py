@@ -27,6 +27,25 @@ class DynamicCar(Car):
         http://www.gipsa-lab.grenoble-inp.fr/~moustapha.doumiati/MED2010.pdf
     """
     def __init__(self, x, y, width=50, length=25, angle=0.0, vel=0.0, acc=0.0, max_vel=20.0, mass=100.0, screen=None, screen_size=0, texture='main', render_mode=False):
+        """
+        Initializes car object.
+
+        Args:
+            x: float, starting x position.
+            y: float, starting y position.
+            width: int, width of car.
+            length: int, length of car.
+            angle: float, starting angle of car in degrees.
+            vel: float, starting velocity of car.
+            acc: float, starting acceleration of car.
+            max_vel: float, maximum velocity of car.
+            mass: float, mass of car.
+            screen: PyGame screen object, used for rendering.
+            screen_size: 1x2 array, size of screen in pixels.
+            texture: str, texture of car for rendering, 
+                must be one of the options in car_textures.
+            render_mode: boolean, whether to render.
+        """
         super(DynamicCar, self).__init__(x, y, width, length, angle, vel, acc, max_vel, mass, screen, screen_size, texture, render_mode)
         self.mass = 1000.0
         self.l_f = self.l_r = width / 2.0
@@ -35,6 +54,13 @@ class DynamicCar(Car):
         self.friction = 0.9
 
     def step(self, action, info_dict=None):
+        """
+        Updates the car for one timestep.
+
+        Args:
+            action: 1x2 array, steering / acceleration action.
+            info_dict: dict, contains information about the environment.
+        """
         self.count += 1
         delta_f, a_f = action
 
@@ -71,6 +97,22 @@ class DynamicCar(Car):
         self.corners = self.calculate_corners()
 
     def integrator(self, state, t, mu, delta_f, a_f):
+        """
+        Calculates numerical values of differential 
+        equation variables for dynamics. 
+        SciPy ODE integrator calls this function.
+
+        Args:
+            state: 1x6 array, contains x, y, dx_body, dy_body, rad_angle, rad_dangle
+                of car.
+            t: float, timestep.
+            mu: float, friction coefficient.
+            delta_f: float, steering angle.
+            a_f: float, acceleration.
+
+        Returns:
+            output: list, contains dx, dy, ddx_body, ddy_body, dangle, ddangle.
+        """
         x, y, dx_body, dy_body, rad_angle, rad_dangle = state
         # Yaw Inertia
         I_z = 2510.15 * 25.0

@@ -44,6 +44,15 @@ xbox: Left stick up/down to accelerate, right stick left/right to steer
 """
 
 def draw_box_coords(rectangle, screen, SCREEN_COORD):
+    """
+    Draws corners of input rectangle on screen,
+    used for debugging.
+
+    Args:
+        rectangle: rectangle object
+        screen: screen object
+        SCREEN_COORD: 1x2 array, coordinates of center of screen
+    """
     corners = rectangle.get_corners()
     for c in corners:
         pos = (int(c[0] - SCREEN_COORD[0]), int(c[1] - SCREEN_COORD[1]))
@@ -53,6 +62,15 @@ def draw_box_coords(rectangle, screen, SCREEN_COORD):
     pygame.draw.circle(screen, 0, pos, 5, 0)
 
 def simulate_driving_agent(search_horizon=3):
+    """
+    Simulates one trajectory controlled by the driving search agent.
+
+    Args:
+        search_horizon: int, number of timesteps in search horizon.
+
+    Returns:
+        counter: int, number of timesteps survived in trajectory. 
+    """
     param_dict = {'num_cpu_cars': 5, 'main_car_starting_angles': np.linspace(-30, 30, 5), 'cpu_cars_bounding_box': [[-100.0, 1000.0], [-90.0, 90.0]]}
     pygame.init()
     fpsClock = pygame.time.Clock()
@@ -86,6 +104,12 @@ def simulate_driving_agent(search_horizon=3):
     fpsClock.tick(FPS)
 
 def run_driving_agent_experiment(num_experiments=50):
+    """
+    Simulates multiple trajectories controlled by the driving search agent.
+
+    Args:
+        num_experiments: Number of trajectories to run.
+    """
     # search_horizons = [3, 5, 7]
     search_horizons = [5]
     result_dict = {}
@@ -111,6 +135,12 @@ def run_driving_agent_experiment(num_experiments=50):
 
 
 def simulate_manual_control(config_filepath=None):
+    """
+    Manually control the main car in the driving environment.
+    
+    Args:
+        config_filepath: str, path to configuration file.
+    """
     print('config_filepath', config_filepath)
     # PyGame initializations
     pygame.init()
