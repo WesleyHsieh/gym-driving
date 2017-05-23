@@ -1,6 +1,6 @@
 from gym_driving.envs.environment import *
-from gym_driving.envs.car import *
-from gym_driving.envs.terrain import *
+from gym_driving.assets.car import *
+from gym_driving.assets.terrain import *
 
 import logging
 import math
@@ -38,7 +38,7 @@ class DrivingEnv(gym.Env):
         
         if config_filepath is None:
             base_dir = os.path.dirname(__file__)
-            config_filepath = os.path.join(base_dir, 'configs/config.json')
+            config_filepath = os.path.join(base_dir, '../configs/config.json')
         param_dict = json.load(open(config_filepath, 'r'))
         print(config_filepath)
         print(param_dict)

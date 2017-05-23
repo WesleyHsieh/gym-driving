@@ -1,8 +1,8 @@
-from gym_driving.envs.car import Car
-from gym_driving.envs.kinematic_car import KinematicCar
-from gym_driving.envs.dynamic_car import DynamicCar
+from gym_driving.assets.car import Car
+from gym_driving.assets.kinematic_car import KinematicCar
+from gym_driving.assets.dynamic_car import DynamicCar
 
-from gym_driving.envs.terrain import *
+from gym_driving.assets.terrain import *
 
 import numpy as np
 import pygame
