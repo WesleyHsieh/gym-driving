@@ -25,7 +25,7 @@
         ]
     ], 
     "logging_dir": null, 
-    "main_car_dynamics": "kinematic", 
+    "logging_rate": 10, 
     "screen_size": [
         512, 
         512
@@ -58,7 +58,7 @@
         3.0
     ], 
     "time_horizon": 100, 
-    "logging_rate": 10, 
+    "main_car_dynamics": "point", 
     "main_car_starting_angles": [
         -30.0, 
         30.0, 

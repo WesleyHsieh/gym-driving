@@ -10,7 +10,7 @@ class Controller:
 
         Args:
             mode: str, determines mode of input control.
-                Must be in ['keyboard', 'xbox', 'agent'].
+                Must be in ['keyboard', 'xbox'].
             param_dict: dict, parameters to pass into controller.
         """
         self.mode = mode
@@ -18,8 +18,6 @@ class Controller:
             pass
         elif mode == 'xbox':
             self.xbox_controller = XboxController()
-        elif mode == 'agent':
-            self.agent = DrivingAgent(param_dict)
         else:
             raise NotImplementedError
 
@@ -37,9 +35,6 @@ class Controller:
             action = self.process_keys()
         elif self.mode == 'xbox':
             action = self.process_xbox_controller()
-        elif self.mode == 'agent':
-            action = self.process_agent(env)
-            # print("Action Taken", action)
         return action
 
     def process_keys(self):
@@ -79,28 +74,3 @@ class Controller:
         acc = -np.rint(left_stick_vertical) + 1
         action = np.array([steer, acc])
         return action
-
-    def process_agent(self, env):
-        """
-        Process an input from the agent.
-
-        Args: 
-            env: environment object, used for agent.
-        Returns:
-            action: 1x2 array, steer / acceleration action.
-        """
-        steer = self.agent.eval_policy(env, None)
-        acc = 0
-        action = np.array([steer, acc])
-        return action
-
-    def reset(self):
-        """
-        Resets the controller, used for agent.
-        """
-        if self.mode == 'keyboard':
-            pass
-        elif self.mode == 'xbox':
-            pass
-        elif self.mode == 'agent':
-            self.agent.reset()

@@ -230,7 +230,7 @@ class Environment:
         for i in range(len(self.vehicles)):
             self.vehicles[i].set_state(**vehicles_states[i])
 
-    def step(self, action, noise=0.1, render_mode=None):
+    def step(self, action, noise=0.0, render_mode=None):
         """
         Updates the environment for one step.
 
@@ -249,7 +249,7 @@ class Environment:
         # Convert numerical action vector to steering angle / acceleration
         if self.control_space == 'discrete':
             if type(action) is int:
-                steer = action 
+                steer = self.steer_space[action]
                 acc = 0.0
             else:
                 steer = self.steer_space[action[0]]
@@ -316,7 +316,7 @@ class Environment:
         # Take actions
         states, rewards, dones, info_dicts, = [], [], [], []
         for action in actions:
-            state, reward, done, info_dict = self.take_action([action, 1.0], noise=noise, render_mode=False)
+            state, reward, done, info_dict = self.step([action, 1], noise=noise, render_mode=False)
             states.append(state)
             rewards.append(reward)
             dones.append(done)
