@@ -18,9 +18,7 @@ import IPython
 
 def run_task(*_):
     import gym_driving
-    # IPython.embed()
     env = normalize(GymEnv('DrivingEnv-v0'))
-    # env = normalize(GymEnv('CartPole-v0'))
 
     policy = CategoricalMLPPolicy(
         env_spec=env.spec,
@@ -35,7 +33,7 @@ def run_task(*_):
         baseline=baseline,
         batch_size=40000,
         max_path_length=env.horizon,
-        n_itr=250,
+        n_itr=500,
         discount=0.99,
         step_size=0.01,
         # Uncomment both lines (this and the plot parameter below) to enable plotting

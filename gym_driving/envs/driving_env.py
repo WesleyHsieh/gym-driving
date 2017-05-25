@@ -24,7 +24,7 @@ class DrivingEnv(gym.Env):
     #     'render.modes': ['human', 'rgb_array'],
     #     'video.frames_per_second' : 50
     # }
-    def __init__(self, render_mode=True, screen=None, config_filepath=None):
+    def __init__(self, render_mode=False, screen=None, config_filepath=None):
         """
         Initializes driving environment interface, 
         passes most arguments down to underlying environment.
