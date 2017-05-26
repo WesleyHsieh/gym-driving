@@ -1,7 +1,7 @@
 from gym_driving.envs.environment import *
-from gym_driving.envs.car import *
-from gym_driving.envs.terrain import *
-import cv2
+from gym_driving.assets.car import *
+from gym_driving.assets.terrain import *
+
 import logging
 import math
 import gym
@@ -17,17 +17,28 @@ logger = logging.getLogger(__name__)
 
 class DrivingEnv(gym.Env):
     """
-    Generic wrapper class for simulating
-    environments.
+    Wrapper class for driving simulator that
+    implements the OpenAI Gym interface.
     """
     # metadata = {
     #     'render.modes': ['human', 'rgb_array'],
     #     'video.frames_per_second' : 50
     # }
     def __init__(self, render_mode=True, screen=None, config_filepath=None):
+        """
+        Initializes driving environment interface, 
+        passes most arguments down to underlying environment.
+
+        Args:
+            render_mode: boolean, whether to render.
+            screen: PyGame screen object, used for rendering.
+                Creates own screen object if existing one is not passed in.
+            config_filepath: str, path to configuration file.
+        """
+        
         if config_filepath is None:
             base_dir = os.path.dirname(__file__)
-            config_filepath = os.path.join(base_dir, 'configs/config.json')
+            config_filepath = os.path.join(base_dir, '../configs/config.json')
         param_dict = json.load(open(config_filepath, 'r'))
         print(config_filepath)
         print(param_dict)
@@ -98,10 +109,41 @@ class DrivingEnv(gym.Env):
     #     return [seed]
 
     def _render(self, mode='human', close=False):
+        """
+        Dummy render command for gym interface.
+
+        Args:
+            mode: str
+            close: boolean
+        """
         pass
+
     def render(self, mode='human', close=False):
+        """
+        Dummy render command for gym interface.
+
+        Args:
+            mode: str
+            close: boolean
+        """
         pass
+
     def _step(self, action):
+        """
+        Updates the environment for one step.
+
+        Args:
+            action: 1x2 array, steering / acceleration action.
+
+        Returns:
+            state: array, state of environment. 
+                Can be positions and angles of cars, or image of environment
+                depending on configuration.
+            reward: float, reward from action taken.
+            done: boolean, whether trajectory is finished.
+            info_dict: dict, contains information about environment that may
+                not be included in the state.
+        """
         self.iter_count += 1
         state, reward, done, info_dict = self.environment.step(action)
         if self.logging_dir is not None and self.iter_count % self.logging_rate == 0:
@@ -111,16 +153,25 @@ class DrivingEnv(gym.Env):
         return state, reward, done, {}
         
     def _reset(self):
+        """
+        Resets the environment.
+
+        Returns:
+            state: array, state of environment.
+        """
         self.exp_count += 1
         self.iter_count = 0
         self.screen = pygame.display.set_mode(self.screen_size)
         state = self.environment.reset(self.screen)
         return state
 
-    def _render(self, mode='human', close=False):
-        return None
-
     def log_state(self, state):
+        """
+        Logs the current step.
+
+        Args:
+            state: array, state of environment.
+        """
         if self.state_space == 'positions':
             file_name = 'log.txt'
             with open(file_name, 'a') as outfile:
@@ -131,9 +182,28 @@ class DrivingEnv(gym.Env):
             pygame.image.save(self.screen, image_path)
 
     def simulate_actions(self, actions, noise=0.0, state=None):
-        return self.environment.simulate_actions(actions, noise, state)
+        """
+        Simulate a sequence of actions.
+
+        Args:
+            noise: float, standard deviation of zero-mean Gaussian noise
+            state: dict, internal starting state of environment.
+                Currently set as the positions, velocities, and angles of 
+                all cars.
+
+        Returns:
+            states: list, list of states in trajectory.
+            rewards: list, list of rewards in trajectory.
+            dones: list, list of dones in trajectory.
+            info_dicts: list, list of info dicts in trajectory.
+        """
+        states, rewards, dones, info_dicts = self.environment.simulate_actions(actions, noise, state)
+        return states, rewards, dones, info_dicts
 
     def __deepcopy__(self, memo):
+        """
+        Deep copy envrionemnt.
+        """
         env = DrivingEnv(render_mode=self.render_mode, \
             screen_size=self.screen_size, screen=None, terrain=None, \
             logging_dir=self.logging_dir, logging_rate=self.logging_rate, \
