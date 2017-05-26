@@ -53,7 +53,6 @@ class SupervisedAgent(Agent):
 		while not done:
 			supervisor_label = self.supervisor.eval_policy(self.env)
 			action = self.learner.eval_policy(state)
-			print("action", action)
 			action_packed = [action, 1]
 			next_state, reward, done, info_dict = self.env._step(action_packed)
 
@@ -74,7 +73,7 @@ class SupervisedAgent(Agent):
 		Update model of underlying learner.
 		"""
 		self.learner.add_to_data(states, actions)
-		self.learner.train_learner(self.iterations)
+		self.learner.train_learner()
 		self.iterations += 1
 
 	def get_statistics(self):

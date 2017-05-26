@@ -15,8 +15,8 @@ class SearchAgent():
 			self.search_horizon = 5
 		else:
 			self.search_horizon = param_dict['search_horizon']
-		# self.actions = [0, 1, 2, 3, 4]
-		self.actions = [0, 1, 2]
+		self.actions = [0, 1, 2, 3, 4]
+		# self.actions = [0, 1, 2]
 		self.reset()
 
 	def eval_policy(self, env, search_horizon=5):

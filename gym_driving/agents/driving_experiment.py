@@ -13,8 +13,8 @@ from functools import partial
 from gym.envs.box2d.bipedal_walker import BipedalWalker
 from gym_experiments.supervisors.bipedal_supervisor import BipedalSupervisor
 
-from deep_lfd.learning_driving.linear_learner import *
-from deep_lfd.learning_driving.deep_learner import *
+from gym_driving.models.linear_learner import *
+from gym_driving.models.deep_learner import *
 from gym_driving.agents.supervised_agent import *
 from gym_driving.agents.dagger_agent import *
 from gym_driving.agents.search_agent import *
@@ -120,7 +120,7 @@ def run_experiment_trial(trial_number, learner_name, agent_name, iterations, sam
 if __name__ == '__main__':
     FILEPATH = 'stats'
     # learners = ['linear_learner', 'deep_learner']
-    learners = ['deep_learner']
+    learners = ['linear_learner']
     agents = ['dagger', 'supervised']
     # agents = ['supervised']
     if not os.path.exists(FILEPATH):
