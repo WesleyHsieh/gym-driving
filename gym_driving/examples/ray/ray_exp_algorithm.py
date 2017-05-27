@@ -17,16 +17,16 @@ import matplotlib.pyplot as plt
 import sys, os
 
 # from deep_lfd.learning_driving.linear_learner import *
-from deep_lfd.learning_driving.deep_learner import *
-from gym_driving.envs.agents.supervised_agent import *
-from gym_driving.envs.agents.dagger_agent import *
-from gym_driving.envs.agents.driving_agent import *
+# from deep_lfd.learning_driving.deep_learner import *
+from gym_driving.models.deep_learner import *
+from gym_driving.agents.supervised_agent import *
+from gym_driving.agents.dagger_agent import *
+from gym_driving.agents.search_agent import *
 from gym_driving.envs.driving_env import *
 
-agent_name = "test"
 NUM_WORKERS = 4
 os.environ["SDL_VIDEODRIVER"] = "dummy"
-
+config_filepath = "../../configs/driving_experiment_config.json"
 ray.init(num_workers=NUM_WORKERS)
 
 
@@ -46,14 +46,8 @@ def plot_reward_curve( stats, agent_name):
         plt.ylabel(stats_name)
         plt.savefig('stats/stats_{}_{}.png'.format(agent_name, stats_name))
 
-
-
-
-
-
-
 def env_init():
-    return DrivingEnv(graphics_mode=False)
+    return DrivingEnv(render_mode=False, config_filepath=config_filepath)
 
 def env_reinit(env):
     return env
@@ -61,7 +55,7 @@ def env_reinit(env):
 ray.env.env = ray.EnvironmentVariable(env_init, env_reinit)
 
 def supervisor_init():
-    return DrivingAgent()
+    return SearchAgent()
 
 def supervisor_reinit(spvsr):
     return spvsr
@@ -72,8 +66,6 @@ def agent_dart_init():
     env = ray.env.env
     supervisor = ray.env.supervisor
     return RayDartAgent(DeepLearner(), env, supervisor)
-
-
 
 def agent_dagger_init():
     env = ray.env.env
@@ -90,12 +82,9 @@ def agent_reinit(agent):
     agent.reset()
     return agent
 
-#ray.env.off_agent = ray.EnvironmentVariable(agent_off_init, agent_reinit)
-#ray.env.dart_agent = ray.EnvironmentVariable(agent_dart_init, agent_reinit)
+ray.env.off_agent = ray.EnvironmentVariable(agent_off_init, agent_reinit)
+ray.env.dart_agent = ray.EnvironmentVariable(agent_dart_init, agent_reinit)
 ray.env.dagger_agent = ray.EnvironmentVariable(agent_dagger_init, agent_reinit)
-
-
-
 
 
 @ray.remote
@@ -107,7 +96,6 @@ def rollout(weights, params,alg_type):
         agent = ray.env.off_agent
     elif(alg_type == 'dart'):
         agent = ray.env.dart_agent
-    #agent = ray.env.agent
     agent.set_weights(weights)
     agent.set_params(params)
     return agent.rollout_algorithm()
@@ -120,10 +108,15 @@ def save_data(stats, alg_name):
     plot_reward_curve(stats, alg_name)
 
 def train(alg_type):
-    TRIALS = 10
-    ITERATIONS = 4
-    SAMPLES_PER_ROLLOUT = 150
-    SAMPLES_PER_EVAL = 20
+    # TRIALS = 10
+    # ITERATIONS = 4
+    # SAMPLES_PER_ROLLOUT = 150
+    # SAMPLES_PER_EVAL = 20
+
+    TRIALS = 2
+    ITERATIONS = 2
+    SAMPLES_PER_ROLLOUT = 2
+    SAMPLES_PER_EVAL = 2
     overall_stats = []
     
 
@@ -135,11 +128,12 @@ def train(alg_type):
     elif(alg_type == 'dart'):
         main_agent = ray.env.dart_agent
 
+    # IPython.embed()
     for i in range(TRIALS):
         trial_stats = []
 
         for j in range(ITERATIONS):
-            print("Agent {}: Trial {}, Iteration {}".format(agent_name, i, j))
+            print("Agent {}: Trial {}, Iteration {}".format(alg_type, i, j))
             weights = main_agent.get_weights()
             weight_id = ray.put(weights)
             
@@ -154,10 +148,7 @@ def train(alg_type):
             results = ray.get(rollouts)
             print "Collected Rollouts"
             state_list, action_list = zip(*results)
-            #IPython.embed()
             main_agent.update_model(state_list, action_list)
-
-           
 
             print "EVAL MODEL"
             for k in range(SAMPLES_PER_EVAL):
@@ -173,8 +164,8 @@ def train(alg_type):
 
 if __name__ == '__main__':
 
-    #train('off_d')
+    train('off_d')
 
     train('dagger')
 
-    #train('dart')
+    train('dart')

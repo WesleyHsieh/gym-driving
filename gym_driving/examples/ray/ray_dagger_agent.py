@@ -1,6 +1,5 @@
 import ray
-# from deep_lfd.learning_driving.deep_learner import *
-from gym_driving.envs.agents.dagger_agent import *
+from gym_driving.agents.dagger_agent import *
 
 class RayDaggerAgent(DaggerAgent):
 
@@ -9,18 +8,12 @@ class RayDaggerAgent(DaggerAgent):
 	def __init__(self, *args):
 		super(RayDaggerAgent, self).__init__(*args)
 
-		# loss = self.learner.net.loss
-		# sess = self.learner.net.sess
-
-		# self.variables = ray.experimental.TensorFlowVariables(loss, sess)
-
 	def get_weights(self):
-		return self.variables.get_weights()
+		return self.learner.get_weights()
 
 	def set_weights(self, weights):
-		self.variables.set_weights(weights)
+		self.learner.set_weights(weights)
 
-	
 	def get_params(self):
 		pass
 

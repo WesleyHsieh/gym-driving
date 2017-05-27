@@ -1,6 +1,6 @@
 import numpy as np
 from numpy.random import rand,randint
-from gym_driving.envs.agents.supervised_agent import * 
+from gym_driving.agents.supervised_agent import * 
 import IPython
 
 class DartAgent(SupervisedAgent):
@@ -17,14 +17,14 @@ class DartAgent(SupervisedAgent):
 		done = False
 		state = self.env._reset()
 		while not done:
-			supervisor_label = self.supervisor.rollout_policy(self.env)
+			supervisor_label = self.supervisor.eval_policy(self.env)
 			sample = rand()
 
-			if(sample < self.eps):
+			if sample < self.eps:
 
-				action = randint(5)
+				action = [randint(5), 1]
 			else: 
-				action = supervisor_label
+				action = [supervisor_label, 1]
 
 			surrogate_losses.append(0)
 			next_state, reward, done, info_dict = self.env._step(action)

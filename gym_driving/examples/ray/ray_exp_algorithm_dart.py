@@ -18,14 +18,15 @@ import sys, os
 
 # from deep_lfd.learning_driving.linear_learner import *
 from deep_lfd.learning_driving.deep_learner import *
-from gym_driving.envs.agents.supervised_agent import *
-from gym_driving.envs.agents.dagger_agent import *
-from gym_driving.envs.agents.driving_agent import *
+from gym_driving.agents.supervised_agent import *
+from gym_driving.agents.dagger_agent import *
+from gym_driving.agents.search_agent import *
 from gym_driving.envs.driving_env import *
 
 agent_name = "test"
 NUM_WORKERS = 4
 os.environ["SDL_VIDEODRIVER"] = "dummy"
+config_filepath = "../../configs/driving_experiment_config.json"
 
 ray.init(num_workers=NUM_WORKERS, num_cpus=4)
 
@@ -54,7 +55,7 @@ def plot_reward_curve( stats, agent_name):
 
 
 def env_init():
-    return DrivingEnv(graphics_mode=False)
+    return DrivingEnv(render_mode=False, config_filepath=config_filepath)
 
 def env_reinit(env):
     return env
@@ -62,7 +63,7 @@ def env_reinit(env):
 ray.env.env = ray.EnvironmentVariable(env_init, env_reinit)
 
 def supervisor_init():
-    return DrivingAgent()
+    return SearchAgent()
 
 def supervisor_reinit(spvsr):
     return spvsr

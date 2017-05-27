@@ -1,6 +1,6 @@
 import ray
 # from deep_lfd.learning_driving.deep_learner import *
-from gym_driving.envs.agents.supervised_agent import *
+from gym_driving.agents.supervised_agent import *
 
 class RayOffAgent(SupervisedAgent):
 
@@ -10,10 +10,10 @@ class RayOffAgent(SupervisedAgent):
 		super(RayOffAgent, self).__init__(*args)
 
 	def get_weights(self):
-		return self.variables.get_weights()
+		return self.learner.get_weights()
 
 	def set_weights(self, weights):
-		self.variables.set_weights(weights)
+		self.learner.set_weights(weights)
 
 	def get_params(self):
 		pass

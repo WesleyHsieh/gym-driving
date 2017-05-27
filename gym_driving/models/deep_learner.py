@@ -5,6 +5,7 @@ import numpy as np, argparse
 import cv2
 from numpy.random import rand,randint
 
+import tensorflow as tf
 from keras.models import Sequential
 from keras.optimizers import SGD
 from keras.layers import Dense, Activation, Flatten
@@ -16,30 +17,52 @@ from gym_driving.models.learner import *
 class DeepLearner(Learner):   
 	def __init__(self):
 		super(DeepLearner, self).__init__()
+		model = Sequential()
+		model.add(Convolution2D(5, 7, 7, border_mode='same', input_shape=(1, 128, 128)))
+		model.add(Activation("relu"))
+		model.add(Flatten())
+		model.add(Dense(units=60))
+		model.add(Activation("relu"))
+		model.add(Dense(units=5))
+		model.add(Activation("softmax"))
+		model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['categorical_accuracy'])
+		self.net = model
+
+		# Use global graph to avoid Tensorflow errors
+		global graph
+		graph = tf.get_default_graph()
+
+		self.init_weights = self.get_weights()
 		self.reset()
 
 	def train_learner(self):
-		train_states, train_labels = self.compile_dataset('train', tensor=True)
-		train_labels = to_categorical(train_labels, num_classes=5)
-		self.net.fit(train_states, train_labels, nb_epoch=5, batch_size=32, verbose=0)
+		global graph
+		with graph.as_default():
+			train_states, train_labels = self.compile_dataset('train', tensor=True)
+			train_labels = to_categorical(train_labels, num_classes=5)
+			self.net.fit(train_states, train_labels, nb_epoch=5, batch_size=32, verbose=0)
 
 	def eval_policy(self, state):
-		processed_state = self.preprocess_image(state)
-		state_expanded = np.expand_dims(np.expand_dims(processed_state, 0), 1)
-		output = self.net.predict_classes(state_expanded, verbose=0)[0]
-		return output
+		global graph
+		with graph.as_default():
+			processed_state = self.preprocess_image(state)
+			state_expanded = np.expand_dims(np.expand_dims(processed_state, 0), 1)
+			output = self.net.predict_classes(state_expanded, verbose=0)[0]
+			return output
 
 	def get_statistics(self):
-		train_states, train_labels = self.compile_dataset('train', tensor=True)
-		train_labels = to_categorical(train_labels, num_classes=5)
-		train_loss, train_acc = self.net.evaluate(train_states, train_labels, verbose=0)
-		test_states, test_labels = self.compile_dataset('test', tensor=True)
-		test_labels = to_categorical(test_labels, num_classes=5)
-		if len(test_states) > 0:
-			test_loss, test_acc = self.net.evaluate(test_states, test_labels, verbose=0)
-		else:
-			test_loss, test_acc = [np.inf, 0.0]
-		return train_acc, test_acc
+		global graph
+		with graph.as_default():
+			train_states, train_labels = self.compile_dataset('train', tensor=True)
+			train_labels = to_categorical(train_labels, num_classes=5)
+			train_loss, train_acc = self.net.evaluate(train_states, train_labels, verbose=0)
+			test_states, test_labels = self.compile_dataset('test', tensor=True)
+			test_labels = to_categorical(test_labels, num_classes=5)
+			if len(test_states) > 0:
+				test_loss, test_acc = self.net.evaluate(test_states, test_labels, verbose=0)
+			else:
+				test_loss, test_acc = [np.inf, 0.0]
+			return train_acc, test_acc
 
 	def preprocess_image(self, state):
 		downsampled = self.downsample_image(self.downsample_image(state))
@@ -47,16 +70,18 @@ class DeepLearner(Learner):
 
 	def reset(self):
 		super(DeepLearner, self).reset()
-		model = Sequential()
-		model.add(Convolution2D(5, 7, 7, border_mode='same', input_shape=(1, 128, 128)))
-		model.add(Activation("relu"))
-		model.add(Flatten())
-		model.add(Dense(output_dim=60))
-		model.add(Activation("relu"))
-		model.add(Dense(output_dim=5))
-		model.add(Activation("softmax"))
-		model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['categorical_accuracy'])
-		self.net = model
+		init_weights = self.get_weights()
+		self.set_weights(init_weights)
+		
+	def get_weights(self):
+		global graph
+		with graph.as_default():
+			return self.net.get_weights()
+
+	def set_weights(self, weights):
+		global graph
+		with graph.as_default():
+			self.net.set_weights(weights)
 
 # class DeepLearner(Learner):   
 # 	# TODO: Replace 'to_categorical' with one-hot vector

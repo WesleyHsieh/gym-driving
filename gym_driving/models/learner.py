@@ -71,7 +71,5 @@ class Learner(object):
 		self.test_states = []
 		self.test_labels = []
 
-		self.net = None
-
 		self.test_loss = []
 		self.train_loss = []

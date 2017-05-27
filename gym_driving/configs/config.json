@@ -25,7 +25,7 @@
         ]
     ], 
     "logging_dir": null, 
-    "logging_rate": 10, 
+    "main_car_dynamics": "point", 
     "screen_size": [
         512, 
         512
@@ -36,7 +36,7 @@
         20.0, 
         20.0
     ], 
-    "state_space": "image", 
+    "state_space": "positions", 
     "steer_action": [
         -7.5, 
         7.5, 
@@ -58,7 +58,7 @@
         3.0
     ], 
     "time_horizon": 100, 
-    "main_car_dynamics": "point", 
+    "logging_rate": 10, 
     "main_car_starting_angles": [
         -30.0, 
         30.0, 

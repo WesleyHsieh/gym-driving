@@ -10,9 +10,6 @@ import matplotlib.pyplot as plt
 import multiprocessing
 from functools import partial
 
-from gym.envs.box2d.bipedal_walker import BipedalWalker
-from gym_experiments.supervisors.bipedal_supervisor import BipedalSupervisor
-
 from gym_driving.models.linear_learner import *
 from gym_driving.models.deep_learner import *
 from gym_driving.agents.supervised_agent import *
@@ -75,16 +72,12 @@ class Experiment():
         
 def run_experiment_trial(trial_number, learner_name, agent_name, iterations, samples_per_rollout, samples_per_eval):
     np.random.seed(trial_number)
-    # num_processes = multiprocessing.cpu_count() - 1
     # Set up learner, agent
     if learner_name == 'linear_learner':
         learner = LinearLearner()
     elif learner_name == 'deep_learner':
         learner = DeepLearner()
-    # env_list = [DrivingEnv(graphics_mode=True, param_dict=env_param_dict) for _ in range(samples_per_rollout)]
-    # supervisor_list = [SearchAgent(env=env) for env in env_list]
-    # env_list = [BipedalWalker() for _ in range(samples_per_rollout)]
-    # supervisor_list = [BipedalSupervisor(env=env) for env in env_list]
+
     config_filepath = '../configs/driving_experiment_config.json'
     env = DrivingEnv(render_mode=True, config_filepath=config_filepath)
     supervisor = SearchAgent(env=env)
@@ -98,17 +91,14 @@ def run_experiment_trial(trial_number, learner_name, agent_name, iterations, sam
     for j in range(iterations):
         print("Agent {}: Trial {}, Iteration {}".format(agent_name, trial_number, j))
         # Collect samples 
-        # print("rolling out algorithm")
         state_list, action_list = [], []
         for _ in range(samples_per_rollout):
             states, actions = agent.rollout_algorithm()
             state_list.append(states)
             action_list.append(actions)
         # Update model
-        # print("updating model")
         agent.update_model(state_list, action_list)
         # Evaluate policy
-        # print("evaluating policy")
         for _ in range(samples_per_eval):
             agent.eval_policy()
         trial_stats.append(agent.get_statistics())
@@ -119,10 +109,8 @@ def run_experiment_trial(trial_number, learner_name, agent_name, iterations, sam
 
 if __name__ == '__main__':
     FILEPATH = 'stats'
-    # learners = ['linear_learner', 'deep_learner']
-    learners = ['linear_learner']
+    learners = ['linear_learner', 'deep_learner']
     agents = ['dagger', 'supervised']
-    # agents = ['supervised']
     if not os.path.exists(FILEPATH):
         os.makedirs(FILEPATH)
     for learner_name in learners:

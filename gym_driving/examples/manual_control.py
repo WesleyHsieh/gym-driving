@@ -68,7 +68,6 @@ def simulate_manual_control(config_filepath=None):
     Args:
         config_filepath: str, path to configuration file.
     """
-    print('config_filepath', config_filepath)
     # PyGame initializations
     pygame.init()
     fpsClock = pygame.time.Clock()
