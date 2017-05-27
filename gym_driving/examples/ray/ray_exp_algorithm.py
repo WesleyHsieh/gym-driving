@@ -16,8 +16,6 @@ import matplotlib.pyplot as plt
 
 import sys, os
 
-# from deep_lfd.learning_driving.linear_learner import *
-# from deep_lfd.learning_driving.deep_learner import *
 from gym_driving.models.deep_learner import *
 from gym_driving.agents.supervised_agent import *
 from gym_driving.agents.dagger_agent import *
@@ -31,8 +29,9 @@ ray.init(num_workers=NUM_WORKERS)
 
 
 def plot_reward_curve( stats, agent_name):
-        # stats: (trials, iterations, stats)
-        # means, stds: (iterations, stats)
+    FILEPATH = 'stats'
+    if not os.path.exists(FILEPATH):
+        os.makedirs(FILEPATH)
     stats_names = ['train_loss', 'test_loss', 'reward', 'surrogate_loss']
     means, stds = np.mean(stats, axis=0), np.std(stats, axis=0)
     n_iters, n_stats = means.shape
@@ -44,7 +43,7 @@ def plot_reward_curve( stats, agent_name):
         plt.title("Driving, Learner: {}, Stat: {}".format(agent_name, stats_name))
         plt.xlabel("Number of Iterations")
         plt.ylabel(stats_name)
-        plt.savefig('stats/stats_{}_{}.png'.format(agent_name, stats_name))
+        plt.savefig(os.path.join(FILEPATH, 'stats_{}_{}.png').format(agent_name, stats_name))
 
 def env_init():
     return DrivingEnv(render_mode=False, config_filepath=config_filepath)
@@ -102,7 +101,10 @@ def rollout(weights, params,alg_type):
 
 
 def save_data(stats, alg_name):
-    data_filepath = os.path.join('results/', alg_name) + '.p'
+    FILEPATH = 'pickles'
+    if not os.path.exists(FILEPATH):
+        os.makedirs(FILEPATH)
+    data_filepath = os.path.join('pickles/', alg_name) + '.pkl'
     
     pickle.dump(stats, open(data_filepath,'wb'))
     plot_reward_curve(stats, alg_name)
