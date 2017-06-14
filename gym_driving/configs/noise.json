@@ -1,5 +1,8 @@
 {
-    "num_cpu_cars": 5, 
+    "screen_size": [
+        512, 
+        512
+    ], 
     "control_space": "discrete", 
     "terrain_params": [
         [
@@ -25,26 +28,27 @@
         ]
     ], 
     "logging_dir": null, 
-    "main_car_dynamics": "kinematic", 
-    "screen_size": [
-        512, 
-        512
-    ], 
+    "logging_rate": 10, 
+    "num_cpu_cars": 10, 
     "main_car_params": [
         0, 
         0, 
-        20.0, 
+        0.0, 
         20.0
     ], 
     "state_space": "positions", 
     "steer_action": [
-        -7.5, 
-        7.5, 
+        -15.0, 
+        15.0, 
         3.0
+    ], 
+    "noise": [
+        "random", 
+        1.0
     ], 
     "cpu_cars_bounding_box": [
         [
-            100.0, 
+            200.0, 
             1000.0
         ], 
         [
@@ -52,21 +56,17 @@
             90.0
         ]
     ], 
-    "acc_action": [
-        -5.0, 
-        5.0, 
-        3.0
-    ], 
-    "time_horizon": 100, 
-    "logging_rate": 10, 
     "main_car_starting_angles": [
         -30.0, 
         30.0, 
         5.0
     ], 
-    "downsampled_size": null,
-    "noise": [
-        "gaussian",
-        0.1
-    ]
+    "time_horizon": 100, 
+    "main_car_dynamics": "kinematic", 
+    "acc_action": [
+        -5.0, 
+        5.0, 
+        3.0
+    ], 
+    "downsampled_size": null
 }
