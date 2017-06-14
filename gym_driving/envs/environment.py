@@ -231,6 +231,7 @@ class Environment:
             self.vehicles[i].set_state(**vehicles_states[i])
 
     def step(self, action, noise=0.1, render_mode=None):
+        #noise=param_dict['noise'] ## (type, magnitude)
         """
         Updates the environment for one step.
 
@@ -263,10 +264,16 @@ class Environment:
                 acc = action[1]
 
         # Add noise
+        # if noise[0] == 'gaussian':
+              #use the below clause
+        # elif noise[0] == 'random':
+              #then do it by sampling the action space
+              #if np.random > noise[1]:
+                # sample the action space randomly, use that
         if steer != 0.0 and noise > 0.0:
-            steer *= 1.0 + np.random.normal(loc=0.0, scale=noise)
+            steer *= 1.0 + np.random.normal(loc=0.0, scale=noise) #noise[1]
         if acc != 0.0 and noise > 0.0:
-            acc *= 1.0 + np.random.normal(loc=0.0, scale=noise)
+            acc *= 1.0 + np.random.normal(loc=0.0, scale=noise) #noise[1]
 
         # Convert to action space, apply action
         action_unpacked = np.array([steer, acc])

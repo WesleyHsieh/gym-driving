@@ -156,6 +156,8 @@ class ParamaterWrapper:
 		return str(space)
 	def get_main_car_dynamics(self, dynamics):
 		return str(dynamics)
+	def get_noise(self, type, magnitude):
+		return str(type), int(magnitude)
 
 # TODO: Nested dictionary data structure for param_dict, description should give examples, arguments should be based on each other
 # Example: action -> continuous / discrete -> boundaries
@@ -183,6 +185,7 @@ class GenerateConfig:
 			'downsampled_size': ('Downsampled size (int)', [None], 2, 1, self.paramater_wrapper.get_downsampled_size),
 			'state_space': ('State space (str, {positions, image})', ['positions'], 1, 1, self.paramater_wrapper.get_state_space),
 			'main_car_dynamics': ('Main car dynamics model (str, {point, kinematic, dynamic})', ['kinematic'], 1, 1, self.paramater_wrapper.get_main_car_dynamics),
+			#'noise': ('Noise type and magnitude{gaussian, random} (int)', ['gaussian', .1], 2, 1, self.parameter_wrapper.get_noise),
 		}
 		self.command_dict = {
 			'help': self.help,
