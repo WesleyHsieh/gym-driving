@@ -97,15 +97,22 @@ class Environment:
         if self.param_dict['terrain_params'] is None:
             self.terrain = []
             self.terrain.append(Terrain(x=0, y=-2000, width=20000, length=3800, texture='grass', \
-                screen=self.screen, screen_size=self.screen_size, render_mode=self.render_mode))
+                screen=self.screen, screen_size=self.screen_size, render_mode=self.render_mode).create())
             self.terrain.append(Terrain(x=0, y=0, width=20000, length=200, texture='road', \
-                screen=self.screen, screen_size=self.screen_size, render_mode=self.render_mode))
+                screen=self.screen, screen_size=self.screen_size, render_mode=self.render_mode).create())
             self.terrain.append(Terrain(x=0, y=2000, width=20000, length=3800, texture='grass', \
-                screen=self.screen, screen_size=self.screen_size, render_mode=self.render_mode))
+                screen=self.screen, screen_size=self.screen_size, render_mode=self.render_mode).create())
         else:
-            self.terrain = [Terrain(x=x, y=y, width=width, length=length, texture=texture, \
-                screen=self.screen, screen_size=self.screen_size, render_mode=self.render_mode) \
-                for x, y, width, length, texture in self.param_dict['terrain_params']]
+            self.terrain = []
+            for elem in self.param_dict['terrain_params']:
+                if len(elem) == 5:
+                    self.terrain.append(Terrain(x=elem[0], y=elem[1], width=elem[2], \
+                        length=elem[3], texture=elem[4], screen=self.screen, screen_size=self.screen_size, \
+                        render_mode=self.render_mode).create())
+                elif len(elem) == 6:
+                    self.terrain.append(Terrain(x=elem[0], y=elem[1], width=elem[2], \
+                        length=elem[3], angle=elem[4], texture=elem[5], screen=self.screen, \
+                        screen_size=self.screen_size, render_mode=self.render_mode).create())
             self.terrain = sorted(self.terrain, key=lambda x: x.friction)
         if self.render_mode:
             self.render()
