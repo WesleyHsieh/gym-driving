@@ -6,6 +6,6 @@ setup(name='gym_driving',
       					'pygame>=1.9.2b8',
 					'opencv-python>=3.2.0.7',
       					'future>=0.16.0',
-		                        'IPython>=5.0.0',
-                                        'scipy>=0.0.5']  # And any other dependencies foo needs
+                'IPython>=5.0.0',
+                'scipy>=0.0.5']  # And any other dependencies foo needs
 )  

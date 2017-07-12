@@ -103,7 +103,7 @@ def apply_tokens(tokens, generator_func):
 # 		except ValueError:
 # 		    return False
 		
-class ParamaterWrapper:
+class ParameterWrapper:
 	def __init__(self):
 		pass
 	def get_num_cpu_cars(self, num):
@@ -121,7 +121,9 @@ class ParamaterWrapper:
 	def get_screen_size(self, x, y):
 		return (int(x), int(y))
 	def get_logging_dir(self, logging_dir):
-		if logging_dir is not None:
+		if logging_dir == 'None':
+			return None
+		elif logging_dir is not None:
 			logging_dir = str(logging_dir)
 		return logging_dir
 	def get_logging_rate(self, logging_rate):
@@ -149,40 +151,59 @@ class ParamaterWrapper:
 	def get_control_space(self, space):
 		return str(space)
 	def get_downsampled_size(self, size):
-		if size is not None:
+		if size == 'None':
+			return None
+		elif size is not None:
 			size = int(size)
 		return size
 	def get_state_space(self, space):
 		return str(space)
 	def get_main_car_dynamics(self, dynamics):
 		return str(dynamics)
+	def get_noise(self, type, magnitude):
+		return str(type), float(magnitude)
+	def get_terrain_from_list(self, terrain_elems):
+		terrain_list = []
+		for elem in terrain_elems:
+			i, element = 0, []
+			for param in elem:
+				if i < 4: # x, y, width, length
+					element.append(int(param.get()))
+				elif i == 4: # Angle 
+					element.append(float(param.get()))
+				else: # Type
+					element.append(str(param.get()))
+				i += 1
+			terrain_list.append(element)
+		return terrain_list
 
 # TODO: Nested dictionary data structure for param_dict, description should give examples, arguments should be based on each other
 # Example: action -> continuous / discrete -> boundaries
 # Curved tracks, collision detection
 class GenerateConfig:
 	def __init__(self):
-		self.paramater_wrapper = ParamaterWrapper()
+		self.parameter_wrapper = ParameterWrapper()
 		# parameter: (description, default_args, num_args, num_inputs, generator_func)
 		self.config_dict_defaults = {
-			'num_cpu_cars': ('Number of CPU cars (int)', [10], 1, 1, self.paramater_wrapper.get_num_cpu_cars), 
-			'main_car_starting_angles': ('Low, High, Num (float, float, float/None)', [-30, 30, 5], 3, 1, self.paramater_wrapper.get_main_car_starting_angles),
-			'cpu_cars_bounding_box': ('x_low, x_high, y_low, y_high (float, float, float, float)', [200.0, 1000.0, -90.0, 90.0], 4, 1, self.paramater_wrapper.get_cpu_cars_bounding_box),
-			'screen_size': ('Width, Height of Screen (int, int)', [512, 512], 2, 1, self.paramater_wrapper.get_screen_size), 
-			'logging_dir': ('Directory for logging (str)', [None], 1, 1, self.paramater_wrapper.get_logging_dir), 
-			'logging_rate': ('Logging every n steps (int)', [10], 1, 1, self.paramater_wrapper.get_logging_rate), 
-			'time_horizon': ('Time horizon for a rollout (int)', [100], 1, 1, self.paramater_wrapper.get_time_horizon), 
+			'num_cpu_cars': ('Number of CPU cars (int)', [10], 1, 1, self.parameter_wrapper.get_num_cpu_cars), 
+			'main_car_starting_angles': ('Low, High, Num (float, float, float/None)', [-30, 30, 5], 3, 1, self.parameter_wrapper.get_main_car_starting_angles),
+			'cpu_cars_bounding_box': ('x_low, x_high, y_low, y_high (float, float, float, float)', [200.0, 1000.0, -90.0, 90.0], 4, 1, self.parameter_wrapper.get_cpu_cars_bounding_box),
+			'screen_size': ('Width, Height of Screen (int, int)', [512, 512], 2, 1, self.parameter_wrapper.get_screen_size), 
+			'logging_dir': ('Directory for logging (str)', [None], 1, 1, self.parameter_wrapper.get_logging_dir), 
+			'logging_rate': ('Logging every n steps (int)', [10], 1, 1, self.parameter_wrapper.get_logging_rate), 
+			'time_horizon': ('Time horizon for a rollout (int)', [100], 1, 1, self.parameter_wrapper.get_time_horizon), 
 			'terrain_params': ('x, y, width, length, texture (int, int, int, int, str)', \
 				[[0, -2000, 30000, 3800, 'grass'], [0, 0, 30000, 200, 'road'], [0, 2000, 30000, 3800, 'grass']], \
-				5, 100, self.paramater_wrapper.get_terrain),
+				5, 100, self.parameter_wrapper.get_terrain),
 			'main_car_params': ('x, y, starting_vel, max_vel (int, int, float, float)', [0, 0, 0.0, 20.0], \
-				4, 1, self.paramater_wrapper.get_main_car_params),
-			'steer_action': ('Low, High, Num (float, float, float/None)', [-15.0, 15.0, 3.0], 1, 1, self.paramater_wrapper.get_steer_action),
-			'acc_action': ('Low, High, Num (float, float, float/None)', [-5.0, 5.0, 3.0], 1, 1, self.paramater_wrapper.get_acc_action),
-			'control_space': ('Control space (str, {discrete, continuous})', ['discrete'], 1, 1, self.paramater_wrapper.get_control_space),
-			'downsampled_size': ('Downsampled size (int)', [None], 2, 1, self.paramater_wrapper.get_downsampled_size),
-			'state_space': ('State space (str, {positions, image})', ['positions'], 1, 1, self.paramater_wrapper.get_state_space),
-			'main_car_dynamics': ('Main car dynamics model (str, {point, kinematic, dynamic})', ['kinematic'], 1, 1, self.paramater_wrapper.get_main_car_dynamics),
+				4, 1, self.parameter_wrapper.get_main_car_params),
+			'steer_action': ('Low, High, Num (float, float, float/None)', [-15.0, 15.0, 3.0], 1, 1, self.parameter_wrapper.get_steer_action),
+			'acc_action': ('Low, High, Num (float, float, float/None)', [-5.0, 5.0, 3.0], 1, 1, self.parameter_wrapper.get_acc_action),
+			'control_space': ('Control space (str, {discrete, continuous})', ['discrete'], 1, 1, self.parameter_wrapper.get_control_space),
+			'downsampled_size': ('Downsampled size (int)', [None], 2, 1, self.parameter_wrapper.get_downsampled_size),
+			'state_space': ('State space (str, {positions, image})', ['positions'], 1, 1, self.parameter_wrapper.get_state_space),
+			'main_car_dynamics': ('Main car dynamics model (str, {point, kinematic, dynamic})', ['kinematic'], 1, 1, self.parameter_wrapper.get_main_car_dynamics),
+			'noise': ('Noise type and magnitude{gaussian, random} (int)', ['gaussian', .1], 2, 1, self.parameter_wrapper.get_noise),
 		}
 		self.command_dict = {
 			'help': self.help,

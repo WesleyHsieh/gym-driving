@@ -25,7 +25,7 @@
         ]
     ], 
     "logging_dir": null, 
-    "main_car_dynamics": "point", 
+    "main_car_dynamics": "dynamic", 
     "screen_size": [
         512, 
         512
@@ -64,9 +64,5 @@
         30.0, 
         5.0
     ], 
-    "downsampled_size": null,
-    "noise": [
-        "gaussian",
-        0.1
-    ]
+    "downsampled_size": null
 }

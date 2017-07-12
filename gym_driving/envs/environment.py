@@ -97,15 +97,22 @@ class Environment:
         if self.param_dict['terrain_params'] is None:
             self.terrain = []
             self.terrain.append(Terrain(x=0, y=-2000, width=20000, length=3800, texture='grass', \
-                screen=self.screen, screen_size=self.screen_size, render_mode=self.render_mode))
+                screen=self.screen, screen_size=self.screen_size, render_mode=self.render_mode).create())
             self.terrain.append(Terrain(x=0, y=0, width=20000, length=200, texture='road', \
-                screen=self.screen, screen_size=self.screen_size, render_mode=self.render_mode))
+                screen=self.screen, screen_size=self.screen_size, render_mode=self.render_mode).create())
             self.terrain.append(Terrain(x=0, y=2000, width=20000, length=3800, texture='grass', \
-                screen=self.screen, screen_size=self.screen_size, render_mode=self.render_mode))
+                screen=self.screen, screen_size=self.screen_size, render_mode=self.render_mode).create())
         else:
-            self.terrain = [Terrain(x=x, y=y, width=width, length=length, texture=texture, \
-                screen=self.screen, screen_size=self.screen_size, render_mode=self.render_mode) \
-                for x, y, width, length, texture in self.param_dict['terrain_params']]
+            self.terrain = []
+            for elem in self.param_dict['terrain_params']:
+                if len(elem) == 5:
+                    self.terrain.append(Terrain(x=elem[0], y=elem[1], width=elem[2], \
+                        length=elem[3], texture=elem[4], screen=self.screen, screen_size=self.screen_size, \
+                        render_mode=self.render_mode).create())
+                elif len(elem) == 6:
+                    self.terrain.append(Terrain(x=elem[0], y=elem[1], width=elem[2], \
+                        length=elem[3], angle=elem[4], texture=elem[5], screen=self.screen, \
+                        screen_size=self.screen_size, render_mode=self.render_mode).create())
             self.terrain = sorted(self.terrain, key=lambda x: x.friction)
         if self.render_mode:
             self.render()
@@ -230,7 +237,8 @@ class Environment:
         for i in range(len(self.vehicles)):
             self.vehicles[i].set_state(**vehicles_states[i])
 
-    def step(self, action, noise=0.0, render_mode=None):
+
+    def step(self, action, render_mode=None):
         """
         Updates the environment for one step.
 
@@ -246,6 +254,8 @@ class Environment:
             info_dict: dict, contains information about environment that may
                 not be included in the state.
         """
+        # Create Noise
+        noise=param_dict['noise'] ## (type, magnitude)
         # Convert numerical action vector to steering angle / acceleration
         if self.control_space == 'discrete':
             if type(action) is int:
@@ -263,10 +273,16 @@ class Environment:
                 acc = action[1]
 
         # Add noise
-        if steer != 0.0 and noise > 0.0:
-            steer *= 1.0 + np.random.normal(loc=0.0, scale=noise)
-        if acc != 0.0 and noise > 0.0:
-            acc *= 1.0 + np.random.normal(loc=0.0, scale=noise)
+        noise = self.param_dict['noise']
+        if noise[0] == 'gaussian': #applies gaussian noise whenever an action is taken
+            if steer != 0.0 and noise > 0.0:
+                steer *= 1.0 + np.random.normal(loc=0.0, scale=noise[1])
+            if acc != 0.0 and noise > 0.0:
+                acc *= 1.0 + np.random.normal(loc=0.0, scale=noise[1])
+        elif noise[0] == 'random': #uniformly samples from the action space
+            if np.random.uniform() >= 0.1:
+                steer = np.random.uniform(-1, 1) * self.param_dict['steer_action'][1]
+                acc = np.random.uniform(-1, 1) * self.param_dict['acc_action'][1]
 
         # Convert to action space, apply action
         action_unpacked = np.array([steer, acc])
