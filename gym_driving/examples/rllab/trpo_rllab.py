@@ -18,10 +18,7 @@ import IPython
 
 def run_task(*_):
     import gym_driving
-    # IPython.embed()
     env = normalize(GymEnv('DrivingEnv-v0'))
-    # env = normalize(GymEnv('CartPole-v0'))
-
     policy = CategoricalMLPPolicy(
         env_spec=env.spec,
         hidden_sizes=(64, 64)

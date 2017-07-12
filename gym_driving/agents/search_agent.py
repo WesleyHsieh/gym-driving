@@ -6,7 +6,7 @@ from gym_driving.assets.terrain import *
 from copy import deepcopy
 import heapq
 
-class DrivingAgent():
+class SearchAgent():
 	"""
 	Agent that autonomously drives a car.
 	"""
@@ -15,22 +15,24 @@ class DrivingAgent():
 			self.search_horizon = 5
 		else:
 			self.search_horizon = param_dict['search_horizon']
-		# self.driving_env = param_dict['driving_env']
 		self.actions = [0, 1, 2, 3, 4]
+		# self.actions = [0, 1, 2]
 		self.reset()
 
-	def eval_policy(self, env, state, search_horizon=5):
+	def eval_policy(self, env, search_horizon=5):
 		self.driving_env = env
 		self.search_horizon = search_horizon
 		self.counter = 0
 		cost, curr_heuristic_cost, action_list = self.search_agent()
 		# print("Length of actions", len(action_list))
+		# print("Final Action List", action_list)
 		# print("Cost of actions", cost)
 		# print("Number of nodes expanded", self.counter)
 		self.counter = 0
 		self.previous_path = tuple(action_list[1:])
 		self.curr_heuristic_cost = curr_heuristic_cost
-		return action_list[0]
+		# print('cost', cost)
+		return action_list[0:1]
 
 	def search_agent(self):
 		# List of tuples of (total_cost, curr_heuristic_cost, action_list, simulator_state, done)
@@ -65,6 +67,7 @@ class DrivingAgent():
 		return successors
 
 	def simulate_actions(self, action_list, simulator_state=None, recompute_all=False):
+		# print("action_list", action_list)
 		if recompute_all:
 			states, _, dones, info_dicts = self.driving_env.simulate_actions(action_list, \
 					noise=0.0, state=simulator_state)
