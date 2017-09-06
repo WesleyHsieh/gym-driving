@@ -5,14 +5,27 @@ We are designing and implementing a clean, elegant driving simulator for deep le
 
 To use this driving simulator, you will need to install PyGame and OpenAI Gym.
 
-The simulator must be installed before running:
+### Steps to install and run driving simulator (manually)
+
+* Create a new virtual environment (this can be useful, because there are occasionally errors in installing some packages when there is a version of numpy already installed).
+> git clone https://github.com/WesleyHsieh/gym-driving.git
+
+> cd gym-driving
+> pip install -e . # This step installs all packages needed, except gym
+
+> cd ..
+
+> git clone https://github.com/openai/gym.git
+
+> cd gym
 
 > pip install -e .
 
-To run the sim, execute:
+> cd ../gym-driving/gym_driving/examples
 
 > python run_simulator.py
 
+This should display a pygame window and you can use your keyboard to move the car. By default, it uses the config "config.json" in gym-driving/gym_driving/configs.
 
 # Documentation Summary
 
