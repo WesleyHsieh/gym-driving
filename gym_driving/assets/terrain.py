@@ -61,7 +61,7 @@ class RectangularTerrain(Rectangle):
         if self.render_mode:
             if texture in self.terrain_properties:
                 base_dir = os.path.dirname(__file__)
-                filename = os.path.join(base_dir, 'sprites', '{}_tile_lite_ps.png'.format(texture))
+                filename = os.path.join(base_dir, 'sprites', '{}_tile_lite.jpg'.format(texture))
                 self.texture_image = pygame.image.load(filename)
             else:
                 print('Error: invalid terrain texture')

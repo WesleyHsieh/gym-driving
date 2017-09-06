@@ -255,7 +255,7 @@ class Environment:
                 not be included in the state.
         """
         # Create Noise
-        noise=param_dict['noise'] ## (type, magnitude)
+        #noise=param_dict['noise'] ## (type, magnitude)
         # Convert numerical action vector to steering angle / acceleration
         if self.control_space == 'discrete':
             if type(action) is int:
