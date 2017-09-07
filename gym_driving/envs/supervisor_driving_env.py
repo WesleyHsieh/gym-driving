@@ -21,17 +21,17 @@ class SupervisorDrivingEnv(gym.Env):
     Wrapper class for driving simulator that
     implements the OpenAI Gym interface.
 
-    In particular, takes in a baseline driving environment, 
+    In particular, takes in a baseline driving environment,
     and returns rewards of booleans whether
     the action taken matches the supervisor's label.
 
-    The input supervisor must implement eval_policy(env, state), 
-    which returns the supervisor's labeled action for the current 
+    The input supervisor must implement eval_policy(env, state),
+    which returns the supervisor's labeled action for the current
     time step.
     """
     def __init__(self, supervisor, render_mode=True, screen=None, config_filepath=None):
         """
-        Initializes driving environment interface, 
+        Initializes driving environment interface,
         passes most arguments down to underlying environment.
 
         Args:
@@ -56,10 +56,10 @@ class SupervisorDrivingEnv(gym.Env):
             action: 1x2 array, steering / acceleration action.
 
         Returns:
-            state: array, state of environment. 
+            state: array, state of environment.
                 Can be positions and angles of cars, or image of environment
                 depending on configuration.
-            reward: float, reward from action taken. 
+            reward: float, reward from action taken.
                 Currently set to whether the action taken matches the supervisor's label.
             done: boolean, whether trajectory is finished.
             info_dict: dict, contains information about environment that may
@@ -69,7 +69,7 @@ class SupervisorDrivingEnv(gym.Env):
         state, _, done, info_dict = self.environment._step(action)
         reward = supervisor_label == action
         return state, reward, done, info_dict
-        
+
     def _reset(self):
         """
         Resets the environment.
@@ -78,7 +78,7 @@ class SupervisorDrivingEnv(gym.Env):
             state: array, state of environment.
         """
         return self.environment._reset()
-        
+
     def _render(self, mode='human', close=False):
         """
         Dummy render command for gym interface.
@@ -102,7 +102,7 @@ class SupervisorDrivingEnv(gym.Env):
         Args:
             noise: float, standard deviation of zero-mean Gaussian noise
             state: dict, internal starting state of environment.
-                Currently set as the positions, velocities, and angles of 
+                Currently set as the positions, velocities, and angles of
                 all cars.
 
         Returns:

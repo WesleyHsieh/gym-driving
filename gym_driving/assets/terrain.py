@@ -16,7 +16,7 @@ class Terrain:
         self.angle, self.render_mode = angle, render_mode
 
     def create(self):
-        """ 
+        """
         Used to create the terrain object which the simulator interacts with.
         """
         if self.angle == 0.0:
@@ -41,7 +41,7 @@ class RectangularTerrain(Rectangle):
             y: float, starting y position.
             width: int, width of terrain.
             length: int, length of terrain.
-            texture: str, texture of terrain for rendering, 
+            texture: str, texture of terrain for rendering,
                 must be one of the options in textures.
             screen: PyGame screen object, used for rendering.
             screen_size: 1x2 array, size of screen in pixels.
@@ -106,7 +106,7 @@ class RotatableTerrain(RectangularTerrain):
             y: float, starting y position.
             width: int, width of terrain.
             length: int, length of terrain.
-            texture: str, texture of terrain for rendering, 
+            texture: str, texture of terrain for rendering,
                 must be one of the options in textures.
             screen: PyGame screen object, used for rendering.
             screen_size: 1x2 array, size of screen in pixels.
@@ -146,12 +146,3 @@ class RotatableTerrain(RectangularTerrain):
                 #pos = (int(center[0] - screen_coord[0] - x_offset), int(center[1] - screen_coord[1] - y_offset))
                 pos = (int(coord[0] - screen_coord[0]), int(coord[1] - screen_coord[1]))
                 self.screen.blit(image_rotated, pos)
-
-
-
-
-
-
-
-
-

@@ -5,6 +5,6 @@ import copy
 import IPython
 
 class Agent(object):
-	def __init__(self, learner, env):
-		self.learner = learner
-		self.env = env
+    def __init__(self, learner, env):
+        self.learner = learner
+        self.env = env

@@ -15,7 +15,7 @@ class TestRectangle:
     def test_get_corners(self):
         rect = Rectangle(x=0.0, y=0.0, width=10.0, length=20.0, angle=0.0)
         corners = rect.get_corners()
-        assert np.array_equal(corners, 
+        assert np.array_equal(corners,
             np.array([[5,10], [5,-10], [-5,10], [-5,-10]]))
 
         rect = Rectangle(x=0.0, y=0.0, width=10.0, length=20.0, angle=45.0)

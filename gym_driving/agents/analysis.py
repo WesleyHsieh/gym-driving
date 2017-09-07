@@ -35,13 +35,13 @@ class Analysis():
         else:
             plt.errorbar(x,mean,yerr=err,linewidth=5.0, color=color)
 
-    
+
         self.mean = mean
         self.err = err
         self.x = x
 
         return [mean,err]
-    
+
 
 
 
@@ -49,7 +49,7 @@ class Analysis():
     @staticmethod
     def load(filename):
         a = cPickle.load(open(filename, 'rb'))
-        if a.x is not None and a.mean is not None:    
+        if a.x is not None and a.mean is not None:
             a.set_errorbar()
         return a
 
@@ -62,7 +62,7 @@ class Analysis():
         plt.xlabel('Iterations')
 
         if names is None:
-            names = ['Sup']        
+            names = ['Sup']
             #names = ['NN_Supervise','LOG_Supervisor']
         plt.legend(names,loc='upper center',prop={'size':10}, bbox_to_anchor=(.5, 1.12), fancybox=False, ncol=len(names))
 
@@ -77,7 +77,7 @@ class Analysis():
             #axes.set_ylim([-60, 100])
         if filename is not None:
             plt.savefig(filename, format='eps', dpi=1000)
-       
+
         plt.ioff()
         plt.clf()
         plt.cla()
@@ -85,11 +85,11 @@ class Analysis():
         #plt.show(block=False)
         #plt.close()
 
- 
 
-        
 
-        
+
+
+
 
 
 

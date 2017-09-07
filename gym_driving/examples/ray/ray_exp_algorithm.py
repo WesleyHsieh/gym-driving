@@ -105,7 +105,7 @@ def save_data(stats, alg_name):
     if not os.path.exists(FILEPATH):
         os.makedirs(FILEPATH)
     data_filepath = os.path.join('pickles/', alg_name) + '.pkl'
-    
+
     pickle.dump(stats, open(data_filepath,'wb'))
     plot_reward_curve(stats, alg_name)
 
@@ -120,7 +120,7 @@ def train(alg_type):
     SAMPLES_PER_ROLLOUT = 2
     SAMPLES_PER_EVAL = 2
     overall_stats = []
-    
+
 
     if(alg_type == 'dagger'):
 
@@ -138,7 +138,7 @@ def train(alg_type):
             print("Agent {}: Trial {}, Iteration {}".format(alg_type, i, j))
             weights = main_agent.get_weights()
             weight_id = ray.put(weights)
-            
+
             if(alg_type == 'dagger'):
                 params = [j]
             elif(alg_type == 'dart'):

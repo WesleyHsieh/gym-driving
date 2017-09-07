@@ -25,7 +25,7 @@ class Car(Rectangle):
             mass: float, mass of car.
             screen: PyGame screen object, used for rendering.
             screen_size: 1x2 array, size of screen in pixels.
-            texture: str, texture of car for rendering, 
+            texture: str, texture of car for rendering,
                 must be one of the options in car_textures.
             render_mode: boolean, whether to render.
         """
@@ -76,10 +76,10 @@ class Car(Rectangle):
         self.vel += self.acc
         self.vel = max(min(self.vel, self.max_vel), 0.0)
         self.corners = self.calculate_corners()
-        
+
     def get_state(self):
         """
-        Get state. 
+        Get state.
 
         Returns:
             state: 1x3 array, contains x, y, angle of car.
@@ -95,7 +95,7 @@ class Car(Rectangle):
 
     def set_state(self, x, y, vel, angle):
         """
-        Sets the state of the car. 
+        Sets the state of the car.
 
         Args:
             x: float, x position.

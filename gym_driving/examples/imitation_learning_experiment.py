@@ -32,7 +32,7 @@ class Experiment():
         self.ITERATIONS = 2
         self.TRIALS = 2
 
-        self.file_path = file_path 
+        self.file_path = file_path
 
     def compute_averages(self, stats):
         train_average, test_average, reward_average, surr_loss_average = \
@@ -69,7 +69,7 @@ class Experiment():
             # plt.xlabel("Number of Iterations")
             # plt.ylabel(stats_name)
         plt.savefig('stats/stats_{}.png'.format(experiment_name))
-        
+
 def run_experiment_trial(trial_number, learner_name, agent_name, iterations, samples_per_rollout, samples_per_eval):
     np.random.seed(trial_number)
     # Set up learner, agent
@@ -90,7 +90,7 @@ def run_experiment_trial(trial_number, learner_name, agent_name, iterations, sam
     trial_stats = []
     for j in range(iterations):
         print("Agent {}: Trial {}, Iteration {}".format(agent_name, trial_number, j))
-        # Collect samples 
+        # Collect samples
         state_list, action_list = [], []
         for _ in range(samples_per_rollout):
             states, actions = agent.rollout_algorithm()

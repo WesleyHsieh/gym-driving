@@ -29,7 +29,7 @@ class KinematicCar(Car):
             mass: float, mass of car.
             screen: PyGame screen object, used for rendering.
             screen_size: 1x2 array, size of screen in pixels.
-            texture: str, texture of car for rendering, 
+            texture: str, texture of car for rendering,
                 must be one of the options in car_textures.
             render_mode: boolean, whether to render.
         """
@@ -68,8 +68,8 @@ class KinematicCar(Car):
 
     def integrator(self, state, t, acc, delta_f):
         """
-        Calculates numerical values of differential 
-        equation variables for dynamics. 
+        Calculates numerical values of differential
+        equation variables for dynamics.
         SciPy ODE integrator calls this function.
 
         Args:
@@ -93,4 +93,3 @@ class KinematicCar(Car):
         dvel = acc
         output = [dx, dy, dvel, dangle]
         return output
-

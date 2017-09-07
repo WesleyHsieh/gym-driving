@@ -21,9 +21,9 @@ class ConfigGUI():
         ##-----------------------------------------------Default Values---------------------------------------------------##
         if not filepath:
             self.config_dict = {
-                'num_cpu_cars': 10, 
+                'num_cpu_cars': 10,
                 'main_car_starting_angles': [-30, 30, 5], #'Low, High, Num (float, float, float/None)'
-                'cpu_cars_bounding_box': [[200.0, 1000.0], [-90.0, 90.0]], # ('x_low, x_high, y_low, y_high (float, float, float, float)', 
+                'cpu_cars_bounding_box': [[200.0, 1000.0], [-90.0, 90.0]], # ('x_low, x_high, y_low, y_high (float, float, float, float)',
                 'screen_size': [512, 512], # 'Width, Height of Screen (int, int)'
                 'logging_dir': None, # 'Directory for logging (str)'
                 'logging_rate': 10, # 'Logging every n steps (int)'
@@ -201,7 +201,7 @@ class ConfigGUI():
             # The action space contains steering action, acceleration action,
             # the type of control space (continuous/discrete), noise, and the
             # main car's min/max accel and velocity
-            # Variables: 
+            # Variables:
             # ang_low, ang_high, ang_step, acc_low, acc_high, acc_step
             control_label = ttk.Label(self.mainframe, text='Control Space')
             control_label.grid(column=0, row=1, sticky=W)
@@ -422,9 +422,9 @@ class ConfigGUI():
         # The new config dictionary converts all StringVars needed to interact with TKinter into standard python variables.
         # It applies the necessary functions to them (str, int, float, etc).
         new_config_dict = {
-            'num_cpu_cars': int(self.num_cpu_cars.get()), 
+            'num_cpu_cars': int(self.num_cpu_cars.get()),
             'main_car_starting_angles': [float(self.mc_start_angle_low.get()), float(self.mc_start_angle_high.get()), float(self.mc_start_angle_step.get())], #'Low, High, Num (float, float, float/None)'
-            'cpu_cars_bounding_box': [[float(self.cpu_start_xlow.get()), float(self.cpu_start_xhigh.get())], [float(self.cpu_start_ylow.get()), float(self.cpu_start_yhigh.get())]], # ('x_low, x_high, y_low, y_high (float, float, float, float)', 
+            'cpu_cars_bounding_box': [[float(self.cpu_start_xlow.get()), float(self.cpu_start_xhigh.get())], [float(self.cpu_start_ylow.get()), float(self.cpu_start_yhigh.get())]], # ('x_low, x_high, y_low, y_high (float, float, float, float)',
             'screen_size': [int(self.screen_size_x.get()), int(self.screen_size_y.get())], # 'Width, Height of Screen (int, int)'
             'logging_dir': self.par_wrap.get_logging_dir(self.logging_dir.get()), # 'Directory for logging (str)'
             'logging_rate': int(self.logging_rate.get()), # 'Logging every n steps (int)'
@@ -446,8 +446,8 @@ class ConfigGUI():
             json.dump(new_config_dict, open(self.save_filepath.get(), 'w'), indent=4)
             print('Saved at {}'.format(self.save_filepath.get()))
         except IOError as e:
-            print e 
-        
+            print e
+
 
 
 

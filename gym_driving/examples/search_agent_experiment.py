@@ -19,14 +19,14 @@ def simulate_driving_agent(search_horizon=3):
         search_horizon: int, number of timesteps in search horizon.
 
     Returns:
-        counter: int, number of timesteps survived in trajectory. 
+        counter: int, number of timesteps survived in trajectory.
     """
     pygame.init()
     screen = None
     env = DrivingEnv(render_mode=render_mode, screen=screen, config_filepath=config_filepath)
-    
+
     agent_param_dict = {'search_horizon': search_horizon}
-    agent = SearchAgent(param_dict=agent_param_dict, env=env)   
+    agent = SearchAgent(param_dict=agent_param_dict, env=env)
 
     done = False
     counter = 0

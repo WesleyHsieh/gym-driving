@@ -6,7 +6,7 @@ from gym_driving.assets.terrain import *
 
 import numpy as np
 import pygame
-import cv2 
+import cv2
 import IPython
 
 class Environment:
@@ -18,12 +18,12 @@ class Environment:
 
     def __init__(self, render_mode, screen_size, screen=None, param_dict=None):
         """
-        Initializes driving environment interface, 
+        Initializes driving environment interface,
         passes most arguments down to underlying environment.
 
         Args:
             render_mode: boolean, whether to render.
-            screen_size: 1x2 array, 
+            screen_size: 1x2 array,
             screen: PyGame screen object, used for rendering.
                 Creates own screen object if existing one is not passed in.
             param_dict: dict, param dictionary containing configuration settings.
@@ -93,7 +93,7 @@ class Environment:
                 texture=np.random.choice(self.cpu_car_textures), render_mode=self.render_mode)
                 collision = any([new_car.collide_rect(car) for car in self.vehicles]) or new_car.collide_rect(self.main_car)
             self.vehicles.append(new_car)
-        
+
         if self.param_dict['terrain_params'] is None:
             self.terrain = []
             self.terrain.append(Terrain(x=0, y=-2000, width=20000, length=3800, texture='grass', \
@@ -136,14 +136,14 @@ class Environment:
         self.main_car.render(screen_coord)
         for c in self.vehicles:
             c.render(screen_coord)
-        
+
         pygame.display.update()
 
     def downsample(self, state, output_size):
         """
         Downsamples the input image until it reaches
         the output size using OpenCV's implementation.
-        output_size must be smaller or equal to the size 
+        output_size must be smaller or equal to the size
         of the input state by a factor of a multiple of 2.
 
         Args:
@@ -165,7 +165,7 @@ class Environment:
         Returns current stored state and info dict.
 
         Returns:
-            state: array, state of environment. 
+            state: array, state of environment.
                 Can be positions and angles of cars, or image of environment
                 depending on configuration.
             info_dict: dict, contains information about environment that may
@@ -217,7 +217,7 @@ class Environment:
             main_car_info_dict: dict, contains info dict with internal state of main car.
             vehicle_info_dicts: list, contains list of info dicts with internal states of CPU cars.
         """
-        _, main_car_info_dict = self.main_car.get_state() 
+        _, main_car_info_dict = self.main_car.get_state()
         if self.num_cpu_cars > 0:
             vehicle_info_dicts = list(zip(*[car.get_state() for car in self.vehicles]))[1]
         else:
@@ -226,7 +226,7 @@ class Environment:
 
     def set_state(self, main_car_state, vehicles_states):
         """
-        Sets state of all cars in the environment based 
+        Sets state of all cars in the environment based
         on input states, obtained by get_compact_state().
 
         Args:
@@ -246,7 +246,7 @@ class Environment:
             action: 1x2 array, steering / acceleration action.
 
         Returns:
-            state: array, state of environment. 
+            state: array, state of environment.
                 Can be positions and angles of cars, or image of environment
                 depending on configuration.
             reward: float, reward from action taken.
@@ -286,7 +286,7 @@ class Environment:
 
         # Convert to action space, apply action
         action_unpacked = np.array([steer, acc])
-        
+
         # Get old state, step
         state, info_dict = self.get_state()
         self.main_car.step(action_unpacked, info_dict)
@@ -312,7 +312,7 @@ class Environment:
         Args:
             noise: float, standard deviation of zero-mean Gaussian noise
             state: dict, internal starting state of environment.
-                Currently set as the positions, velocities, and angles of 
+                Currently set as the positions, velocities, and angles of
                 all cars.
 
         Returns:
@@ -322,7 +322,7 @@ class Environment:
             info_dicts: list, list of info dicts in trajectory.
         """
         # Save copy of original states
-        _, main_car_info_dict = self.main_car.get_state() 
+        _, main_car_info_dict = self.main_car.get_state()
         vehicle_info_dicts = list(zip(*[car.get_state() for car in self.vehicles]))[1]
 
         if compact_state is not None:
@@ -337,10 +337,9 @@ class Environment:
             rewards.append(reward)
             dones.append(done)
             info_dicts.append(info_dict)
-        
+
         # Restore cars to original states
         self.set_state(main_car_info_dict, vehicle_info_dicts)
 
-        # Return new state after taking actions 
+        # Return new state after taking actions
         return states, rewards, dones, info_dicts
-

@@ -23,20 +23,20 @@ class Rectangle(object):
     def get_pos(self):
         """
         Returns x, y coordinates.
-        
+
         Returns:
             x: float, x position.
-            y: float, y position. 
+            y: float, y position.
         """
         return self.x, self.y
-        
+
     def get_corners(self):
         """
-        Returns corners. 
+        Returns corners.
         Should be called to access corners.
-        
+
         Returns:
-            corners: list, contains top right, bottom right, top left, bottom left 
+            corners: list, contains top right, bottom right, top left, bottom left
                 corners of rectangle.
         """
         return self.corners
@@ -44,11 +44,11 @@ class Rectangle(object):
     def calculate_corners(self):
         """
         Calculates corners of rectangle after
-        applying rotations. 
+        applying rotations.
         Should be called during updates.
-        
+
         Returns:
-            corners: list, contains top right, bottom right, top left, bottom left 
+            corners: list, contains top right, bottom right, top left, bottom left
                 corners of rectangle.
         """
         angle = np.radians(self.angle)
@@ -64,9 +64,9 @@ class Rectangle(object):
         """
         CChecks whether any point in
         the other rectangle is contained.
-        
+
         Returns:
-            has_collision: boolean, whether any point is contained in 
+            has_collision: boolean, whether any point is contained in
             the current rectangle.
         """
         corners = self.get_corners()
@@ -81,10 +81,10 @@ class Rectangle(object):
         in the rectangle, according to the formula
         described.
         http://stackoverflow.com/questions/2752725/finding-whether-a-point-lies-inside-a-rectangle-or-not
-        
+
         Args:
-            point: 1x2 array, point to check. 
-        Returns: 
+            point: 1x2 array, point to check.
+        Returns:
             contains: boolean, whether the point is contained.
         """
         a, b, c, d = self.get_corners()
@@ -98,10 +98,10 @@ class Rectangle(object):
         """
         Calculate minimum distance between any pair
         of corners of current rectangle and an input rectangle.
-        
+
         Args:
             other_rect: rectangle object, rectnagle to compare to.
-        Returns: 
+        Returns:
             min_dist: float, minimum distance.
         """
         corners = self.get_corners()

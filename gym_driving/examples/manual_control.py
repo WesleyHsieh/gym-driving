@@ -64,7 +64,7 @@ def draw_box_coords(rectangle, screen, SCREEN_COORD):
 def simulate_manual_control(config_filepath=None):
     """
     Manually control the main car in the driving environment.
-    
+
     Args:
         config_filepath: str, path to configuration file.
     """
@@ -123,4 +123,3 @@ if __name__ == '__main__':
 
     config_filepath = args.config
     simulate_manual_control(config_filepath)
-

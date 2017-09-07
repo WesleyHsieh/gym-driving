@@ -26,7 +26,7 @@ class DrivingEnv(gym.Env):
     # }
     def __init__(self, render_mode=True, screen=None, config_filepath=None):
         """
-        Initializes driving environment interface, 
+        Initializes driving environment interface,
         passes most arguments down to underlying environment.
 
         Args:
@@ -35,7 +35,7 @@ class DrivingEnv(gym.Env):
                 Creates own screen object if existing one is not passed in.
             config_filepath: str, path to configuration file.
         """
-        
+
         if config_filepath is None:
             base_dir = os.path.dirname(__file__)
             config_filepath = os.path.join(base_dir, '../configs/config.json')
@@ -83,7 +83,7 @@ class DrivingEnv(gym.Env):
             w, h = param_dict['screen_size']
             self.observation_space = spaces.Box(low=0, high=255, shape=(w, h))
         self.exp_count = self.iter_count = 0
-        
+
         # self._seed()
         # self.reset()
         # self.viewer = None
@@ -128,7 +128,7 @@ class DrivingEnv(gym.Env):
             action: 1x2 array, steering / acceleration action.
 
         Returns:
-            state: array, state of environment. 
+            state: array, state of environment.
                 Can be positions and angles of cars, or image of environment
                 depending on configuration.
             reward: float, reward from action taken.
@@ -143,7 +143,7 @@ class DrivingEnv(gym.Env):
         if self.iter_count >= self.time_horizon:
             done = True
         return state, reward, done, {}
-        
+
     def _reset(self):
         """
         Resets the environment.
@@ -180,7 +180,7 @@ class DrivingEnv(gym.Env):
         Args:
             noise: float, standard deviation of zero-mean Gaussian noise
             state: dict, internal starting state of environment.
-                Currently set as the positions, velocities, and angles of 
+                Currently set as the positions, velocities, and angles of
                 all cars.
 
         Returns:

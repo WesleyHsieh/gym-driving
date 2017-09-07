@@ -6,7 +6,7 @@ from scipy.integrate import odeint
 
 from gym_driving.assets.rectangle import Rectangle
 from gym_driving.assets.car import Car
- 
+
 def dampen_val(val, lim, coef):
     damped = val * coef
     if np.abs(damped) < lim:
@@ -49,7 +49,7 @@ class DynamicCar(Car):
             mass: float, mass of car.
             screen: PyGame screen object, used for rendering.
             screen_size: 1x2 array, size of screen in pixels.
-            texture: str, texture of car for rendering, 
+            texture: str, texture of car for rendering,
                 must be one of the options in car_textures.
             render_mode: boolean, whether to render.
         """
@@ -71,7 +71,7 @@ class DynamicCar(Car):
         self.count += 1
         delta_f, a_f = action
 
-        # Convert to radians 
+        # Convert to radians
         delta_f, rad_angle, rad_dangle = np.radians(delta_f), np.radians(self.angle), np.radians(self.dangle)
 
         # Friction coefficient
@@ -91,7 +91,7 @@ class DynamicCar(Car):
         delta_ode_state = odeint(self.integrator, ode_state, t, args=aux_state)
         x, y, dx_body, dy_body, rad_angle, rad_dangle = delta_ode_state[-1]
 
-        # Update car 
+        # Update car
         self.x, self.y, self.dx_body, self.dy_body, self.angle, self.dangle = \
             x, y, dx_body, dy_body, np.rad2deg(rad_angle), np.rad2deg(rad_dangle)
 
@@ -104,8 +104,8 @@ class DynamicCar(Car):
 
     def integrator(self, state, t, mu, delta_f, a_f):
         """
-        Calculates numerical values of differential 
-        equation variables for dynamics. 
+        Calculates numerical values of differential
+        equation variables for dynamics.
         SciPy ODE integrator calls this function.
 
         Args:
@@ -146,7 +146,7 @@ class DynamicCar(Car):
         # Differential equations
         ddx_body = rad_dangle * dy_body + a_f
         ddy_body = -rad_dangle * dx_body + (2 / self.mass) * (F_cf * np.cos(delta_f) + F_cr)
-        
+
         # Clamp acceleration if above maximum velocity
         body_vel = np.sqrt((ddx_body + dx_body) ** 2 + (ddy_body + dy_body) ** 2)
         if body_vel > self.max_vel:
@@ -160,7 +160,7 @@ class DynamicCar(Car):
             if sqrt_term < epsilon:
                 ratio = 0.0
             else:
-                ratios = (-b + np.sqrt(b**2 - 4*a*c)) / (2*a) , (-b - np.sqrt(b**2 - 4*a*c)) / (2*a) 
+                ratios = (-b + np.sqrt(b**2 - 4*a*c)) / (2*a) , (-b - np.sqrt(b**2 - 4*a*c)) / (2*a)
                 ratio = max(ratios)
             ddx_body, ddy_body = ddx_body * ratio, ddy_body * ratio
 
@@ -169,7 +169,7 @@ class DynamicCar(Car):
 
         dx = dx_body * np.cos(rad_angle) - dy_body * np.sin(rad_angle)
         dy = dx_body * np.sin(rad_angle) + dy_body * np.sin(rad_angle)
-        
+
         # Clamp velocity
         vel = np.sqrt(dx ** 2 + dy ** 2)
         if vel > self.max_vel:
